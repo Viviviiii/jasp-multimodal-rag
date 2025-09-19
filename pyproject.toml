@@ -1,0 +1,44 @@
+[project]
+name = "jasp-multimodal-rag"
+version = "0.1.0"
+description = "Multimodal RAG backend for the JASP manual assistant"
+authors = [
+  { name = "Yuan, Vivi (BDS) – UvA", email = "ywxiu0811@gmail.com" }
+]
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+
+dependencies = [
+  "fastapi",
+  "uvicorn[standard]",
+  "streamlit",
+  "pydantic",
+  "pyyaml",
+  "python-dotenv",
+  "langchain",
+  "langchain-community",
+  "chromadb",
+  "sentence-transformers",
+  "transformers",
+  "open-clip-torch",
+  "pillow",
+  "pymupdf",
+  "tqdm",
+  "pypdf (>=6.0.0,<7.0.0)"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+  "black",
+  "ruff"
+]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+package-mode = false
+
+
