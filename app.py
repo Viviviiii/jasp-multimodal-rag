@@ -1,6 +1,5 @@
 # app.py
 import streamlit as st
-from manual_query import run_query, build_rag_chain
 from src.pipelines.data_query import run_query, build_rag_chain
 
 st.set_page_config(page_title="JASP Manual Assistant", page_icon="📘")

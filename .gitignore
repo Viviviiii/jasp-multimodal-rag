@@ -37,8 +37,8 @@ data/processed/
 data/images/
 *.db
 *.sqlite
-chromadb/
-chroma/
+data/chromadb/
+data/chroma/
 *.parquet
 
 # ----------------------

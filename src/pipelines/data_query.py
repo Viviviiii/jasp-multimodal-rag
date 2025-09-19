@@ -32,7 +32,7 @@ from langchain.schema import Document
 # ==============================
 # CONFIG
 # ==============================
-CHROMA_PATH = "chroma"  # must match ingestion script
+CHROMA_PATH = "data/chroma"  # must match ingestion script
 TEXT_MODEL_NAME = "BAAI/bge-small-en"  # same as ingestion
 DEFAULT_MODEL = "llama3"  # Ollama LLM to use
 DEFAULT_TOPK = 1  # number of chunks to retrieve
@@ -75,8 +75,6 @@ Question:
 
 Instructions:
 - ONLY use the information in the provided context. Do not make up or guess.
-- If the answer is not in the context, reply exactly:
-  "The answer is not in the retrieved context (see Page X)."
 - Provide clear, structured instructions (use bullet points or steps if relevant).
 
 Answer:
