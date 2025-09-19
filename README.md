@@ -38,3 +38,8 @@ poetry run streamlit run app.py
 ```bash
 poetry run python src/ingestion/data_create.py
 poetry run python src/pipelines/data_query.py "How do I run multiple regression in JASP?" --model mistral:7b-instruct --topk 1
+
+###### update: When you make changes in VS Code:
+git add .
+git commit -m "Describe your change"
+git push

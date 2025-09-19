@@ -2,8 +2,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 import logging
-from manual_query import build_rag_chain
-from src.pipelines.query import build_rag_chain
+from src.pipelines.data_query import build_rag_chain
 
 
 

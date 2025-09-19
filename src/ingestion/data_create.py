@@ -27,7 +27,7 @@ import re
 # =========================
 PDF_PATH = "data/Statistical-Analysis-in-JASP-A-guide-for-students-2025.pdf"
 OUTPUT_IMG_DIR = "data/images"
-CHROMA_DIR = "chroma"  # persistent dir which can inspect in VSCode
+CHROMA_DIR = "data/chroma"  # persistent dir which can inspect in VSCode
 
 
 # Image extraction rules
