@@ -41,5 +41,5 @@ poetry run python src/pipelines/data_query.py "How do I run multiple regression 
 
 ###### update: When you make changes in VS Code:
 git add .
-git commit -m "Describe your change"
+git commit -m "1st version commit"
 git push

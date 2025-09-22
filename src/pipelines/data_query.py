@@ -1,5 +1,5 @@
 """
-manual_query.py — Ask questions against the JASP manual (multimodal RAG pipeline)
+data_query.py — Ask questions against the JASP manual (multimodal RAG pipeline)
 
 This script connects to the Chroma vector database you built during ingestion
 and lets a user query it with natural language. Retrieval is based on

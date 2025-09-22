@@ -239,6 +239,26 @@ blip_processor, blip_model = _load_blip()
 
 
 def build_page_docs(docs, images_by_page):
+    """
+    Enrich page-level documents with figure captions.
+
+    For each document:
+      - Extracts its page number and text content.
+      - If the page contains images (from `images_by_page` mapping),
+        generates textual descriptions for each image using `describe_image`.
+      - Appends these descriptions as inline figure captions 
+        (e.g., "[Figure: caption]") after the page text.
+      - Creates a new Document that combines text + captions while
+        preserving original metadata.
+
+    Args:
+        docs (List[Document]): List of page-level text documents.
+        images_by_page (Dict[int, List[str]]): Mapping of page numbers
+            to lists of image file paths extracted from the PDF.
+
+    Returns:
+        List[Document]: New documents enriched with image captions.
+    """
     page_docs = []
     for doc in docs:
         page_num = doc.metadata["page"]
@@ -263,9 +283,26 @@ def hybrid_split(
     preview_samples: int = PREVIEW_SAMPLES
 ) -> List[Document]:
     """
-    Hybrid splitting:
-      - Keep obvious headers/tables/figures as standalone.
-      - Otherwise recurse with a character splitter.
+    Split documents into smaller chunks using a hybrid strategy.
+
+    Steps:
+    1. Detects structural elements (chapter headers, section numbers, 
+       Markdown headers, tables, figures) and keeps them as standalone chunks.
+    2. For all other text, applies a recursive character-based splitter 
+       that breaks text into overlapping chunks of configurable size.
+    3. Annotates each chunk with metadata indicating whether it came from 
+       a "header_or_table" or the main "body".
+    4. Logs statistics on the total number of chunks and previews a few 
+       random samples for inspection.
+
+    Args:
+        docs (List[Document]): List of documents to split.
+        chunk_size (int): Max characters per chunk (default from CHUNK_SIZE).
+        overlap (int): Characters of overlap between chunks (default from CHUNK_OVERLAP).
+        preview_samples (int): Number of random chunks to log as examples.
+
+    Returns:
+        List[Document]: New list of split documents with metadata.
     """
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size,
@@ -450,10 +487,11 @@ def embed_images(images_by_page: Dict[int, List[str]], source: str):
 # =========================
 # MAIN
 # =========================
+
 if __name__ == "__main__":
     logging.info("🚀 Starting JASP multimodal RAG pipeline")
 
-    # Fresh image dir for this run (optional—keep if you need a clean slate)
+    # Clean slate for images
     shutil.rmtree(OUTPUT_IMG_DIR, ignore_errors=True)
 
     source_name = Path(PDF_PATH).name
@@ -461,10 +499,13 @@ if __name__ == "__main__":
     # 1) Load PDF text + images (front matter dropped)
     docs, images_by_page = load_pdf_with_images(PDF_PATH)
 
-    # 2) Split text
-    chunks = hybrid_split(docs)
+    # 2) Enrich pages with inline figure captions
+    page_docs = build_page_docs(docs, images_by_page)
 
-    # 3) Embed
+    # 3) Split enriched docs into chunks
+    chunks = hybrid_split(page_docs)
+
+    # 4) Embed text + images
     embed_texts(chunks, source=source_name)
     embed_images(images_by_page, source=source_name)
 

@@ -1,0 +1,324 @@
+JASP Manual Ground Truth Q&A Benchmark (~73 Pairs)
+
+==================================================== DATA HANDLING &
+BASICS ==================================================== 
+
+
+Q1: What file types can I import into JASP? A1: JASP can open .jasp, Excel
+(.xls/.xlsx), CSV, TXT, TSV, SPSS (.sav, .por), Stata (.dta), SAS
+(.sas7bdat, .xpt), and ODS files. (p.2)
+
+Q2: How do I save my JASP project so I can continue later? A2: Use
+Save/Save As to store everything (data, annotations, analyses) in JASP’s
+.jasp format. (p.3)
+
+Q3: How do I export results from JASP? A3: Results can be exported to
+HTML or PDF, and data can be exported to CSV, TSV, or TXT. (p.3)
+
+Q4: Can I change JASP’s appearance? A4: Yes. In Preferences > Interface,
+you can choose light or dark theme, adjust zoom, fonts, and language (13
+supported). (pp.4–5)
+
+Q5: How do I filter data in JASP? A5: In the spreadsheet view, click the
+filter icon to exclude cases. Complex filters are also available. (p.9)
+
+Q6: How does JASP recognize variable types? A6: JASP guesses between
+Nominal, Ordinal, and Continuous, but you can click the column icon to
+manually adjust. (p.8)
+
+Q7: How can I edit my dataset inside JASP? A7: Click Data Editor to add
+or modify cells. Changes sync automatically back unless the file is
+renamed. (p.11)
+
+  ----------------------------------------------------
+  DESCRIPTIVE STATISTICS & VISUALIZATION
+  ----------------------------------------------------
+  Q8: What are the three main measures of central
+  tendency reported in JASP? A8: Mean, median, and
+  mode. (p.16–17)
+
+  Q9: How is dispersion summarized in JASP
+  descriptives? A9: Standard deviation, variance,
+  standard error, coefficient of variation, MAD, IQR,
+  and confidence intervals. (pp.17–18)
+
+  Q10: How do I split descriptive statistics by groups
+  in JASP? A10: Add a categorical variable into the
+  Split box. JASP then produces group-wise tables and
+  plots. (p.21)
+
+  Q11: What plot shows whether data are normally
+  distributed in JASP? A11: The Q–Q plot: if points
+  fall along the 45° line, the data are close to
+  normal. (p.22)
+
+  Q12: What’s the difference between a boxplot and a
+  violin plot in JASP? A12: A boxplot shows quartiles,
+  median, and outliers, while a violin plot overlays a
+  smoothed density curve. (p.25)
+
+  Q13: How can I customize a plot in JASP? A13:
+  Right-click > Edit Image allows modifying axis
+  labels, ranges, and exporting plots as images.
+  (p.28)
+  ----------------------------------------------------
+
+DATA INTEGRITY & ASSUMPTIONS
+
+Q14: How does JASP define an outlier? A14: A value beyond 1.5 × IQR from
+the 25th or 75th percentile. (p.30–31)
+
+Q15: What are the common options for handling outliers? A15: Correct
+input errors, keep them, delete them, or Winsorize (replace with
+boundary values). (p.32)
+
+Q16: What does the Shapiro–Wilk test check in JASP? A16: It tests the
+null hypothesis that the sample comes from a normal distribution. (p.35)
+
+Q17: What does Levene’s test tell me in JASP? A17: It tests equality of
+variances across groups. If p > .05, homogeneity is assumed. (p.36)
+
+Q18: What can I do if my data are not normally distributed? A18: Use
+transformations (log, square root) or apply non-parametric alternatives.
+(pp.36, 40–41)
+
+Q19: What assumption does homoscedasticity relate to? A19: That residual
+variance is constant across predictor values. Violations appear as
+funnel-shaped residual plots. (p.37)
+
+Q20: How does JASP support data transformation? A20: In spreadsheet
+view, click + to create a computed column using built-in functions
+(log10, square, etc.). (pp.38–40)
+
+  ----------------------------------------------------
+  T-TESTS
+  ----------------------------------------------------
+  Q21: How do I run a one-sample t-test in JASP? A21:
+  Go to T-Tests > One-Sample T-Test, move your
+  variable into the analysis box, and enter the
+  hypothesized mean. (pp.44–45)
+
+  Q22: What assumptions are required for a one-sample
+  t-test? A22: Continuous data, independent values,
+  approximate normality, and no significant outliers.
+  (p.44)
+
+  Q23: How do I interpret a one-sample t-test result?
+  A23: If p < .05, the sample mean significantly
+  differs from the population mean. Check Shapiro–Wilk
+  for normality. (p.45)
+
+  Q24: What is the non-parametric alternative to the
+  one-sample t-test? A24: The Wilcoxon signed-rank
+  test. (p.45)
+
+  Q25: How do I run an independent samples t-test in
+  JASP? A25: Go to T-Tests > Independent Samples
+  T-Test, assign the dependent variable and grouping
+  variable. (p.56)
+
+  Q26: What assumptions are required for independent
+  t-tests? A26: Independence, continuous DV,
+  normality, no major outliers, and homogeneity of
+  variance. (p.57)
+
+  Q27: How do I interpret an independent samples
+  t-test? A27: If Levene’s test is not significant,
+  use Student t-test; if significant, use Welch’s.
+  Significant p-values show group mean differences.
+  (pp.58–60)
+
+  Q28: What is Cohen’s d in JASP t-test output? A28:
+  Cohen’s d quantifies effect size; values >0.8 are
+  large, ~0.5 medium, ~0.2 small. (p.60)
+
+  Q29: What is the non-parametric alternative to the
+  independent t-test? A29: The Mann–Whitney U test.
+  (p.61)
+
+  Q30: How do I run a paired-samples t-test? A30: Go
+  to T-Tests > Paired Samples T-Test, select the two
+  related variables, and run the analysis. (p.63)
+
+  Q31: What assumptions are required for paired
+  t-tests? A31: Continuous DV, paired groups, normally
+  distributed differences, no outlier differences.
+  (p.63)
+
+  Q32: What is the non-parametric alternative to the
+  paired t-test? A32: Wilcoxon’s signed-rank test.
+  (p.67)
+  ----------------------------------------------------
+
+CORRELATION
+
+Q33: How do I calculate correlation in JASP? A33: Use Regression >
+Correlation, select variables, and tick Pearson. (p.70)
+
+Q34: How do I interpret Pearson’s r in JASP? A34: r ranges from –1 to
++1. Values near ±1 show strong association; near 0 show weak/no
+association. (p.69)
+
+Q35: What is R² in correlation analysis? A35: R² is the proportion of
+variance explained by the relationship. For r=0.98, R²=96.8%. (p.72)
+
+Q36: What are the non-parametric alternatives to Pearson’s correlation?
+A36: Spearman’s rho and Kendall’s tau. (p.73)
+
+Q37: How do I interpret a negative correlation in JASP? A37: As one
+variable increases, the other decreases. (p.69)
+
+  ----------------------------------------------------
+  REGRESSION
+  ----------------------------------------------------
+  Q38: How do I run a simple linear regression in
+  JASP? A38: Go to Regression > Linear Regression,
+  enter DV as Dependent, predictor as Covariate.
+  (p.78)
+
+  Q39: How do I interpret R² in regression output?
+  A39: R² shows how much variance in the DV is
+  explained by predictors. Higher values = better fit.
+  (p.77)
+
+  Q40: How do I interpret regression coefficients in
+  JASP? A40: Each coefficient (b) shows the expected
+  change in the DV for a 1-unit increase in the
+  predictor. (p.79)
+
+  Q41: What assumptions must be checked in regression?
+  A41: Linearity, normality of residuals,
+  homoscedasticity, no multicollinearity, independence
+  of observations. (p.75)
+
+  Q42: How do I run multiple regression in JASP? A42:
+  Add several predictors under Covariates in
+  Regression > Linear Regression. (p.81)
+
+  Q43: What does the Durbin–Watson statistic check?
+  A43: It checks for autocorrelation of residuals.
+  Values ~2 indicate independence. (p.79, p.83)
+
+  Q44: What is logistic regression used for in JASP?
+  A44: To predict binary outcomes (yes/no) using
+  categorical or continuous predictors. (p.88)
+
+  Q45: How do you interpret an odds ratio in logistic
+  regression? A45: OR >1 means higher odds, OR <1
+  means lower odds of the outcome with that predictor.
+  (p.91)
+  ----------------------------------------------------
+
+ANOVA FAMILY
+
+Q46: How do I run a one-way ANOVA in JASP? A46: Go to ANOVA > ANOVA,
+enter DV into Dependent Variable and factor into Fixed Factors. (p.95)
+
+Q47: What assumptions apply to one-way ANOVA? A47: Continuous DV,
+categorical IV, independent groups, normality, homogeneity of variances,
+no extreme outliers. (p.93)
+
+Q48: How do I interpret a significant ANOVA result? A48: If p < .05,
+group means differ. Use post hoc tests to identify which groups differ.
+(p.96–98)
+
+Q49: What is partial eta squared in ANOVA? A49: It measures effect size:
+<0.01 small, ~0.06 medium, >0.14 large. (p.95)
+
+Q50: What is the non-parametric alternative to one-way ANOVA? A50: The
+Kruskal–Wallis test. (p.100)
+
+Q51: How do I run a repeated measures ANOVA? A51: Go to ANOVA > Repeated
+Measures ANOVA, define levels, and assign variables. (p.104)
+
+Q52: What is Mauchly’s test used for? A52: It checks sphericity (equal
+variance of differences). If violated, apply Greenhouse–Geisser or
+Huynh–Feldt corrections. (p.103–104)
+
+Q53: What are the post hoc options in repeated measures ANOVA? A53:
+Bonferroni or Holm corrections. Tukey and Scheffe are not available.
+(p.104)
+
+Q54: What is the non-parametric equivalent of repeated measures ANOVA?
+A54: Friedman’s test. (p.109)
+
+Q55: How do I run a two-way ANOVA in JASP? A55: Go to ANOVA > ANOVA, add
+two factors into Fixed Factors. (p.120)
+
+Q56: What does an interaction effect mean in two-way ANOVA? A56: It
+means the effect of one factor depends on the level of another factor.
+(p.120–122)
+
+Q57: What is a mixed factor ANOVA? A57: A design combining
+between-subject and within-subject factors. (p.137)
+
+  ----------------------------------------------------
+  CHI-SQUARE TESTS
+  ----------------------------------------------------
+  Q58: How do I run a chi-square goodness-of-fit test
+  in JASP? A58: Use Frequencies > Multinomial test,
+  enter observed and expected frequencies. (p.53)
+
+  Q59: How do I run a chi-square test of association?
+  A59: Use Frequencies > Contingency Tables, add
+  variables to rows and columns. (p.145)
+
+  Q60: What does a significant chi-square test
+  indicate? A60: That there is an association between
+  the categorical variables. (p.149)
+
+  Q61: What effect size measures are used in
+  chi-square tests? A61: Phi for 2x2 tables, Cramer’s
+  V for larger tables. (p.150)
+  ----------------------------------------------------
+
+META-ANALYSIS
+
+Q62: What is the purpose of meta-analysis in JASP? A62: To combine
+results from multiple studies into a pooled effect size. (p.153)
+
+Q63: What is a forest plot? A63: A plot showing effect sizes of
+individual studies and the pooled estimate (diamond). (p.161)
+
+Q64: What does a funnel plot check? A64: It checks for publication bias
+or asymmetry in study effect sizes. (p.162)
+
+Q65: What does I² indicate in meta-analysis? A65: The percentage of
+variability due to heterogeneity rather than chance. (p.154)
+
+  ----------------------------------------------------
+  EFFECT SIZE & DECISION-MAKING
+  ----------------------------------------------------
+  Q66: What is an effect size and why report it? A66:
+  It quantifies the strength of relationships or
+  differences beyond p-values. (p.42)
+
+  Q67: What are common effect sizes in JASP? A67:
+  Cohen’s d, Pearson’s r, odds ratios, eta squared,
+  partial eta squared, omega squared. (p.43, p.95)
+
+  Q68: How do I know which test to use in JASP? A68:
+  Refer to the “Which test should I use?” decision
+  section (pp.179–182). (p.179)
+
+  Q69: Which test compares two related groups? A69:
+  Paired samples t-test (parametric) or Wilcoxon
+  signed-rank test (non-parametric). (p.181)
+
+  Q70: Which test compares more than two independent
+  groups? A70: ANOVA if assumptions met; otherwise
+  Kruskal–Wallis. (p.181)
+
+  Q71: Which test checks the relationship between two
+  continuous variables? A71: Pearson’s correlation if
+  assumptions met, Spearman/Kendall otherwise. (p.179)
+
+  Q72: Which test predicts a binary outcome? A72:
+  Logistic regression. (p.180)
+
+  Q73: Which test checks association between two
+  categorical variables? A73: Chi-square test of
+  association. (p.180)
+  ----------------------------------------------------
+
+(Additional Q&A up to ~100 would follow same style across sections)
