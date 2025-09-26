@@ -24,7 +24,12 @@ dependencies = [
   "pillow",
   "pymupdf",
   "tqdm",
-  "pypdf (>=6.0.0,<7.0.0)"
+  "pypdf (>=6.0.0,<7.0.0)",
+  "youtube-transcript-api (>=0.6.2,<0.7.0)",
+  "pytube (>=15.0.0,<16.0.0)",
+  "yt-dlp (>=2025.9.23,<2026.0.0)",
+  "openai-whisper @ git+https://github.com/openai/whisper.git",
+  "watchdog (>=6.0.0,<7.0.0)"
 ]
 
 [project.optional-dependencies]
