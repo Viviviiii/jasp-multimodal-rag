@@ -28,7 +28,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import logging
 
-from src.retrieval.query import build_rag_chain
+from src.retrieval.pdf_query import build_rag_chain
 
 app = FastAPI(title="JASP Multimodal RAG API", version="0.1.0")
 logging.basicConfig(level=logging.INFO)
@@ -103,7 +103,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import logging
 
-from src.retrieval.query import build_rag_chain
+from src.retrieval.pdf_query import build_rag_chain
 
 # Create app
 app = FastAPI(title="JASP Multimodal RAG API", version="0.1.0")

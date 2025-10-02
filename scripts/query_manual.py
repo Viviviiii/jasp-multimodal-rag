@@ -16,7 +16,7 @@ Usage:
 
 
 import argparse
-from src.retrieval.query import run_query, DEFAULT_MODEL, DEFAULT_TOPK
+from src.retrieval.pdf_query import run_query, DEFAULT_MODEL, DEFAULT_TOPK
 
 def main():
     parser = argparse.ArgumentParser(description="Query the JASP manual via RAG.")
