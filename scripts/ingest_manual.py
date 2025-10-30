@@ -22,8 +22,8 @@ import torch
 
 from src.utils.logger import setup_logger
 from src.utils.ids import source_name_from_path, text_chunk_id, image_id, image_caption_id
-from src.ingestion.pdf_loader import load_pdf_with_images, PAGE_OFFSET_DEFAULT
-from src.ingestion.captioner import BLIPCaptioner
+from utils.pdf_loader import load_pdf_with_images, PAGE_OFFSET_DEFAULT
+from utils.captioner import BLIPCaptioner
 from src.retrieval.splitter import build_page_docs, hybrid_split
 from src.retrieval.embedder import TextEmbedder, ImageEmbedder
 from src.retrieval.index import ChromaIndex
