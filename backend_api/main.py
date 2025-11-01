@@ -1,11 +1,18 @@
 """
 ---------------------------------------------------
 🌐 FASTAPI BACKEND for Local RAG + Ollama Generation
-open → http://127.0.0.1:8000/docs
- to test interactively.
 ---------------------------------------------------
+
+Exposes REST endpoints for:
+    - Hybrid retrieval + RRF + BGE reranking
+    - Contextual answer generation using local Ollama models
+
+Test interactively:
+    👉 http://127.0.0.1:8000/docs
+
 Run:
     poetry run uvicorn backend_api.main:app --reload --port 8000
+---------------------------------------------------
 """
 
 from fastapi import FastAPI, HTTPException
@@ -13,43 +20,53 @@ from pydantic import BaseModel
 from loguru import logger
 from typing import List, Dict, Any
 
-from src.generation.generation import answer_query
+# ✅ Import from your pipeline (new unified entrypoint)
+from src.pipelines.generate_answer import run_generation_pipeline
 
+# ---------- FastAPI App ----------
 app = FastAPI(title="JASP RAG Backend", version="1.0")
 
-# ---------- Request/Response Schemas ----------
+# ---------- Request / Response Schemas ----------
 class QueryRequest(BaseModel):
     query: str
     model: str = "mistral:7b"
 
+class DocumentItem(BaseModel):
+    rank: int
+    source: str
+    page: str | int | None
+    chunk_id: str | None
+    score: float | None
+
 class GenerationResponse(BaseModel):
+    query: str
+    model: str
     answer: str
-    documents: List[Dict[str, Any]]
+    sources: List[DocumentItem]
 
 # ---------- Routes ----------
 @app.get("/")
 async def root():
-    return {"message": "JASP RAG API is running 🚀"}
+    return {"message": "✅ JASP RAG API is running", "docs": "/docs"}
 
 @app.post("/generate", response_model=GenerationResponse)
-async def generate_answer(request: QueryRequest):
+async def generate_endpoint(request: QueryRequest):
+    """
+    Generate an AI-assisted answer from the JASP RAG pipeline.
+    """
     try:
-        logger.info(f"Received query: {request.query} | model={request.model}")
-        answer, nodes = answer_query(request.query)
+        logger.info(f"📩 Query received: {request.query} | Model: {request.model}")
 
-        docs = []
-        for n in nodes:
-            md = n.node.metadata or {}
-            docs.append({
-                "source": md.get("source", "N/A"),
-                "page": md.get("page", "N/A"),
-                "chapter": md.get("chapter", "N/A"),
-                "chunk_id": md.get("chunk_id", "N/A"),
-                "text": n.node.get_content()
-            })
+        # ✅ Run your unified pipeline
+        result = run_generation_pipeline(request.query, model=request.model)
 
-        return GenerationResponse(answer=answer, documents=docs)
+        return GenerationResponse(
+            query=result["query"],
+            model=result["model"],
+            answer=result["answer"],
+            sources=result["sources"]
+        )
 
     except Exception as e:
-        logger.exception(e)
+        logger.exception(f"❌ Error during generation: {e}")
         raise HTTPException(status_code=500, detail=str(e))

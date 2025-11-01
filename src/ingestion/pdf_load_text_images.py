@@ -24,7 +24,7 @@ poetry run python src/ingestion/pdf_load_text_images.py
 
 
 
-
+import uuid
 import os
 import sys
 import json
@@ -398,11 +398,18 @@ def enrich_llamaparse_with_images(
 
         enriched_doc = Document(
             text=merged_text.strip(),
-            metadata={
-                "source": doc.metadata.get("source"),
+
+            metadata = {
+                "data_source": "jasp_manual",                  # which collection/domain this PDF belongs to
+                "document_name": Path(pdf_path).stem,          # clean PDF name without extension
+                "source": Path(pdf_path).name,                 # PDF filename with .pdf
                 "page": page_num,
-                "images": image_paths
+                "images": image_paths,
+                "image_summaries": image_summary_texts,
+                "uuid": str(uuid.uuid4()),                     # unique identifier
+                "char_length": len(merged_text),               # useful for filtering later
             }
+
         )
         enriched_docs.append(enriched_doc)
 

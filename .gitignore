@@ -40,6 +40,8 @@ data/images/
 data/chromadb/
 data/chroma/
 *.parquet
+data/page_images/
+data/vector_store/
 
 # ----------------------
 # Cache

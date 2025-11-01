@@ -45,5 +45,5 @@ Example:
 
 ###### update: When you make changes in VS Code:
 git add .
-git commit -m "video ingestion updated "
+git commit -m "full manual+mutiple docs version "
 git push

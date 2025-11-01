@@ -1,7 +1,7 @@
 
 """
 poetry env activate
-poetry run python -m src.splitting.text_splitting
+poetry run python -m src.splitting.text_split
 
 """
 
@@ -81,10 +81,18 @@ def split_enriched_documents(
 
         for sent_idx, sentence_text in enumerate(merged_sentences):
             chunk_id = f"{node.metadata.get('page', 'NA')}_{node_idx}_{sent_idx}"
+
+        # ✅ Derive document and data source safely (outside Document())
+            source_file = node.metadata.get("source", "unknown.pdf")
+            document_name = Path(source_file).stem
+
             final_chunks.append(
                 Document(
                     text=sentence_text,
+
                     metadata={
+                        "data_source": "jasp_manual",
+                        "document_name": document_name,
                         "source": node.metadata.get("source"),
                         "page": node.metadata.get("page"),
                         "images": list(set(node.metadata.get("images", []))),  # dedup
@@ -121,29 +129,28 @@ def split_enriched_documents(
 
 
 # ---------------------------------------------------
-# 🧪 MAIN ENTRYPOINT (reusable for other modules)
+# 🧪 MAIN ENTRYPOINT -test splitting
 # ---------------------------------------------------
+
+def load_enriched_json(json_path: str) -> list[Document]:
+    """Load enriched JSON (from enrich_llamaparse_with_images) as Document objects."""
+    if not os.path.exists(json_path):
+        raise FileNotFoundError(f"❌ Enriched JSON not found: {json_path}")
+
+    with open(json_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    docs = [Document(text=item["text"], metadata=item.get("metadata", {})) for item in data]
+    return docs
+
+
 if __name__ == "__main__":
-    from dotenv import load_dotenv
-    from src.ingestion.pdf_load_text_images import enrich_llamaparse_with_images
+    enriched_json_path = "data/processed/enriched/test_pages25-28_enriched.json"
+    pdf_name = Path(enriched_json_path).stem.replace("_enriched", "")
 
-    load_dotenv()
-    pdf_path = "./data/raw/test_pages25-28.pdf"
-    pdf_name = Path(pdf_path).stem
-
-    logger.info(f"🚀 Starting full enrichment + splitting pipeline for {pdf_name}")
-
-    enriched_docs = enrich_llamaparse_with_images(
-        pdf_path=pdf_path,
-        result_type="text",
-        save_output=True,
-    )
-
-    if not enriched_docs:
-        logger.error("❌ Enrichment failed or returned no documents.")
-        exit(1)
-
-    logger.info(f"✅ Enrichment completed: {len(enriched_docs)} pages enriched.")
+    logger.info(f"🚀 Loading enriched JSON: {enriched_json_path}")
+    enriched_docs = load_enriched_json(enriched_json_path)
+    logger.info(f"✅ Loaded {len(enriched_docs)} enriched documents")
 
     # Run the hybrid splitting
     chunks, embed_model = split_enriched_documents(
@@ -162,4 +169,4 @@ if __name__ == "__main__":
     # Display samples
     for i, doc in enumerate(chunks[:5]):
         print(f"\n--- Chunk {i+1} ---")
-        print(doc.text, "...\n")
+        print(doc.text[:300], "...\n")  # optional truncate
