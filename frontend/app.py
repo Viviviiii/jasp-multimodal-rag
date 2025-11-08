@@ -47,6 +47,12 @@ if st.button("Generate Answer"):
             st.markdown("### ☄️ **Answer**")
             st.markdown(data["answer"])
 
+                # --- Show Logs ---
+            if "logs" in data and data["logs"]:
+                with st.expander("🪵 **Logs / Debug Info**"):
+                    for line in data["logs"]:
+                        st.text(line)
+
             st.markdown("---")
             st.markdown("### 🦄 **Source Documents**")
 

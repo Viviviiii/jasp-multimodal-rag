@@ -39,6 +39,9 @@ data/images/
 *.sqlite
 data/chromadb/
 data/chroma/
+data/test
+data/test_QA
+data/vector_store/chroma_db
 *.parquet
 data/page_images/
 data/vector_store/*

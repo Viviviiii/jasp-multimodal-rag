@@ -23,38 +23,52 @@ from loguru import logger
 from src.retrieval.retrieval import retrieve_top_k, NodeWithScore
 from src.generation.generation import generate_answer
 
+# --------------------------------------------------
+# 🧩 METADATA UNPACKING
+# --------------------------------------------------
+def unpack_source(node_item, rank: int):
+    node = getattr(node_item, "node", node_item)
+    meta = getattr(node, "metadata", {}) or {}
+    text = node.get_content() if hasattr(node, "get_content") else getattr(node, "text", "")
 
-def run_generation_pipeline(query: str, model: str = "mistral:7b") -> Dict[str, object]:
-    """
-    Execute the full RAG pipeline: retrieve → rerank → generate.
-    Returns a structured dict for frontend rendering.
-    """
-    logger.info(f"🔍 Running RAG generation pipeline for query: {query!r}")
+    return {
+        "rank": rank,
+        "source": meta.get("pdf_name") or meta.get("markdown_file") or meta.get("source") or "Unknown",
+        "page": meta.get("page_start") or meta.get("page") or "?",
+        "chunk_id": meta.get("section_id") or meta.get("doc_id") or f"chunk_{rank}",
+        "score": getattr(node_item, "score", None),
+        "section": meta.get("section_title") or "Unknown section",
+        "text": text[:1200],
+        "metadata": meta,  # ✅ pass full metadata to FastAPI response
+    }
 
-    # 1️⃣ Retrieve & rerank
+
+# --------------------------------------------------
+# 🧩 MAIN PIPELINE ENTRYPOINT (for backend + CLI)
+# --------------------------------------------------
+def run_generation_pipeline(query: str, model: str = "mistral:7b"):
+    """
+    Unified pipeline used by both CLI and FastAPI backend.
+    Returns structured response with flattened metadata.
+    """
+    logger.info(f"🎯 Running generation pipeline for query: {query}")
+
+    # 1️⃣ Retrieve top chunks
     reranked_nodes = retrieve_top_k(query)
-    logger.success(f"✅ Retrieved and reranked top-{len(reranked_nodes)} nodes.")
+    logger.info(f"Retrieved {len(reranked_nodes)} chunks")
 
-    # 2️⃣ Generate answer
-    answer_text = generate_answer(query, reranked_nodes, model=model)
+    # 2️⃣ Normalize metadata for frontend
+    clean_sources = [unpack_source(item, rank=i+1) for i, item in enumerate(reranked_nodes)]
 
-    # 3️⃣ Prepare sources for display
-    sources = []
-    for i, node in enumerate(reranked_nodes, start=1):
-        meta = getattr(node.node, "metadata", {})
-        sources.append({
-            "rank": i,
-            "source": meta.get("source", "N/A"),
-            "page": meta.get("page", "?"),
-            "chunk_id": meta.get("chunk_id", "N/A"),
-            "score": getattr(node, "score", None)
-        })
+    # 3️⃣ Generate contextual answer
+    final_answer = generate_answer(query, reranked_nodes, model=model)
 
+    # 4️⃣ Return final structured result
     return {
         "query": query,
         "model": model,
-        "answer": answer_text.strip(),
-        "sources": sources
+        "answer": final_answer,
+        "sources": clean_sources,
     }
 
 
