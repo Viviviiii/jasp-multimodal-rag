@@ -105,44 +105,34 @@ OLLAMA_MODEL = "mistral:7b"
 # --------------------------------------------------
 # LOAD DOCUMENTS FOR BM25
 # --------------------------------------------------
-def load_docs_for_bm25_onlyone(json_path: str) -> List[Document]:
-    """Load chunks and prepare for BM25 retriever."""
-    if not os.path.exists(json_path):
-        raise FileNotFoundError(f"❌ Chunk JSON not found: {json_path}")
+def get_node_metadata(node) -> Dict:
+    """
+    Robustly extract metadata from a LlamaIndex Node / Document / NodeWithScore.
+    Handles differences between versions (metadata vs extra_info).
+    """
+    # unwrap NodeWithScore
+    if hasattr(node, "node"):
+        node = node.node
 
-    with open(json_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
+    # Try the usual metadata attribute
+    meta = getattr(node, "metadata", None)
+    if meta:
+        return dict(meta)
 
-    docs = []
-    for item in data:
-        md = item.get("metadata", {})
-        flat_md = {}
+    # Older versions sometimes use extra_info
+    extra = getattr(node, "extra_info", None)
+    if extra:
+        return dict(extra)
 
-        for k, v in md.items():
-            if isinstance(v, list):
-                flat_md[k] = ", ".join(map(str, v))
-            elif isinstance(v, dict):
-                flat_md[k] = json.dumps(v, ensure_ascii=False)
-            else:
-                flat_md[k] = v
+    # Some Documents store in .metadata, Nodes in .extra_info; try source_node if present
+    source_node = getattr(node, "source_node", None)
+    if source_node is not None:
+        return get_node_metadata(source_node)
 
-        if "id" in item:
-            flat_md["doc_id"] = item["id"]
-
-        docs.append(Document(text=item["text"], metadata=flat_md))
-
-    logger.info(f"BM25 corpus loaded: {len(docs)} documents")
-    return docs
+    return {}
 
 
 def load_docs_for_bm25(input_path: Union[str, list[str]]) -> List[Document]:
-    """
-    Load one or more JSON chunk files for BM25 retriever.
-    - input_path can be:
-        • a single JSON file
-        • a folder containing multiple *.json files
-        • a list of JSON paths
-    """
     json_files = []
 
     if isinstance(input_path, list):
@@ -163,11 +153,22 @@ def load_docs_for_bm25(input_path: Union[str, list[str]]) -> List[Document]:
         with open(json_path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
+        # ✅ Handle dict-wrapped structure
+        if isinstance(data, dict) and "sections" in data:
+            data = data["sections"]
+
+        # ✅ Handle stringified dicts (double-encoded)
+        if isinstance(data, list) and all(isinstance(x, str) for x in data):
+            data = [json.loads(x) for x in data]
+
         source_name = Path(json_path).stem
         for item in data:
+            if not isinstance(item, dict) or "text" not in item:
+                logger.warning(f"⚠️ Skipping malformed item in {json_path}")
+                continue
+
             md = item.get("metadata", {})
             flat_md = {}
-
             for k, v in md.items():
                 if isinstance(v, list):
                     flat_md[k] = ", ".join(map(str, v))
@@ -180,9 +181,16 @@ def load_docs_for_bm25(input_path: Union[str, list[str]]) -> List[Document]:
             if "id" in item:
                 flat_md["doc_id"] = item["id"]
 
+            # ✅ Add robust metadata mapping
+            flat_md["pdf_name"] = md.get("pdf_name") or source_name
+            flat_md["page_start"] = md.get("page_start") or md.get("page") or None
+            flat_md["section_title"] = md.get("section_title") or md.get("title") or "Unknown section"
+            flat_md["section_id"] = md.get("section_id") or f"{source_name}_chunk_{item.get('id', len(all_docs))}"
+
+
             all_docs.append(Document(text=item["text"], metadata=flat_md))
 
-        logger.info(f"📄 Loaded {len(data)} chunks from {json_path}")
+        logger.info(f"📄 Loaded {len(all_docs)} chunks from {json_path}")
 
     logger.success(f"✅ Total BM25 corpus size: {len(all_docs)} chunks from {len(json_files)} files.")
     return all_docs
@@ -204,7 +212,9 @@ def build_bm25_retriever(docs: List[Document]):
     if BM25Retriever is None:
         raise RuntimeError("BM25Retriever not available. Install llama-index with bm25 extras.")
     logger.info(f"Initializing BM25 retriever with {len(docs)} documents...")
-    return BM25Retriever(docs, similarity_top_k=K_BM25)
+
+    bm25_retriever = BM25Retriever(docs, similarity_top_k=K_BM25)
+    return bm25_retriever
 
 
 
@@ -324,6 +334,7 @@ def retrieve_top_k(query: str, top_k: int = TOP_FINAL):
     # 2️⃣ Build retrievers
     semantic_retriever = build_vector_retriever()
     bm25_retriever = build_bm25_retriever(docs)
+    
 
     # 3️⃣ Retrieve candidates
     logger.info("⚙️ Retrieving from BM25 and semantic retrievers...")
@@ -353,20 +364,31 @@ def main():
     query = args.query.strip()
     results = retrieve_top_k(query, top_k=TOP_FINAL)
 
-    print(f"\n🏁 Reranked top-{TOP_FINAL}: {len(results)}\n{'='*60}")
     for i, item in enumerate(results, 1):
         node = getattr(item, "node", item)
-        metadata = getattr(node, "metadata", {})
-        text = getattr(node, "text", str(node))
+        metadata = get_node_metadata(node)
+        text = node.get_content() if hasattr(node, "get_content") else getattr(node, "text", str(node))
+
+        # robust page extraction
+        page = (
+            metadata.get("page")
+            or metadata.get("page_start")
+            or metadata.get("page_number")
+            or (
+                metadata.get("section_id", "").split("_PAGE_")[-1]
+                if "PAGE_" in metadata.get("section_id", "")
+                else None
+            )
+            or "?"
+        )
 
         print(f"\n⭐ Final Rank {i}")
-        print(f" 📄 Source : {metadata.get('source', 'N/A')}")
-        print(f" 📑 Page   : {metadata.get('page', 'N/A')}")
+        print(f" 📄 Source : {metadata.get('source', metadata.get('pdf_name', 'N/A'))}")
+        print(f" 📑 Page   : {page}")
         print(f" 🔢 Score  : {getattr(item, 'score', 'N/A')}")
-        print(f" 🧩 Chunk  : {metadata.get('chunk_id', 'N/A')}")
+        print(f" 🧩 Chunk  : {metadata.get('chunk_id', metadata.get('section_id', 'N/A'))}")
         print(f" 🗒️ Text   : {text[:400]}...")
         print("-" * 60)
-
     logger.info("✅ Retrieval pipeline completed successfully.")
 
 

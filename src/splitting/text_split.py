@@ -95,6 +95,8 @@ def split_enriched_documents(
                         "document_name": document_name,
                         "source": node.metadata.get("source"),
                         "page": node.metadata.get("page"),
+                        "chapter": node.metadata.get("chapter"),
+                        "section": node.metadata.get("section"),
                         "images": list(set(node.metadata.get("images", []))),  # dedup
                         "semantic_id": node_idx,
                         "chunk_id": chunk_id,
@@ -140,12 +142,17 @@ def load_enriched_json(json_path: str) -> list[Document]:
     with open(json_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
-    docs = [Document(text=item["text"], metadata=item.get("metadata", {})) for item in data]
+    docs = []
+    for item in data:
+        # Some enriched files contain nested text fields
+        text = item.get("text") or item.get("text_resource", {}).get("text", "")
+        metadata = item.get("metadata", {})
+        docs.append(Document(text=text, metadata=metadata))
     return docs
 
 
 if __name__ == "__main__":
-    enriched_json_path = "data/processed/enriched/test_pages25-28_enriched.json"
+    enriched_json_path = "data/processed/enriched/Statistical-Analysis-in-JASP-A-guide-for-students-2025_enriched_with_toc.json"
     pdf_name = Path(enriched_json_path).stem.replace("_enriched", "")
 
     logger.info(f"🚀 Loading enriched JSON: {enriched_json_path}")

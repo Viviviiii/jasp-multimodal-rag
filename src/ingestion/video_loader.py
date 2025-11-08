@@ -1,323 +1,491 @@
 """
-poetry run python -m src.ingestion.video_loader
----------------
-Utilities for ingesting YouTube videos into structured, query-ready
-LangChain Document objects.
+pdf_loader.py
+--------------
+End-to-end pipeline using your original logic:
 
-Pipeline overview:
-1. Fetch video metadata (title, author, duration, chapters, description).
-2. Fetch transcript (captions/subtitles) and normalize them into text segments.
-3. Split description into paragraph-based chunks (fallback: length split).
-4. Split transcript into semantically coherent chunks (hybrid: chapter → semantic → length).
-5. Wrap description + transcript chunks into LangChain Documents.
+1. Load PDF(s) with LlamaIndex SimpleDirectoryReader
+2. Clean text, extract sections, reconstruct equations, normalize tables
+3. Create a Markdown file with image placeholders
+4. Load the Markdown back, split into section-level chunks
+5. Count tokens and save chunks + metadata into a JSON file
 
-Each Document contains:
-- `page_content`: the actual text (description or transcript chunk)
-- `metadata`: structured information (video id, url, timestamps, author, etc.)
+Run:
+    poetry run python pdf_loader.py
 
-Comments are intentionally excluded in this version.
+Edit the CONFIG section at the top to point to your PDF, markdown, and JSON paths.
 """
 
-import logging
-from typing import List, Dict, Any
+import re
+import os
+import json
+import uuid
+from datetime import datetime
+from pathlib import Path
+from typing import List
 
-import yt_dlp
-import requests
-from sentence_transformers import SentenceTransformer, util
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain.schema import Document
+from loguru import logger
+from llama_index.core import SimpleDirectoryReader, Document
+import tiktoken
 
-# ---------------------------
-# Config
-# ---------------------------
-MAX_CHARS = 1200        # Maximum characters per chunk (~300 tokens)
-OVERLAP_CHARS = 150     # Overlap for recursive splitter
-SEMANTIC_THRESHOLD = 0.70  # Similarity threshold for semantic splitting
-TEXT_MODEL_NAME = "BAAI/bge-small-en"
 
-# Set up logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+# ----------------------------
+# CONFIG – EDIT THESE PATHS
+# ----------------------------
+PDF_DIR = "/Users/ywxiu/jasp-multimodal-rag/data/raw"
+MARKDOWN_OUTPUT_DIR = "/Users/ywxiu/jasp-multimodal-rag/data/processed/markdown"
+JSON_OUTPUT_PATH = "/Users/ywxiu/jasp-multimodal-rag/data/processed/test_only.json"
 
-# Load embedder once globally
-embedder = SentenceTransformer(TEXT_MODEL_NAME)
+# If you like, also keep these explicit names (as in your original example)
+PDF_NAME = "Statistical-Analysis-in-JASP-A-guide-for-students-2025.pdf"
+MARKDOWN_FILE = (
+    "/Users/ywxiu/jasp-multimodal-rag/data/processed/markdown/"
+    "Statistical-Analysis-in-JASP-A-guide-for-students-2025.md"
+)
 
-# ---------------------------
-# Fetch video metadata
-# ---------------------------
-def fetch_video_info(url: str) -> Dict[str, Any]:
-    """
-    Fetch metadata of a YouTube video using yt-dlp.
-    Includes description and chapter info if available.
-    """
-    logging.info(f"📺 Fetching video info for {url}")
-    ydl_opts = {"quiet": True, "skip_download": True, "noplaylist": True}
-    try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(url, download=False)
-        if not info:
-            raise RuntimeError(f"yt-dlp failed for {url}")
-    except Exception as e:
-        logging.error(f"❌ Failed to fetch video info: {e}")
-        raise
 
-    meta = {
-        "video_id": info.get("id"),
-        "url": url,
-        "title": info.get("title"),
-        "description": info.get("description") or "",
-        "author": info.get("uploader"),
-        "publish_date": info.get("upload_date"),
-        "duration": info.get("duration"),
-        "chapters": info.get("chapters") or []
-    }
-    logging.info(f"✅ Metadata fetched for video {meta['video_id']} ({meta['title']})")
-    return meta
+# ----------------------------
+# YOUR ORIGINAL FUNCTIONS
+# (kept the same as you sent)
+# ----------------------------
 
-# ---------------------------
-# Fetch transcript (subtitles)
-# ---------------------------
-def fetch_transcript(url: str, lang: str = "en") -> Dict[str, Any]:
-    """
-    Download transcript (captions) in JSON3 format using yt-dlp.
-    Returns both segment-level and full concatenated text.
-    """
-    logging.info(f"📝 Fetching transcript for {url} (lang={lang})")
-    ydl_opts = {
-        "quiet": True,
-        "skip_download": True,
-        "writesubtitles": True,
-        "subtitleslangs": [lang],
-        "subtitlesformat": "json3"
-    }
-
-    try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(url, download=False)
-    except Exception as e:
-        logging.error(f"❌ Failed to fetch transcript metadata: {e}")
-        return {"segments": [], "full_text": ""}
-
-    subs = info.get("subtitles") or {}
-    auto_subs = info.get("automatic_captions") or {}
-    tracks = subs.get(lang) or auto_subs.get(lang)
-    if not tracks:
-        logging.warning("⚠️ No transcript available for this video.")
-        return {"segments": [], "full_text": ""}
-
-    sub_url = next((t["url"] for t in tracks if t["ext"] == "json3"), None)
-    if not sub_url:
-        logging.warning("⚠️ No JSON3 subtitle track available.")
-        return {"segments": [], "full_text": ""}
-
-    try:
-        resp = requests.get(sub_url)
-        resp.raise_for_status()
-        data = resp.json()
-    except Exception as e:
-        logging.error(f"❌ Failed to download captions: {e}")
-        return {"segments": [], "full_text": ""}
-
-    segments = []
-    for evt in data.get("events", []):
-        if "segs" in evt:
-            text = "".join(seg.get("utf8", "") for seg in evt["segs"]).strip()
-            if text:
-                segments.append({
-                    "text": text,
-                    "start": evt.get("tStartMs", 0) / 1000.0,
-                    "duration": evt.get("dDurationMs", 0) / 1000.0
-                })
-
-    full_text = " ".join(seg["text"] for seg in segments)
-    logging.info(f"✅ {len(segments)} transcript segments fetched.")
-    return {"segments": segments, "full_text": full_text}
-
-# ---------------------------
-# Text splitting utilities
-# ---------------------------
-def length_split(text: str, meta: Dict[str, Any], uid_prefix: str) -> List[Dict[str, Any]]:
-    """
-    Split text into fixed-size chunks using RecursiveCharacterTextSplitter.
-    Ensures maximum length and overlap.
-    """
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=MAX_CHARS, chunk_overlap=OVERLAP_CHARS
-    )
-    chunks = []
-    for i, split_text in enumerate(splitter.split_text(text)):
-        chunks.append({"id": f"{uid_prefix}_len{i}", "text": split_text, "meta": meta})
-    return chunks
-
-def semantic_split(text: str, meta: Dict[str, Any], uid_prefix: str) -> List[Dict[str, Any]]:
-    """
-    Attempt semantic splitting for transcripts:
-    - Break text into sentences
-    - Use embeddings to find semantic breakpoints
-    - If chunks are too long, fallback to length_split
-    """
-    if len(text) <= MAX_CHARS:
-        return [{"id": f"{uid_prefix}_sem0", "text": text, "meta": meta}]
-
-    sentences = text.split(". ")
-    embeddings = embedder.encode(sentences, convert_to_tensor=True)
-    sims = util.pytorch_cos_sim(embeddings[:-1], embeddings[1:]).diagonal().cpu().numpy()
-    breakpoints = [i + 1 for i, score in enumerate(sims) if score < SEMANTIC_THRESHOLD]
-
-    chunks, start, seg_id = [], 0, 0
-    for bp in breakpoints + [len(sentences)]:
-        chunk_text = ". ".join(sentences[start:bp]).strip()
-        if chunk_text:
-            if len(chunk_text) > MAX_CHARS:
-                chunks.extend(length_split(chunk_text, meta, f"{uid_prefix}_sem{seg_id}"))
-            else:
-                chunks.append({"id": f"{uid_prefix}_sem{seg_id}", "text": chunk_text, "meta": meta})
-            seg_id += 1
-        start = bp
-    return chunks
-
-# ---------------------------
-# Hybrid split: chapter → semantic → length
-# ---------------------------
-def hybrid_split(meta: Dict[str, Any], transcript: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """
-    Hierarchical splitting of transcript:
-    1. Split transcript by chapters (if available).
-    2. Within each chapter, perform semantic splitting.
-    3. Enforce length limits for overly long segments.
-    Returns a list of chunk dicts with metadata attached.
-    """
-    if not transcript["segments"]:
-        logging.warning("⚠️ Transcript is empty, skipping hybrid split.")
-        return []
-
-    chapter_blocks = []
-    if meta.get("chapters"):
-        logging.info(f"⏩ Splitting transcript by {len(meta['chapters'])} chapters")
-        chapters = meta["chapters"]
-        for i, ch in enumerate(chapters):
-            start = ch["start_time"]
-            end = chapters[i + 1]["start_time"] if i + 1 < len(chapters) else float("inf")
-            texts = [s["text"] for s in transcript["segments"] if start <= s["start"] < end]
-            block_text = " ".join(texts).strip()
-            if block_text:
-                chapter_blocks.append({
-                    "text": block_text,
-                    "meta": {
-                        "video_id": meta["video_id"],
-                        "url": meta["url"],
-                        "title": meta["title"],
-                        "chapter": ch.get("title"),
-                        "start_time": start,
-                        "yt_link": f"{meta['url']}&t={int(start)}s",
-                        "chapter_index": i
-                    }
-                })
-    else:
-        logging.info("ℹ️ No chapters found, treating transcript as single block.")
-        chapter_blocks = [{
-            "text": transcript["full_text"].strip(),
-            "meta": {
-                "video_id": meta["video_id"],
-                "url": meta["url"],
-                "title": meta["title"],
-                "chapter": None,
-                "start_time": 0,
-                "yt_link": meta["url"],
-                "chapter_index": 0
-            }
-        }]
-
-    final_chunks = []
-    for block in chapter_blocks:
-        uid_prefix = f"{block['meta']['video_id']}_ch{block['meta']['chapter_index']}"
-        final_chunks.extend(semantic_split(block["text"], block["meta"], uid_prefix))
-
-    logging.info(f"✅ Produced {len(final_chunks)} transcript chunks.")
-    return final_chunks
-
-# ---------------------------
-# Paragraph-first description splitter
-# ---------------------------
-def split_description(text: str, meta: Dict[str, Any], uid_prefix: str) -> List[Dict[str, Any]]:
-    """
-    Split description into paragraphs first.
-    If a paragraph is too long, fallback to length_split.
-    """
-    if not text.strip():
-        return []
-
-    paragraphs = [p.strip() for p in text.split("\n") if p.strip()]
-    chunks, i = [], 0
-    for p in paragraphs:
-        if len(p) > MAX_CHARS:
-            logging.info(f"↘️ Splitting long description paragraph {i} into smaller chunks")
-            chunks.extend(length_split(p, meta, f"{uid_prefix}_p{i}"))
-        else:
-            chunks.append({"id": f"{uid_prefix}_p{i}", "text": p, "meta": meta})
-        i += 1
-    logging.info(f"✅ Produced {len(chunks)} description chunks.")
-    return chunks
-
-# ---------------------------
-# Build LangChain Documents
-# ---------------------------
-
-def build_docs_from_video(meta: Dict[str, Any],
-                          transcript: Dict[str, Any]) -> List[Document]:
-    """
-    Convert raw ingestion results into LangChain Document objects:
-    - One or more Documents for description (paragraph-first split)
-    - One Document per transcript chunk (from hybrid_split)
-    Comments are intentionally excluded.
-    """
-    docs: List[Document] = []
-
-    # --- description ---
-    if meta.get("description"):
-        desc_chunks = split_description(meta["description"], meta, f"{meta['video_id']}_desc")
-        for ch in desc_chunks:
-            desc_meta = {
-                "video_id": meta["video_id"],
-                "url": meta["url"],
-                "title": meta["title"],
-                "author": meta["author"],
-                "publish_date": meta["publish_date"],
-                "duration": meta["duration"],
-                "type": "description"
-            }
-            docs.append(Document(page_content=ch["text"], metadata=desc_meta))
-
-    # --- transcript chunks ---
-    chunks = hybrid_split(meta, transcript)
-    for ch in chunks:
-        text = ch.get("text", "")
-        if not text.strip():
+def clean_page_header(text: str) -> str:
+    """Remove noisy headers/footers like '21 | P a g e' or 'JASP 0.19.3 - ...'."""
+    lines = text.split("\n")
+    cleaned_lines = []
+    for line in lines:
+        if re.match(r"^\d+\s*\|\s*P\s*a\s*g\s*e", line):
             continue
-        docs.append(
-            Document(
-                page_content=text,
-                metadata={**ch["meta"], "type": "transcript"}
-            )
+        if "JASP 0." in line or "Professor Mark Goss-Sampson" in line:
+            continue
+        cleaned_lines.append(line)
+    return "\n".join(cleaned_lines).strip()
+
+
+def merge_uppercase_titles(lines):
+    """Merge consecutive ALL-CAPS lines into a single title joined by ':'."""
+    merged = []
+    buffer = []
+    for line in lines:
+        if line.isupper() and len(line.split()) > 1:
+            buffer.append(line)
+        else:
+            if buffer:
+                merged.append(": ".join(buffer))
+                buffer = []
+            merged.append(line)
+    if buffer:
+        merged.append(": ".join(buffer))
+    return merged
+
+
+def convert_text_to_sections(text: str, page_number: str):
+    """Split text into sections based on uppercase headers — but skip mathematical expressions."""
+    lines = [l.strip() for l in text.split("\n") if l.strip()]
+    lines = merge_uppercase_titles(lines)
+
+    sections = []
+    current_title = None
+    current_content = []
+
+    for line in lines:
+        # Detect formula-like line (should NOT be treated as header)
+        if re.search(r"=|_|\|^|<|>", line):
+            current_content.append(line)
+            continue
+
+        # Real uppercase title (not formula)
+        if line.isupper() and len(line.split()) > 1:
+            # Save previous section
+            if current_title or current_content:
+                sections.append(
+                    {"title": current_title, "content": "\n".join(current_content).strip()}
+                )
+            current_title = line
+            current_content = []
+        else:
+            current_content.append(line)
+
+    if current_title or current_content:
+        sections.append({"title": current_title, "content": "\n".join(current_content).strip()})
+
+    # Add page numbers to section titles
+    for s in sections:
+        if s["title"]:
+            s["title"] = f"{s['title']} (page {page_number})"
+
+    return sections
+
+
+def reconstruct_equations(text: str) -> str:
+    """
+    Detect and format specific statistical formulas:
+      1. R^2 = SS_M / SS_T
+      2. F = Mean SS_M / Mean SS_R
+      3. t = mean group 1 - mean group 2 / standard error of mean differences
+         (also handles missing dash between group 1 and group 2)
+      4. t = (X1 - X2) / sqrt((S1)^2/n1 + (S2)^2/n2)
+    Handles:
+      - Hyphen variants (–, —, −, --)
+      - Unicode math italic letters (𝒎, 𝒆, 𝟏, etc.)
+    """
+    import re
+    import unicodedata
+
+    # Normalize Unicode math letters to ASCII
+    text = unicodedata.normalize("NFKD", text)
+    text = text.encode("ascii", "ignore").decode("ascii")
+
+    # Normalize all dash types
+    text = re.sub(r"[–—−]", "-", text)
+    text = text.replace("--", "-")
+
+    lines = [l.strip() for l in text.split("\n") if l.strip()]
+    combined = []
+    i = 0
+
+    while i < len(lines):
+        line = lines[i]
+
+        # ---------- Case 1: R² ----------
+        if re.match(r"R\s*\^?\s*2\s*=", line, re.I):
+            if i + 2 < len(lines):
+                n1, n2 = lines[i + 1], lines[i + 2]
+                if re.search(r"SSM?", n1, re.I) and re.search(r"SST?", n2, re.I):
+                    combined.append("$$R^2 = \\frac{SS_M}{SS_T}$$")
+                    i += 3
+                    continue
+
+        # ---------- Case 2: F-ratio ----------
+        if re.match(r"F\s*=", line, re.I):
+            if i + 2 < len(lines):
+                n1, n2 = lines[i + 1], lines[i + 2]
+                if re.search(r"Mean\s+SSM?", n1, re.I) and re.search(r"Mean\s+SSR?", n2, re.I):
+                    combined.append("$$F = \\frac{Mean\\ SS_M}{Mean\\ SS_R}$$")
+                    i += 3
+                    continue
+
+        # ---------- Case 3: Independent t-statistic ----------
+        if re.match(r"t\s*=", line, re.I):
+            if i + 2 < len(lines):
+                num, den = lines[i + 1], lines[i + 2]
+                num = re.sub(r"[–—−]", "-", num)
+                num = num.replace("--", "-")
+                den = re.sub(r"[–—−]", "-", den)
+
+                # If missing dash but has both group 1 & 2 → insert it
+                if re.search(r"mean\s+group\s*1", num, re.I) and re.search(r"mean\s+group\s*2", num, re.I):
+                    if "-" not in num:
+                        num = re.sub(r"(mean\s+group\s*1)\s+(mean\s+group\s*2)", r"\1 - \2", num, flags=re.I)
+
+                if re.search(r"mean\s+group\s*1.*-.*mean\s+group\s*2", num, re.I) and re.search(
+                    r"standard\s+error", den, re.I
+                ):
+                    combined.append(
+                        "$$t = \\frac{\\text{"
+                        + num.strip()
+                        + "}}{\\text{"
+                        + den.strip()
+                        + "}}$$"
+                    )
+                    i += 3
+                    continue
+
+        # ---------- Case 4: (X1 - X2) type ----------
+        if re.match(r"t\s*=", line, re.I):
+            if i + 1 < len(lines):
+                den = lines[i + 1]
+                if re.search(r"\(.*X1.*-.*X2.*\)", line, re.I) and re.search(r"S1", den, re.I):
+                    combined.append(
+                        "$$t = \\frac{(X_1 - X_2)}{\\sqrt{\\frac{(S_1)^2}{n_1} + \\frac{(S_2)^2}{n_2}}}$$"
+                    )
+                    i += 2
+                    continue
+
+        # ---------- Default ----------
+        combined.append(line)
+        i += 1
+
+    return "\n".join(combined)
+
+
+def normalize_tables(text: str) -> str:
+    """
+    Detect and remove any flattened table-like structures (numeric-heavy or repetitive short lines).
+    """
+    blocks = text.split("\n\n")
+    cleaned_blocks = []
+
+    for block in blocks:
+        lines = [l.strip() for l in block.split("\n") if l.strip()]
+        if not lines:
+            continue
+
+        # Heuristic: numeric-heavy or repeated short lines
+        num_lines = sum(1 for l in lines if re.search(r"\d", l) or "<" in l or ">" in l)
+        short_lines = sum(1 for l in lines if len(l.split()) <= 4)
+        repetition_ratio = 1 - len(set(lines)) / len(lines)
+
+        if (
+            len(lines) > 4
+            and (num_lines / len(lines) > 0.4 or short_lines / len(lines) > 0.6)
+            and repetition_ratio > 0.1
+        ):
+            logger.debug(f"🧹 Removed flattened table ({len(lines)} lines)")
+            continue
+
+        cleaned_blocks.append(block)
+
+    return "\n\n".join(cleaned_blocks)
+
+
+def make_placeholders(tag: str) -> str:
+    """Return 4 standardized placeholders."""
+    return "\n".join(f"[IMAGE_PLACEHOLDER_{tag}_{i}]" for i in range(1, 5))
+
+
+def load_and_convert_to_markdown(data_dir: str, output_dir: str):
+    """Load PDFs, clean text, and produce Markdown with placeholders using previous section names."""
+    docs = SimpleDirectoryReader(data_dir).load_data()
+    os.makedirs(output_dir, exist_ok=True)
+
+    grouped = {}
+    for d in docs:
+        fname = Path(d.metadata["file_name"]).stem
+        grouped.setdefault(fname, []).append(d)
+
+    for fname, doc_list in grouped.items():
+        all_sections = []
+
+        for d in doc_list:
+            page_num = d.metadata.get("page_label", "Unknown")
+
+            # Step 1: basic cleaning only (remove headers/footers)
+            text = clean_page_header(d.text)
+
+            # Step 2: detect sections early — while titles are still intact
+            sections = convert_text_to_sections(text, page_num)
+
+            # Step 3: process content inside each section, leave titles untouched
+            for s in sections:
+                content = s["content"]
+                content = reconstruct_equations(content)
+                # ⚠️ NOTE: normalize_equations is assumed to exist in your project,
+                # since your original script runs fine with it.
+                # We keep this call exactly as you had it.
+                content = normalize_equations(content)
+                content = normalize_tables(content)
+                s["content"] = content
+
+            all_sections.extend(sections)
+
+        # build markdown text
+        md_lines = []
+        for sec in all_sections:
+            if sec["title"]:
+                md_lines.append(f"# {sec['title']}\n")
+            if sec["content"]:
+                md_lines.append(sec["content"])
+
+        md_text = "\n\n".join(md_lines).strip()
+
+        # ✅ Insert placeholders before each header — tag = previous header’s name
+        previous_tag = None
+        previous_title = None
+
+        def insert_before_header(match):
+            nonlocal previous_tag, previous_title
+            header_line = match.group(0)
+
+            insert_text = ""
+            # Only insert if it's not the first header
+            if previous_tag:
+                image_title = f"{previous_title}-IMAGE DESCRIPTIONS"
+                insert_text = f"# {image_title}\n" + make_placeholders(previous_tag) + "\n\n"
+
+            # derive new tag and title for the *next* section
+            clean_header = header_line.replace("#", "").strip()
+            new_tag = re.sub(r"[^A-Za-z0-9]+", "_", clean_header).strip("_").upper()
+            previous_tag = new_tag
+            previous_title = clean_header
+
+            return f"{insert_text}{header_line}"
+
+        md_text = re.sub(r"(?m)^# .+", insert_before_header, md_text)
+
+        # ✅ Add final placeholders with last section’s tag and title
+        if previous_tag:
+            final_title = f"{previous_title}-IMAGE DESCRIPTIONS"
+            md_text += f"\n\n# {final_title}\n" + make_placeholders(previous_tag)
+
+        # ----------------------------
+        # CONFIG
+        # ----------------------------
+        START_MARKER = "# USING THE JASP ENVIRONMENT (page 6)"
+
+        # ✅ Remove everything before the configured start marker
+        if START_MARKER:
+            pattern = re.escape(START_MARKER)
+            match = re.search(pattern, md_text)
+            if match:
+                start_idx = match.start()
+                md_text = md_text[start_idx:]
+                logger.info(f"✂️ Trimmed content before start marker: {START_MARKER}")
+            else:
+                logger.warning(f"⚠️ Start marker not found in {fname}, keeping full text.")
+
+        out_path = Path(output_dir) / f"{fname}.md"
+        with open(out_path, "w", encoding="utf-8") as f:
+            f.write(md_text + "\n")
+
+        logger.success(
+            f"📘 Markdown created: placeholders named after previous sections → {out_path}"
         )
 
-    logging.info(
-        f"📦 Built {len(docs)} docs "
-        f"(desc={sum(1 for d in docs if d.metadata['type']=='description')}, "
-        f"trans={sum(1 for d in docs if d.metadata['type']=='transcript')})."
+
+def split_markdown_by_sections(document_text):
+    """
+    Split markdown into section chunks by '# TITLE (page N)' pattern.
+    Returns a list of dicts with 'text' and 'metadata'.
+    """
+    pattern = r"^# (.+?) \(page (\d+)\)"
+    matches = list(re.finditer(pattern, document_text, flags=re.MULTILINE))
+    sections = []
+
+    for i, match in enumerate(matches):
+        title, page = match.group(1), match.group(2)
+        start = match.end()
+        end = matches[i + 1].start() if i + 1 < len(matches) else len(document_text)
+        section_text = document_text[start:end].strip()
+
+        sections.append({
+            "text": section_text,
+            "metadata": {
+                "section_title": title,
+                "page_start": page,
+                "page_end": page,
+            },
+        })
+    return sections
+
+
+def save_test_only_json(
+    documents: List[Document],
+    output_path: str,
+    pdf_name: str,
+    source_path: str,
+):
+    """
+    Save section-level LlamaIndex Documents to a JSON file
+    with minimal, ChromaDB-safe metadata.
+    Handles case-insensitive placeholder extraction.
+    """
+    encoding = tiktoken.get_encoding("cl100k_base")
+
+    def count_tokens(text: str) -> int:
+        return len(encoding.encode(text))
+
+    def clean_none_values(d: dict) -> dict:
+        """Remove keys with None or empty strings (Chroma-safe)."""
+        return {k: v for k, v in d.items() if v not in [None, ""]}
+
+    # --- Pattern: match image placeholders, case-insensitive ---
+    placeholder_pattern = re.compile(r"\[image_placeholder_[a-z0-9_]+\]", re.IGNORECASE)
+
+    records = []
+    for doc in documents:
+        text = doc.text
+        meta = doc.metadata.copy()
+
+        # --- Parse section title and page number ---
+        section_title = meta.get("section_title", "")
+        page_start = str(meta.get("page_start", ""))
+        section_id = (
+            re.sub(r"[^A-Za-z0-9]+", "_", section_title)
+            .strip("_")
+            .upper()
+            + f"_PAGE_{page_start}"
+        )
+
+        # --- Extract image placeholders (case-insensitive) ---
+        placeholders = placeholder_pattern.findall(text)
+        # Normalize placeholders to uppercase for consistency
+        placeholders = [p.upper() for p in placeholders]
+
+        # --- Build metadata dict ---
+        record_meta = {
+            "doc_id": str(uuid.uuid4())[:8],
+            "pdf_name": pdf_name,
+            "source_path": source_path,
+            "markdown_file": Path(source_path).name,
+            "section_id": section_id,
+            "section_title": section_title,
+            "page_start": page_start,
+            "image_placeholders": placeholders,
+            "token_length": count_tokens(text),
+            "processing_date": datetime.now().isoformat(timespec="seconds"),
+        }
+
+        # --- Remove null/empty keys ---
+        record_meta = clean_none_values(record_meta)
+
+        # --- Append record ---
+        records.append({"text": text, "metadata": record_meta})
+
+    # --- Save to JSON ---
+    output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(records, f, indent=2, ensure_ascii=False)
+
+    print(f"✅ Saved {len(records)} section-level documents → {output_path}")
+    if len(records) > 1:
+        print(f"📸 Example placeholders from second doc: {records[1]['metadata'].get('image_placeholders', [])}")
+
+
+# ----------------------------
+# MAIN – wire everything together
+# ----------------------------
+
+def main():
+    # 1) PDF → Markdown (your original workflow)
+    load_and_convert_to_markdown(PDF_DIR, MARKDOWN_OUTPUT_DIR)
+
+    # 2) Load the produced markdown back with SimpleDirectoryReader
+    docs = SimpleDirectoryReader(
+        input_dir=MARKDOWN_OUTPUT_DIR,
+        recursive=False
+    ).load_data()
+
+    print(len(docs), docs[0].metadata)
+    print(docs[0].text[:500])
+
+    # 3) Split markdown into section-level "documents"
+    documents = []
+    for doc in docs:
+        for sec in split_markdown_by_sections(doc.text):
+            documents.append(
+                Document(
+                    text=sec["text"],
+                    metadata={
+                        "pdf_name": doc.metadata.get("file_name"),
+                        **sec["metadata"],
+                    }
+                )
+            )
+
+    print(f"✅ Created {len(documents)} section-level documents")
+
+    # 4) Save as JSON exactly like your original example
+    save_test_only_json(
+        documents=documents,
+        output_path=JSON_OUTPUT_PATH,
+        pdf_name=PDF_NAME,
+        source_path=MARKDOWN_FILE,
     )
-    return docs
 
 
-# ---------------------------
-# CLI entrypoint
-# ---------------------------
 if __name__ == "__main__":
-    url = "https://www.youtube.com/watch?v=j9w7hEfeIbE"
-    meta = fetch_video_info(url)
-    transcript = fetch_transcript(url, lang="en")
-    docs = build_docs_from_video(meta, transcript)
-    print(f"✅ Built {len(docs)} documents")
-    for d in docs[:3]:
-        print("---")
-        print("Type:", d.metadata["type"])
-        print("Preview:", d.page_content[:400], "...")
+    logger.info("🚀 Starting full PDF → Markdown → JSON pipeline (original logic)...")
+    main()
+    logger.info("✅ Pipeline completed successfully!")

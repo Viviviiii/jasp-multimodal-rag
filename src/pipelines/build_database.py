@@ -16,7 +16,7 @@ import time
 import os
 
 # Stage imports
-from src.ingestion.pdf_load_text_images import enrich_llamaparse_with_images
+from src.ingestion.pdf_load_text_images import enrich_toc
 from src.splitting.text_split import split_enriched_documents
 from src.embedding.embedding_store import embed_and_store
 
@@ -128,7 +128,7 @@ def build_database(
 # ---------------------------------------------------
 @timed_stage("PDF ingestion (text + images)")
 def _ingest_stage(pdf_path: str):
-    return enrich_llamaparse_with_images(pdf_path)
+    return enrich_toc(pdf_path)
 
 
 @timed_stage("Semantic chunk splitting")

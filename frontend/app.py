@@ -51,8 +51,21 @@ if st.button("Generate Answer"):
             st.markdown("### 🦄 **Source Documents**")
 
             for src in data.get("sources", []):
-                with st.expander(f"Rank {src['rank']}: {src['source']} (Page {src['page']})"):
-                    st.markdown(f"**Chunk ID:** {src['chunk_id']}")
-                    st.markdown(f"**Score:** {round(src['score'], 3) if src['score'] else 'N/A'}")
+                page = src.get("page", "?")
+                section = src.get("section", "N/A")
+                text = src.get("text", "")
+                score = round(src["score"], 3) if src.get("score") else "N/A"
+
+                with st.expander(f"Rank {src['rank']}: {src['source']} (Page {page})"):
+                    st.markdown(f"**Section:** {section}")
+                    st.markdown(f"**Chunk ID:** {src.get('chunk_id', 'N/A')}")
+                    st.markdown(f"**Score:** {score}")
+                    if text:
+                        st.markdown("---")
+                        st.markdown("**Chunk Content:**")
+                        st.markdown(f"> {text}")
+
+
+
         else:
             st.error(f"Error {response.status_code}: {response.text}")

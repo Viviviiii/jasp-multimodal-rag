@@ -37,6 +37,9 @@ class DocumentItem(BaseModel):
     page: str | int | None
     chunk_id: str | None
     score: float | None
+    section: str | None = None   # ✅ NEW
+    text: str | None = None      # ✅ NEW
+
 
 class GenerationResponse(BaseModel):
     query: str
@@ -49,6 +52,7 @@ class GenerationResponse(BaseModel):
 async def root():
     return {"message": "✅ JASP RAG API is running", "docs": "/docs"}
 
+
 @app.post("/generate", response_model=GenerationResponse)
 async def generate_endpoint(request: QueryRequest):
     """
@@ -60,11 +64,27 @@ async def generate_endpoint(request: QueryRequest):
         # ✅ Run your unified pipeline
         result = run_generation_pipeline(request.query, model=request.model)
 
+        # ✅ Include section + text content in API response
+
+        clean_sources = []
+        for i, src in enumerate(result["sources"], 1):
+            meta = src.get("metadata", {})
+            clean_sources.append({
+                "rank": i,
+                "source": meta.get("pdf_name") or meta.get("source") or "Unknown",
+                "page": str(meta.get("page_start") or meta.get("page") or "?"),
+                "chunk_id": meta.get("section_id") or meta.get("doc_id"),
+                "score": src.get("score"),
+                "section": meta.get("section_title") or "N/A",
+                "text": src.get("text", "")[:1200],
+            })
+
+
         return GenerationResponse(
             query=result["query"],
             model=result["model"],
             answer=result["answer"],
-            sources=result["sources"]
+            sources=clean_sources,
         )
 
     except Exception as e:

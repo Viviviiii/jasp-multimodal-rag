@@ -4,8 +4,9 @@ The PDF ingestion process involved extracting textual and visual information fro
 to prepare data for downstream retrieval-augmented generation (RAG) tasks. Using LlamaParse, 
 the PDFs were parsed into structured text documents, 
 while relevant figures were extracted and summarized through LLaVA to capture visual context. 
-The textual and visual content were then merged into unified, page-level representations and
-stored as structured JSON files. This format preserves both semantic and contextual information,
+The textual and visual content were then merged into unified, page-level representations ,
+and chapter/section metadata were also added and tored as structured JSON files. 
+This format preserves both semantic and contextual information,
  enabling efficient reuse for later stages such as text chunking, embedding generation, 
  and vector database indexing.
 
@@ -430,12 +431,153 @@ def enrich_llamaparse_with_images(
 
 
 
+import os
+import re
+import json
+import pandas as pd
+from pathlib import Path
+from loguru import logger
+from typing import List
+
+
+def enrich_toc(
+    pdf_path: str,
+    toc_pages: tuple = (3, 4),
+    page_offset: int = 4,
+    result_type: str = "text",
+    output_dir: str = "./data/processed/enriched",
+    save_output: bool = True
+) -> List[dict]:
+    """
+    📘 Enriches a parsed PDF (via LlamaParse + LLaVA) with chapter and section metadata
+    automatically extracted from its Table of Contents (TOC).
+
+    This function internally calls `enrich_llamaparse_with_images()` to:
+    - Parse text and extract image summaries.
+    - Combine both into page-level Documents.
+    - Then parse the TOC pages to infer `chapter` and `section` ranges.
+    - Finally, merge this structural metadata into each document.
+
+    Args:
+        pdf_path (str): Path to the input PDF file.
+        toc_pages (tuple): Page numbers containing the Table of Contents (default: (3, 4)).
+        page_offset (int): Offset between TOC numbering and actual PDF page numbering (default: 4).
+        result_type (str): Output format for LlamaParse (`"text"`, `"markdown"`, or `"json"`).
+        output_dir (str): Directory to save the final enriched file.
+        save_output (bool): Whether to save the enriched result as JSON.
+
+    Returns:
+        List[dict]: List of enriched page-level documents (as dicts), each containing:
+            - "text" : page text + image summaries
+            - "metadata" : includes page number, images, image summaries, chapter, and section
+    """
+
+    pdf_name = Path(pdf_path).stem
+    logger.info(f"🚀 Starting complete enrichment pipeline for '{pdf_name}'")
+
+    # ---------- Step 1️⃣: Parse text + image summaries ----------
+    logger.info("🧩 Running LlamaParse + LLaVA enrichment...")
+    enriched_docs = enrich_llamaparse_with_images(
+        pdf_path=pdf_path,
+        result_type=result_type,
+        save_output=False
+    )
+
+    if not enriched_docs:
+        logger.error("❌ No documents returned from enrich_llamaparse_with_images(). Aborting TOC enrichment.")
+        return []
+
+    logger.info(f"✅ Parsed and enriched {len(enriched_docs)} pages")
+
+    # ---------- Step 2️⃣: Extract TOC text ----------
+    toc_docs = [doc for doc in enriched_docs if doc.metadata.get("page") in toc_pages]
+    if not toc_docs:
+        logger.warning("⚠️ No TOC pages found — skipping structural enrichment.")
+        return [d.to_dict() for d in enriched_docs]
+
+    toc_text = "\n".join(doc.text for doc in toc_docs)
+
+    # ---------- Step 3️⃣: Parse TOC entries ----------
+    lines = [l for l in toc_text.splitlines() if re.search(r"\d{1,3}\b", l)]
+    pattern = re.compile(r"^([A-Za-z0-9’'–—“”‘.,&()/%\- ]*?)\s{2,}(\d{1,3})$")
+
+    entries = []
+    current_chapter = None
+
+    for line in lines:
+        match = pattern.search(line.strip())
+        if not match:
+            continue
+        title, page = match.groups()
+        title = title.strip()
+        page = int(page)
+
+        if not line.startswith(" "):  # CHAPTER (non-indented)
+            current_chapter = title
+            entries.append({
+                "chapter": current_chapter,
+                "section": None,
+                "start_page": page
+            })
+        else:  # SECTION (indented)
+            entries.append({
+                "chapter": current_chapter,
+                "section": title,
+                "start_page": page
+            })
+
+    toc_df = pd.DataFrame(entries)
+    toc_df["start_page"] = toc_df["start_page"] + page_offset
+    toc_df["end_page"] = toc_df["start_page"].shift(-1, fill_value=toc_df["start_page"].max() + 2) - 1
+    toc_df["end_page"] = toc_df["end_page"].astype(int)
+
+    logger.info(f"📖 TOC parsed: {len(toc_df)} sections detected after page offset ({page_offset})")
+
+    # ---------- Step 4️⃣: Map page → chapter/section ----------
+    def find_labels(page: int):
+        """Find the chapter and section corresponding to a given page number."""
+        row = toc_df[(toc_df["start_page"] <= page) & (toc_df["end_page"] >= page)]
+        if not row.empty:
+            row = row.iloc[-1]
+            return row["chapter"], row["section"]
+        prev = toc_df[toc_df["start_page"] <= page]
+        if not prev.empty:
+            row = prev.iloc[-1]
+            return row["chapter"], row["section"]
+        return None, None
+
+    # ---------- Step 5️⃣: Add chapter/section metadata ----------
+    enriched_with_toc = []
+    for doc in enriched_docs:
+        doc_dict = doc.to_dict()  # convert LlamaIndex Document to dict
+        page = doc.metadata.get("page", 0)
+        chapter, section = find_labels(page)
+        doc_dict["metadata"]["chapter"] = chapter
+        doc_dict["metadata"]["section"] = section
+        enriched_with_toc.append(doc_dict)
+
+    logger.info("✅ Added chapter and section metadata to all enriched pages.")
+
+    # ---------- Step 6️⃣: Save final enriched JSON ----------
+    if save_output:
+        Path(output_dir).mkdir(parents=True, exist_ok=True)
+        out_path = Path(output_dir) / f"{pdf_name}_enriched_with_toc.json"
+        with open(out_path, "w", encoding="utf-8") as f:
+            json.dump(enriched_with_toc, f, indent=2, ensure_ascii=False)
+        logger.success(f"💾 Saved enriched file with chapter & section metadata → {out_path}")
+
+    return enriched_with_toc
+
+
+
+
+
 # -----------------------------
 # TEST RUN (if executed directly)
 # -----------------------------
 if __name__ == "__main__":
     sample_pdf = "./data/raw/test_pages25-28.pdf"
-    enriched_docs = enrich_llamaparse_with_images(sample_pdf)
+    enriched_docs = enrich_toc(sample_pdf)
     print(f"\nProcessed {len(enriched_docs)} enriched documents ✅")
 
     # ✅ Show the first 2 enriched texts (text + image summaries)
