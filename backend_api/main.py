@@ -21,7 +21,7 @@ from loguru import logger
 from typing import List, Dict, Any
 
 # ✅ Import from your pipeline (new unified entrypoint)
-from src.pipelines.generate_answer import run_generation_pipeline
+from src.generation.generation import run_generation_pipeline
 
 # ---------- FastAPI App ----------
 app = FastAPI(title="JASP RAG Backend", version="1.0")
@@ -69,15 +69,65 @@ async def generate_endpoint(request: QueryRequest):
         clean_sources = []
         for i, src in enumerate(result["sources"], 1):
             meta = src.get("metadata", {})
-            clean_sources.append({
-                "rank": i,
-                "source": meta.get("pdf_name") or meta.get("source") or "Unknown",
-                "page": str(meta.get("page_start") or meta.get("page") or "?"),
-                "chunk_id": meta.get("section_id") or meta.get("doc_id"),
-                "score": src.get("score"),
-                "section": meta.get("section_title") or "N/A",
-                "text": src.get("text", "")[:1200],
-            })
+            source_type = meta.get("source_type", "document")
+
+            if source_type == "video_transcript":
+                video_title = meta.get("video_title", "Untitled Video")
+                chapter_title = meta.get("chapter_title", None)
+                video_author = meta.get("author", "Unknown")
+                video_url = meta.get("url", "")
+                start_time = meta.get("start_time", "")
+                end_time = meta.get("end_time", "")
+                time_range = meta.get("time_range") or f"{start_time}–{end_time}" if start_time else "N/A"
+
+                # Construct deep link to specific timestamp
+                if video_url and start_time:
+                    try:
+                        mins, secs = start_time.split(":")
+                        timestamp = int(mins) * 60 + int(secs)
+                        video_link = f"{video_url}&t={timestamp}s"
+                    except Exception:
+                        video_link = video_url
+                else:
+                    video_link = video_url
+
+                # Display readable section title
+                section_label = f"🎥 {chapter_title}" if chapter_title else f"🎥 Video Segment {time_range}"
+
+                source_display = f"{video_title} ({video_author})"
+
+                clean_sources.append({
+                    "rank": i,
+                    "source": source_display,
+                    "page": time_range,
+                    "chunk_id": meta.get("section_id") or meta.get("doc_id"),
+                    "score": src.get("score"),
+                    "section": section_label,
+                    "text": src.get("text", "")[:1200],
+                    "source_type": source_type,
+                    "video_link": video_link,
+                    "video_url": video_url,  # ✅ Base YouTube URL
+                })
+
+            else:
+                # Text-based source (PDF/Markdown)
+                clean_sources.append({
+                    "rank": i,
+                    "source": meta.get("pdf_name") or meta.get("markdown_file") or meta.get("source") or "Unknown",
+                    "page": str(meta.get("page_start") or meta.get("page") or "?"),
+                    "chunk_id": meta.get("section_id") or meta.get("doc_id"),
+                    "score": src.get("score"),
+                    "section": meta.get("section_title") or "N/A",
+                    "text": src.get("text", "")[:1200],
+                    "source_type": source_type,
+                    "video_link": None,
+                    "video_url": None,
+                })
+
+
+
+
+
 
 
         return GenerationResponse(

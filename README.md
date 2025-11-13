@@ -45,5 +45,5 @@ Example:
 
 ###### update: When you make changes in VS Code:
 git add .
-git commit -m "full pipeline version-1 "
+git commit -m "full pipeline version-3:add github and video  "
 git push

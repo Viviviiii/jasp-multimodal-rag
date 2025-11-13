@@ -1,0 +1,16 @@
+{
+  "videos": [
+    {
+      "name": "Introduction to JASP",
+      "url": "https://www.youtube.com/watch?v=APRaBFC2lEQ",
+      "category": "Analysis",
+      "language": "en"
+    },
+    {
+      "name": "JASP repeated measures ANOVA and post hoc tests",
+      "url": "https://www.youtube.com/watch?v=CWRmc2t1Vlo",
+      "category": "Analysis",
+      "language": "en"
+    }
+  ]
+}

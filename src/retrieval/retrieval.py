@@ -9,7 +9,7 @@
 
 ---------------------------------------------------
 Run:
-    poetry run python -m src.retrieval.retrieval --q "How to split data files in JASP?"
+    poetry run python -m src.retrieval.retrieval --q "How to run repeated measures ANOVA in JASP?"
   
 ---------------------------------------------------
 """
@@ -95,7 +95,7 @@ K_SEMANTIC = 10
 K_BM25 = 10
 RRF_K = 60
 TOP_AFTER_RRF = 10
-TOP_FINAL = 3
+TOP_FINAL = 5
 
 BGE_RERANKER = "BAAI/bge-reranker-large"
 ST_CE_FALLBACK = "cross-encoder/ms-marco-MiniLM-L-6-v2"
@@ -131,6 +131,10 @@ def get_node_metadata(node) -> Dict:
 
     return {}
 
+
+# --------------------------------------------------
+# LOAD DOCUMENTS FOR BM25 (Supports folder or list)
+# --------------------------------------------------
 
 def load_docs_for_bm25(input_path: Union[str, list[str]]) -> List[Document]:
     json_files = []
@@ -197,25 +201,50 @@ def load_docs_for_bm25(input_path: Union[str, list[str]]) -> List[Document]:
 
 
 
-# --------------------------------------------------
-# LOAD DOCUMENTS FOR BM25 (Supports folder or list)
-# --------------------------------------------------
-
 
 # --------------------------------------------------
 # BUILD RETRIEVERS
 # --------------------------------------------------
 
+class BoostedBM25Retriever:
+    """BM25 retriever with metadata-based score boosting."""
+    def __init__(self, retriever: BM25Retriever, boost_weight: float = 0.2):
+        self.retriever = retriever
+        self.boost_weight = boost_weight
+
+    def retrieve(self, query: str):
+        results = self.retriever.retrieve(query)
+        boosted_results = []
+
+        for node in results:
+            meta = node.metadata or {}
+            section_title = str(meta.get("section_title", "")).lower()
+            video_title = str(meta.get("title", "")).lower()
+            q_lower = query.lower()
+
+            # Simple keyword-based boosting
+            if any(kw in section_title or kw in video_title for kw in q_lower.split()):
+                node.score += self.boost_weight
+                logger.debug(f"⚡ Boosted score by {self.boost_weight} for match in '{section_title or video_title}'")
+
+            boosted_results.append(node)
+
+        # Re-sort by new scores
+        boosted_results.sort(key=lambda x: x.score, reverse=True)
+        return boosted_results
+
+
 
 def build_bm25_retriever(docs: List[Document]):
-    """Build a BM25 retriever."""
+    """Build a BM25 retriever with optional metadata boost."""
     if BM25Retriever is None:
         raise RuntimeError("BM25Retriever not available. Install llama-index with bm25 extras.")
     logger.info(f"Initializing BM25 retriever with {len(docs)} documents...")
 
-    bm25_retriever = BM25Retriever(docs, similarity_top_k=K_BM25)
-    return bm25_retriever
+    base_retriever = BM25Retriever(docs, similarity_top_k=K_BM25)
+    boosted_retriever = BoostedBM25Retriever(base_retriever, boost_weight=0.2)
 
+    return boosted_retriever
 
 
 
@@ -282,30 +311,38 @@ def rrf_fuse(results_a, results_b, k=RRF_K, top_n=TOP_AFTER_RRF):
 # CROSS-ENCODER RERANK
 # --------------------------------------------------
 
-
 def rerank_cross_encoder(nodes: List[NodeWithScore], query: str, top_k: int = TOP_FINAL) -> List[NodeWithScore]:
-    """Apply cross-encoder reranking (BGE preferred)."""
+    """Apply cross-encoder reranking (BGE preferred) with positive-score filtering."""
 
+    if not nodes:
+        logger.warning("⚠️ No retrieved nodes to rerank.")
+        return []
+
+    results = []
     if FlagEmbeddingReranker is not None:
         logger.info(f"⚙️ Cross-encoder rerank with BGE model: {BGE_RERANKER}")
         reranker = FlagEmbeddingReranker(
             model=BGE_RERANKER,
             top_n=top_k,
-            use_fp16=True,  # ✅ faster on MPS or GPU
+            use_fp16=True,
         )
         results = reranker.postprocess_nodes(nodes, query_str=query)
         logger.success("✅ Reranking completed with FlagEmbeddingReranker")
-        return results
 
     elif SentenceTransformerRerank is not None:
         logger.info(f"⚙️ Cross-encoder rerank with SentenceTransformer fallback: {ST_CE_FALLBACK}")
         reranker = SentenceTransformerRerank(model=ST_CE_FALLBACK, top_n=top_k)
-        return reranker.postprocess_nodes(nodes, query_str=query)
+        results = reranker.postprocess_nodes(nodes, query_str=query)
 
     else:
         logger.warning("⚠️ No cross-encoder available — skipping rerank.")
-        return nodes[:top_k]
+        results = nodes[:top_k]
 
+    # ✅ Filter out nodes with non-positive scores
+    filtered = [n for n in results if getattr(n, "score", -99) > -3]
+    logger.info(f"📊 Retained {len(filtered)}/{len(results)} nodes after score filtering (score > 0)")
+
+    return filtered
 
 
 

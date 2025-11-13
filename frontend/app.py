@@ -26,9 +26,9 @@ model = st.sidebar.selectbox("Select model:", ["mistral:7b", "llama3.2:3b", "phi
 st.sidebar.markdown("---")
 
 # ---------- Main UI ----------
-st.title("🦁 JASP RAG Assistant")
+st.title("🦁 JASP RAG Protocol")
 query = st.text_area(
-    "Ask a question about the JASP manual:",
+    "Ask a question:",
     height=120,
     placeholder="e.g. How to split data files in JASP?"
 )
@@ -37,14 +37,14 @@ if st.button("Generate Answer"):
     if not query.strip():
         st.warning("Please enter a query.")
     else:
-        with st.spinner("Generating response... 🐦‍🔥"):
+        with st.spinner("Generating response... 🔥"):
             response = requests.post(API_URL, json={"query": query, "model": model})
 
         if response.status_code == 200:
             data = response.json()
 
-            st.success("🔥 Answer generated successfully!")
-            st.markdown("### ☄️ **Answer**")
+            st.success("☄️ Answer generated successfully!")
+            st.markdown("### **Answer**")
             st.markdown(data["answer"])
 
                 # --- Show Logs ---
@@ -62,14 +62,25 @@ if st.button("Generate Answer"):
                 text = src.get("text", "")
                 score = round(src["score"], 3) if src.get("score") else "N/A"
 
-                with st.expander(f"Rank {src['rank']}: {src['source']} (Page {page})"):
-                    st.markdown(f"**Section:** {section}")
-                    st.markdown(f"**Chunk ID:** {src.get('chunk_id', 'N/A')}")
-                    st.markdown(f"**Score:** {score}")
-                    if text:
-                        st.markdown("---")
-                        st.markdown("**Chunk Content:**")
-                        st.markdown(f"> {text}")
+                source_type = src.get("source_type", "document")
+                source = src.get("source", "Unknown")
+
+                if source_type == "video_transcript":
+                    # 🎥 Format for video chunks
+                    header = f"🎥 Rank {src['rank']}: {source} (Time {page})"
+                else:
+                    header = f"📄 Rank {src['rank']}: {source} (Page {page})"
+
+                with st.expander(header):
+                    st.markdown(f"**Section:** {src.get('section', 'N/A')}")
+                    st.markdown(f"**Score:** {round(src.get('score', 0), 3) if src.get('score') else 'N/A'}")
+
+                    if source_type == "video_transcript" and src.get("video_link"):
+                        st.markdown(f"[▶️ Open on YouTube]({src['video_link']})")
+
+                    st.markdown("---")
+                    st.markdown("**Chunk Content:**")
+                    st.markdown(f"> {src.get('text', '')}")
 
 
 

@@ -64,26 +64,6 @@ def make_doc_id(text: str, source: str, chunk_id: int) -> str:
     return hashlib.md5(raw).hexdigest()
 
 
-def load_chunks_from_json_old(json_path: str) -> List[Document]:
-    """Load one JSON file and convert to LlamaIndex Documents with IDs."""
-    if not os.path.exists(json_path):
-        raise FileNotFoundError(f"❌ File not found: {json_path}")
-
-    with open(json_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-
-    source_name = Path(json_path).stem
-    docs = []
-    for idx, item in enumerate(data):
-        metadata = flatten_metadata(item.get("metadata", {}))
-        metadata.update({"source": source_name, "chunk_id": str(idx)})
-
-        doc_id = make_doc_id(item["text"], source_name, idx)
-        docs.append(Document(id_=doc_id, text=item["text"], metadata=metadata))
-
-    logger.info(f"📄 Loaded {len(docs)} chunks from {json_path}")
-    return docs
-
 def load_chunks_from_json(json_path: str) -> List[Document]:
     """Load one JSON file and convert to LlamaIndex Documents with IDs."""
     if not os.path.exists(json_path):
