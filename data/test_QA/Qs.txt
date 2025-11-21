@@ -1,161 +1,39 @@
 🧪 How to instructions:
 
+How to import data from Excel or CSV into JASP?
+
 How do I run a repeated measures ANOVA in JASP?
-
-How to perform a Bayesian ANOVA and interpret Bayes Factors?
-
-How can I add a covariate in repeated measures ANOVA?
 
 How to perform mediation or moderation analysis in JASP?
 
-How to perform equivalence tests or pairwise comparisons in JASP?
+How to run PAIRED SAMPLES T-TEST in JASP?
 
-How to import data from Excel or CSV into JASP?
-
-How to compute or transform new variables (e.g., mean score)?
-
-How to deal with missing data in ANOVA or chi-square tests?
-
-How to reshape data from wide to long format?
-
-How to filter rows or select specific cases in JASP?
-
-How to merge two datasets or append variables?
-
-How to handle missing values before running tests?
-
-How to export plots from JASP to high-resolution images?
-
-How to generate APA-style tables in JASP?
-
-How to create a raincloud plot in JASP?
-
-How to change color schemes or axis labels in plots?
-
-How to customize the appearance of forest plots?
-
-How to visualize correlations in JASP?
-
-How to combine multiple plots in one figure?
-
-Can I adjust figure size before export?
- 
-
-
+Can JASP run Principal Component Analysis?
 
 
 📚 Learning / Conceptual Struggles:
 
-What analysis should I use for my data?
-
-How to interpret the Bayes factor in Bayesian repeated measures ANOVA?
-
-How to interpret results of Bayesian mixed models?
-
-What does a Bayes factor of 3.2 mean?
-
-How to understand what a Bayes factor means?
-
-How to report Bayesian t-test results in APA format?
-
-How to interpret partial eta-squared in ANOVA?
-
-How to interpret main effects and interactions in rmANOVA?
-
-Why is my F-test significant but no pairwise comparisons are?
-
-How to interpret standardized estimates in mediation SEM?
-
-What does the difference between BF10 and BF01 mean?
-
-How to describe posterior probability results in Bayesian models?
-
-What is the difference between ANCOVA and repeated measures with a covariate?
-
-What is the difference between one-way and repeated measures ANOVA?
-
-When should I use regression instead of correlation?
-
 How to know if my data meets ANOVA assumptions?
 
-What’s the difference between within- and between-subject factors?
+How to perform a Bayesian regression and interpret Bayes Factors?
 
-What does “posterior probability” mean in JASP output?
-
-How to interpret an interaction effect conceptually?
 
 
 
 ⚙️ Technical / Software Issues: 
 
-
-JASP won’t start after updating to version 0.19.1.
-
 JASP crashes when opening a .jasp file.
-
-Error loading “Descriptives” or other modules in JASP.
-
-Antivirus (AVAST) flags libRinside.dll as a virus after update.
 
 Why can’t I install JASP on macOS Ventura?
 
-JASP freezes when running Bayesian ANOVA.
 
-Compatibility issue: opening .jasp from 0.19.0 in 0.19.1.
-
-Where should libRinside.dll normally be stored?
-
-Why does JASP fail to load the SEM module?
-
-JASP output disappears after reopening the file.
-
-Why does JASP misclassify variable types after import?
-
-Why does my dataset not show categorical factors correctly?
-
-Why are my variable labels lost after importing from SPSS?
-
-Why are plots missing in my saved .jasp file?
-
-Why doesn’t the interaction plot appear in ANOVA output?
-
-Why do my results change when I rerun the analysis?
-
-My JASP output is blank — what happened?
-
-Can I recover a JASP file after a crash?
 
 
 💡 Feature Requests / Philosophy: 
 
-Why does JASP use Cauchy priors by default?
-
 Why does JASP use z-tests instead of t-tests in the Process module?
 
 Why do JASP and SPSS show different p-values?
-
-Why are SPSS and JASP giving different ANOVA results?
-
-Will JASP support mediation analysis in the future?
-
-Is it possible to run a confirmatory factor analysis in JASP?
-
-Can JASP integrate with R or JAMOVI modules?
-
-Can you add survival analysis or path analysis?
-
-Why is effect size not shown by default in t-tests?
-
-Can we change the prior settings globally in JASP?
-
-Will JASP allow scripting or automation in future versions?
-
-Why does JASP only show descriptive plots for some tests?
-
-Can I set my own significance threshold by default?
-
-Can JASP support robust regression methods?
-
 
 
 
@@ -163,14 +41,7 @@ Can JASP support robust regression methods?
 
 I can’t reproduce results from a published paper using JASP.
 
-My data look strange — can someone help?
-
 Something went wrong but I don’t know what.
-
-My JASP file doesn’t match the tutorial video.
-
-Please help, my analysis results seem wrong.
 
 Does anyone know if JASP can do this?
 
-Why are my results different from a textbook example?

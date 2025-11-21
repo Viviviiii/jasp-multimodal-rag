@@ -92,7 +92,12 @@ def split_json_sections_into_chunks(
     # 💾 SAVE OUTPUT
     # ---------------------------------------------------------------------
     output_dir.mkdir(parents=True, exist_ok=True)
-    output_path = output_dir / f"{input_json.stem}_chunks.json"
+    
+    # Remove the suffix from the stem
+    clean_stem = input_json.stem.replace("_section_enriched", "")
+
+    # Save output file using the cleaned name
+    output_path = output_dir / f"manual_{clean_stem}.json"
 
     with open(output_path, "w") as f:
         json.dump({"sections": all_chunks}, f, indent=2, ensure_ascii=False)

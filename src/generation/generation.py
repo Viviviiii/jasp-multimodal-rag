@@ -41,62 +41,73 @@ Answer in markdown, include source references when available.
 # --------------------------------------------------
 # 🧩 METADATA UNPACKING (robust multi-source version)
 # --------------------------------------------------
+
 def unpack_source(node_item, rank: int) -> Dict:
     """
     Normalize metadata across PDFs, GitHub markdown, and videos.
-    Guarantees consistent keys: source_type, source, section, page.
+    Guarantees consistent keys for the frontend:
+    source_type, source, source_url, page, section, score, text.
     """
     node = getattr(node_item, "node", node_item)
     meta = getattr(node, "metadata", {}) or {}
     text = node.get_content() if hasattr(node, "get_content") else getattr(node, "text", "")
-
-    source_type = meta.get("source_type", "document").lower()
     score = getattr(node_item, "score", None)
 
-    # ---------- 📘 PDF / Document ----------
+    source_type = (meta.get("source_type") or "").lower()
+
+    # ---------------------------------
+    # 📘 PDF CHUNKS
+    # ---------------------------------
     if "pdf" in source_type or meta.get("pdf_name"):
-        source = meta.get("pdf_name", "Unknown PDF")
-        page = meta.get("page_start") or meta.get("page") or "?"
-        section = meta.get("section_title") or "Document section"
-        display_source = f"📘 {source}"
+        return {
+            "rank": rank,
+            "source_type": "pdf",
+            "source": meta.get("pdf_name"),
+            "source_url": meta.get("source_url"),
+            "page": meta.get("page_start") or meta.get("page") or "?",
+            "section": meta.get("section_title") or "PDF section",
+            "chunk_id": meta.get("doc_id") or f"chunk_{rank}",
+            "score": score,
+            "text": text[:1200],
+            "metadata": meta,
+        }
 
-    # ---------- 🧩 GitHub Markdown ----------
-    elif "github" in source_type or meta.get("markdown_file"):
-        source = meta.get("markdown_file", "GitHub help file")
-        github_repo = meta.get("github_name", "JASP GitHub")
-        section = meta.get("section_title") or "GitHub section"
-        page = meta.get("section_title") or "–"
-        display_source = f"🐙 {github_repo}/{source}"
+    # ---------------------------------
+    # 🧩 GITHUB MARKDOWN
+    # ---------------------------------
+    if "github" in source_type or meta.get("markdown_file"):
+        return {
+            "rank": rank,
+            "source_type": "github",
+            "source": meta.get("markdown_file"),
+            "source_url": meta.get("source_url"),
+            "page": meta.get("section_title") or "-",
+            "section": meta.get("section_title") or "GitHub section",
+            "chunk_id": meta.get("doc_id") or f"chunk_{rank}",
+            "score": score,
+            "text": text[:1200],
+            "metadata": meta,
+        }
 
-    # ---------- 🎥 Video Transcript ----------
-    elif "video" in source_type or meta.get("video_title"):
-        video_title = meta.get("video_title", "Untitled Video")
-        chapter = meta.get("chapter_title")
-        start = meta.get("start_time")
-        end = meta.get("end_time")
-        time_range = f"{start}–{end}" if start and end else start or "N/A"
-        section = chapter or f"Segment {time_range}"
-        page = time_range
-        display_source = f"🎥 {video_title}"
+    # ---------------------------------
+    # 🎥 VIDEO TRANSCRIPTS
+    # ---------------------------------
+    if "video" in source_type or meta.get("video_title"):
+        return {
+            "rank": rank,
+            "source_type": "video",
+            "source": meta.get("video_title"),
+            "source_url": meta.get("video_url") or meta.get("source_url"),
+            "page": meta.get("start_time"),
+            "section": meta.get("chapter_title") or "Video segment",
+            "chunk_id": meta.get("doc_id") or f"chunk_{rank}",
+            "score": score,
+            "text": text[:1200],
+            "metadata": meta,
+        }
 
-    # ---------- Default fallback ----------
-    else:
-        source = meta.get("source") or "Unknown source"
-        section = meta.get("section_title") or "General section"
-        page = meta.get("page") or "?"
-        display_source = source
-
-    return {
-        "rank": rank,
-        "source_type": source_type,
-        "source": display_source,
-        "page": page,
-        "section": section,
-        "chunk_id": meta.get("doc_id") or f"chunk_{rank}",
-        "score": score,
-        "text": text[:1200],
-        "metadata": meta,
-    }
+    # ---------------------------------
+    #
 
 
 # --------------------------------------------------

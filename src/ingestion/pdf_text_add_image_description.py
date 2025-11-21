@@ -21,6 +21,7 @@ import json
 import base64
 import fitz  # PyMuPDF
 import requests
+
 from time import sleep
 from tqdm import tqdm
 from pathlib import Path
@@ -42,7 +43,7 @@ MAX_PER_PLACEHOLDER = 2
 # -------------------------------------------------------------------------
 def extract_images_from_pdf(
     pdf_path: str,
-    output_root: str = "./data/page_images",
+    output_root: str = "./data/processed/pdf/images_extracted",
     min_width: int = MIN_W_DEFAULT,
     min_height: int = MIN_H_DEFAULT,
     overwrite: bool = False,
@@ -56,6 +57,7 @@ def extract_images_from_pdf(
 
     pdf_name = Path(pdf_path).stem
     output_dir = Path(output_root) / pdf_name
+    
     output_dir.mkdir(parents=True, exist_ok=True)
 
     images_by_page: Dict[int, List[str]] = {}
@@ -177,12 +179,13 @@ def summarize_all_images(images_by_page: Dict[int, List[str]], model: str = MODE
 # -------------------------------------------------------------------------
 # 🧩 STEP 3 — Dispatch (unchanged from working version)
 # -------------------------------------------------------------------------
-
 def dispatch_images_to_placeholders(
     text_json_path: str,
     image_data: Dict[int | str, Dict[str, List[str]]],
+    source_metadata: dict,
     output_path: Optional[str] = None,
 ) -> str:
+
     """
     Assign image descriptions to placeholders, allowing fallback to nearby pages.
 
@@ -253,6 +256,9 @@ def dispatch_images_to_placeholders(
     # Iterate through sections and assign images
     for sec in sections:
         meta = sec.get("metadata", {})
+        # Add PDF-level metadata
+        meta.update(source_metadata)
+
         placeholders = meta.get("image_placeholders") or []
 
         if not placeholders:
@@ -306,10 +312,14 @@ def dispatch_images_to_placeholders(
 
 
     # Save output
-    out_path = output_path or text_json_path.with_name(
-        text_json_path.stem + "_with_images.json"
-    )
-    out_path.parent.mkdir(parents=True, exist_ok=True)
+    # Save enriched JSON into text_with_images/<PDF_NAME>.json
+    out_dir = Path("data/processed/pdf/text_with_images")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    # Clean filename (no suffix)
+    pdf_name = Path(text_json_path).stem
+    out_path = out_dir / f"{pdf_name}.json"
+
+
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(sections, f, indent=2, ensure_ascii=False)
 
@@ -332,18 +342,24 @@ import re
 from pathlib import Path
 from loguru import logger
 
+from transformers import AutoTokenizer
+
+# -------------------------------------------------------------------------
+# 🧮 Tokenize using your real embedding tokenizer + log oversize sections
+# -------------------------------------------------------------------------
+
+EMBED_MAX_TOKENS = 512   # your embedding model limit
+EMBED_MODEL = "BAAI/bge-large-en-v1.5"
+tokenizer = AutoTokenizer.from_pretrained(EMBED_MODEL)
 
 def simple_tokenize(text: str) -> int:
-    """
-    Very simple, open-source-friendly tokenizer.
-    Counts 'tokens' as sequences of non-whitespace characters.
-    This is not model-specific, but good enough for relative length.
-    """
+    """Tokenize text using your embedding model tokenizer."""
     if not text:
         return 0
-    # Split on any whitespace; each non-empty piece is a 'token'
-    return len(re.findall(r"\S+", text))
-    
+    return len(tokenizer.encode(text, add_special_tokens=False))
+
+
+ 
 
 def update_token_length(json_path: str) -> str:
     """
@@ -370,7 +386,33 @@ def update_token_length(json_path: str) -> str:
         meta["token_length"] = tokens
         sec["metadata"] = meta
 
-    updated_path = Path("data/processed") / f"{Path(json_path).stem.replace('_with_images', '')}_section_enriched.json"
+   
+   # Count sections exceeding embedding model token limit
+    oversized = [
+        sec for sec in data
+        if sec.get("metadata", {}).get("token_length", 0) > EMBED_MAX_TOKENS
+    ]
+
+    if oversized:
+        logger.warning(f"⚠️ {len(oversized)} sections exceed {EMBED_MAX_TOKENS} tokens!")
+
+        # Log detail: section_id & length
+        for sec in oversized:
+            m = sec["metadata"]
+            logger.warning(
+                f"    - {m.get('section_id')} : {m.get('token_length')} tokens"
+            )
+    else:
+        logger.info("✅ No sections exceed the embedding token limit.")
+
+    # Save final enriched JSON into final_enriched/<PDF_NAME>.json
+    out_dir = Path("data/processed/pdf/final_enriched")
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    # Remove folder suffixes from name
+    pdf_name = Path(json_path).stem  # Already clean now
+    updated_path = out_dir / f"{pdf_name}.json"
+
 
     with open(updated_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
@@ -379,46 +421,168 @@ def update_token_length(json_path: str) -> str:
     return str(updated_path)
 
 
+
+def load_pdf_source_metadata(pdf_name: str) -> dict:
+    """
+    Load PDF metadata (source_url, etc.) from data/raw_pdf/pdf_list.json
+    based on the PDF name.
+    """
+    meta_file = Path("data/raw_pdf/pdf_list.json")
+    if not meta_file.exists():
+        logger.warning("⚠️ pdf_list.json not found — no source_url added.")
+        return {}
+
+    with open(meta_file, "r", encoding="utf-8") as f:
+        data = json.load(f).get("pdf", [])
+
+    for item in data:
+        # match by the base name, without ".pdf"
+        if item.get("name") == pdf_name:
+            return {
+                "source_type": "pdf",
+                "source_url": item.get("source_url"),
+            }
+
+    logger.warning(f"⚠️ No metadata found in pdf_list.json for '{pdf_name}'")
+    return {}
+
+
+
+
 # -------------------------------------------------------------------------
 # 🚀 STEP 4 — Unified pipeline
 # -------------------------------------------------------------------------
+
 def add_image_descriptions_pipeline(pdf_path: str, text_json_path: str, model: str = MODEL_DEFAULT):
     """
-    Full pipeline:
-      1. Extract images from the PDF.
-      2. Summarize images with LLaVA.
-      3. Dispatch summaries into the text JSON.
-      4. Update token length for enriched sections.
+    Full pipeline with early skip for existing image summaries.
     """
     pdf_name = Path(pdf_path).stem
-    image_json_path = Path(f"./data/processed/image_summaries/{pdf_name}_summaries.json")
 
-    # ✅ Step 1: Extract all pages
-    images_by_page = extract_images_from_pdf(pdf_path, overwrite=False)
-    if not images_by_page:
-        logger.warning("No images found.")
-        return
+    # Load metadata
+    pdf_source_meta = load_pdf_source_metadata(pdf_name)
 
-    # ✅ Step 2: Summarize
-    image_data = summarize_all_images(images_by_page, model=model, output_path=image_json_path)
+    # Where the summary JSON should be
+    image_json_dir = Path("data/processed/pdf/image_description")
+    image_json_dir.mkdir(parents=True, exist_ok=True)
+    image_json_path = image_json_dir / f"{pdf_name}.json"
 
-    # ✅ Step 3: Dispatch (creates *_with_images.json)
-    enriched_path = dispatch_images_to_placeholders(text_json_path, image_data=image_data)
+    # ------------------------------------------------------
+    # ✅ EARLY SKIP: If image summary exists, skip extraction & summarization
+    # ------------------------------------------------------
+    if image_json_path.exists():
+        logger.info(f"⏭️ Found existing image summary: {image_json_path}")
+        logger.info("⏭️ Skipping image extraction & summarization.")
 
-    # ✅ Step 4: Update token length for enriched data
+        with open(image_json_path, "r", encoding="utf-8") as f:
+            image_data = json.load(f)
+
+    else:
+        # ------------------------------------------------------
+        # Step 1: Extract images
+        # ------------------------------------------------------
+        images_by_page = extract_images_from_pdf(pdf_path, overwrite=False)
+
+        if not images_by_page:
+            logger.warning(f"⚠️ No extractable images found in {pdf_name}, but continuing with empty image data.")
+            image_data = {}
+        else:
+            # ------------------------------------------------------
+            # Step 2: Summarize
+            # ------------------------------------------------------
+            image_data = summarize_all_images(
+                images_by_page,
+                model=model,
+                output_path=image_json_path
+            )
+
+    # ------------------------------------------------------
+    # Step 3: Dispatch into section-level JSON
+    # ------------------------------------------------------
+    enriched_path = dispatch_images_to_placeholders(
+        text_json_path,
+        image_data=image_data,
+        source_metadata=pdf_source_meta,
+    )
+
+    # ------------------------------------------------------
+    # Step 4: Update token lengths
+    # ------------------------------------------------------
     final_path = update_token_length(enriched_path)
 
-    logger.success(f"🏁 Pipeline complete → Final enriched JSON with tokens: {final_path}")
+    logger.success(f"🏁 Pipeline complete → Final enriched JSON created: {final_path}")
     return final_path
 
 
 
+def run_pdf_add_image_descriptions_batch(
+    pdf_dir: str,
+    text_json_dir: str,
+    target_pdf: str | None = None,
+    model: str = MODEL_DEFAULT,
+):
+    """
+    Run the image-description pipeline for:
+      - all PDFs in the folder, OR
+      - only one selected PDF.
+    """
+    pdf_dir = Path(pdf_dir)
+    text_json_dir = Path(text_json_dir)
+
+    pdf_files = sorted(pdf_dir.glob("*.pdf"))
+
+    if target_pdf:
+        target_pdf = target_pdf.lower()
+        pdf_files = [p for p in pdf_files if p.name.lower() == target_pdf]
+
+        if not pdf_files:
+            logger.error(f"❌ Target PDF '{target_pdf}' not found in {pdf_dir}")
+            return []
+
+        logger.info(f"🎯 Processing ONLY: {target_pdf}")
+    else:
+        logger.info(f"📘 Processing all {len(pdf_files)} PDFs found in {pdf_dir}")
+
+    outputs = []
+
+    for pdf_path in pdf_files:
+        pdf_name = pdf_path.stem
+        text_json_path = text_json_dir / f"{pdf_name}.json"
+
+        if not text_json_path.exists():
+            logger.warning(f"⚠️ JSON not found for {pdf_name}, skipping.")
+            continue
+
+        logger.info(f"🚀 Running pipeline for: {pdf_name}")
+        out = add_image_descriptions_pipeline(
+            pdf_path=str(pdf_path),
+            text_json_path=str(text_json_path),
+            model=model,
+        )
+        outputs.append(out)
+
+    logger.success(f"🏁 Completed image description pipeline for {len(outputs)} PDF(s).")
+    return outputs
 
 
 # -------------------------------------------------------------------------
 # CLI entry
 # -------------------------------------------------------------------------
 if __name__ == "__main__":
-    PDF_PATH = "/Users/ywxiu/jasp-multimodal-rag/data/data/raw/Statistical-Analysis-in-JASP-A-guide-for-students-2025.pdf"
-    TEXT_JSON = "/Users/ywxiu/jasp-multimodal-rag/data/processed/Statistical-Analysis-in-JASP-A-guide-for-students-2025.json"
-    add_image_descriptions_pipeline(PDF_PATH, TEXT_JSON, model="llava-phi3:latest")
+    PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+    RAW_PDF_DIR = PROJECT_ROOT / "data/raw_pdf"
+    TEXT_JSON_DIR = PROJECT_ROOT / "data/processed/pdf/text"
+
+
+    # Set None to process all PDFs
+    target_pdf = None
+    # Or:
+    # target_pdf = "Statistical-Analysis-in-JASP-A-guide-for-students-2025.pdf"
+
+    run_pdf_add_image_descriptions_batch(
+        pdf_dir=str(RAW_PDF_DIR),
+        text_json_dir=str(TEXT_JSON_DIR),
+        target_pdf=target_pdf,
+        model=MODEL_DEFAULT,
+    )

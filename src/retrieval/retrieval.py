@@ -23,7 +23,7 @@ import json
 import argparse
 import hashlib
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, Union
 from loguru import logger
 import chromadb
 
@@ -93,9 +93,11 @@ CHUNKS_JSON = "/Users/ywxiu/jasp-multimodal-rag/data/processed/chunks/"
 
 K_SEMANTIC = 10
 K_BM25 = 10
-RRF_K = 60
+BOOST_WEIGHT = 5
+RRF_K = 120
 TOP_AFTER_RRF = 10
 TOP_FINAL = 5
+SCORE_THRESHOLD = -3 
 
 BGE_RERANKER = "BAAI/bge-reranker-large"
 ST_CE_FALLBACK = "cross-encoder/ms-marco-MiniLM-L-6-v2"
@@ -105,33 +107,183 @@ OLLAMA_MODEL = "mistral:7b"
 # --------------------------------------------------
 # LOAD DOCUMENTS FOR BM25
 # --------------------------------------------------
+
 def get_node_metadata(node) -> Dict:
     """
-    Robustly extract metadata from a LlamaIndex Node / Document / NodeWithScore.
-    Handles differences between versions (metadata vs extra_info).
+    Robustly extract and normalize metadata from a LlamaIndex Node / Document / NodeWithScore.
+    Ensures PDF metadata includes: source_type, source_url, page.
     """
-    # unwrap NodeWithScore
+
+    # ------------------------------
+    # 1. Unwrap NodeWithScore
+    # ------------------------------
     if hasattr(node, "node"):
         node = node.node
 
-    # Try the usual metadata attribute
+    # ------------------------------
+    # 2. Extract metadata from Node
+    # ------------------------------
     meta = getattr(node, "metadata", None)
     if meta:
-        return dict(meta)
+        meta = dict(meta)
+    else:
+        meta = {}
 
-    # Older versions sometimes use extra_info
+    # fallback for older versions (extra_info)
     extra = getattr(node, "extra_info", None)
     if extra:
-        return dict(extra)
+        meta.update(extra)
 
-    # Some Documents store in .metadata, Nodes in .extra_info; try source_node if present
+    # fallback for nodes with source_node metadata
     source_node = getattr(node, "source_node", None)
     if source_node is not None:
-        return get_node_metadata(source_node)
+        src_meta = getattr(source_node, "metadata", {}) or {}
+        meta.update(src_meta)
 
-    return {}
+    # ------------------------------
+    # 3. Normalize metadata fields
+    # ------------------------------
+
+    # Ensure a source type exists
+    if meta.get("pdf_name"):
+        meta["source_type"] = "pdf"
+    else:
+        meta["source_type"] = meta.get("source_type", "document")
+
+    # Page number normalization
+    meta["page"] = (
+        meta.get("page_start")
+        or meta.get("page")
+        or meta.get("page_number")
+        or None
+    )
+
+    # Ensure PDF URL is preserved
+    if "source_url" in meta:
+        meta["source_url"] = meta["source_url"]
+
+    # Always return a flat dict
+    return meta
 
 
+
+
+# -----------------------------------------------------------
+# METADATA NORMALIZATION
+# -----------------------------------------------------------
+def normalize_metadata(node_item: NodeWithScore, rank: int) -> Dict:
+    """
+    Unify metadata into a frontend-friendly structure:
+    
+    Returns keys:
+      - source_type: pdf | video | markdown
+      - pdf_id, page_number, total_pages
+      - video_link, second_offset
+      - markdown_file, repo_url
+      - text (chunk)
+      - score
+    """
+
+    node = getattr(node_item, "node", node_item)
+    meta = getattr(node, "metadata", {}) or {}
+    text = node.get_content()[:1000]
+    score = getattr(node_item, "score", None)
+
+    source_type = meta.get("source_type", "").lower()
+
+
+    # ---- PDF ----
+    if "pdf" in source_type:
+        # Convert page_number safely
+        raw_page = meta.get("page_start") or meta.get("page") or 1
+        try:
+            page_number = int(raw_page)
+        except:
+            page_number = 1  # fallback: page 1
+
+        # Convert total_pages safely
+        raw_total = meta.get("total_pages") or 1
+        try:
+            total_pages = int(raw_total)
+        except:
+            total_pages = 1
+
+        return {
+            "source_url": meta.get("source_url"),
+            "rank": rank,
+            "source_type": "pdf",
+            "pdf_id": meta.get("pdf_name", "").replace(".pdf", ""),
+            "page_number": page_number,
+            "total_pages": total_pages,
+            "title": meta.get("section_title"),
+            "score": score,
+            "content": text,
+        }
+
+    # ---- VIDEO ----
+    if "video" in source_type:
+
+        # Extract raw start_time from metadata (e.g. "0:20", "1:23", "00:02:15")
+        start_time_str = meta.get("start_time")
+
+        def convert_to_seconds(ts):
+            if not ts:
+                return None
+            parts = ts.split(":")
+            parts = list(map(int, parts))
+
+            if len(parts) == 3:
+                h, m, s = parts
+            elif len(parts) == 2:
+                h = 0
+                m, s = parts
+            elif len(parts) == 1:
+                h = 0
+                m = 0
+                s = parts[0]
+            else:
+                return None
+
+            return h * 3600 + m * 60 + s
+
+        second_offset = convert_to_seconds(start_time_str)
+
+        return {
+            "rank": rank,
+            "source_type": "video",
+            "title": meta.get("video_title") or meta.get("chapter_title"),
+            "video_link": meta.get("url"),
+            "timestamp": start_time_str,         # Human friendly "0:20"
+            "second_offset": second_offset,      # Numeric 20
+            "score": score,
+            "content": text,
+        }
+
+
+
+    # ---- MARKDOWN / GITHUB ----
+    if "markdown" in source_type or "github" in source_type:
+        return {
+            "rank": rank,
+            "source_type": "markdown",
+            "title": meta.get("markdown_file"),
+            "source_url": meta.get("source_url"),
+            "score": score,
+            "content": text,
+        }
+
+    # fallback
+    return {
+        "source_url": meta.get("source_url"),
+        "rank": rank,
+        "source_type": "text",
+        "title": meta.get("section_title"),
+        "score": score,
+        "content": text,
+    }
+
+
+# -----------------------------------------------------------
 # --------------------------------------------------
 # LOAD DOCUMENTS FOR BM25 (Supports folder or list)
 # --------------------------------------------------
@@ -191,6 +343,14 @@ def load_docs_for_bm25(input_path: Union[str, list[str]]) -> List[Document]:
             flat_md["section_title"] = md.get("section_title") or md.get("title") or "Unknown section"
             flat_md["section_id"] = md.get("section_id") or f"{source_name}_chunk_{item.get('id', len(all_docs))}"
 
+            # Ensure video metadata is preserved
+            flat_md["start_time"] = md.get("start_time")
+            flat_md["end_time"] = md.get("end_time")
+            flat_md["video_title"] = md.get("video_title")
+            flat_md["chapter_title"] = md.get("chapter_title")
+            flat_md["url"] = md.get("url")   # important!!
+            flat_md["source_type"] = md.get("source_type")
+
 
             all_docs.append(Document(text=item["text"], metadata=flat_md))
 
@@ -242,7 +402,7 @@ def build_bm25_retriever(docs: List[Document]):
     logger.info(f"Initializing BM25 retriever with {len(docs)} documents...")
 
     base_retriever = BM25Retriever(docs, similarity_top_k=K_BM25)
-    boosted_retriever = BoostedBM25Retriever(base_retriever, boost_weight=0.2)
+    boosted_retriever = BoostedBM25Retriever(base_retriever, boost_weight=BOOST_WEIGHT)
 
     return boosted_retriever
 
@@ -339,8 +499,10 @@ def rerank_cross_encoder(nodes: List[NodeWithScore], query: str, top_k: int = TO
         results = nodes[:top_k]
 
     # ✅ Filter out nodes with non-positive scores
-    filtered = [n for n in results if getattr(n, "score", -99) > -3]
-    logger.info(f"📊 Retained {len(filtered)}/{len(results)} nodes after score filtering (score > 0)")
+    filtered = [n for n in results if getattr(n, "score", -99) > SCORE_THRESHOLD]
+    logger.info(
+        f"📊 Retained {len(filtered)}/{len(results)} nodes after score filtering (score > {SCORE_THRESHOLD})"
+    )
 
     return filtered
 
@@ -390,6 +552,15 @@ def retrieve_top_k(query: str, top_k: int = TOP_FINAL):
     return reranked
 
 
+def retrieve_clean(query: str, top_k: int = TOP_FINAL) -> List[Dict]:
+    nodes = retrieve_top_k(query, top_k)
+
+    clean_list = []
+    for i, node in enumerate(nodes, start=1):
+        clean_list.append(normalize_metadata(node, i))
+
+    return clean_list
+
 # --------------------------------------------------
 # MAIN PIPELINE (SIMPLIFIED)
 # --------------------------------------------------
@@ -404,6 +575,7 @@ def main():
     for i, item in enumerate(results, 1):
         node = getattr(item, "node", item)
         metadata = get_node_metadata(node)
+        
         text = node.get_content() if hasattr(node, "get_content") else getattr(node, "text", str(node))
 
         # robust page extraction

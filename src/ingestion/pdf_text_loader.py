@@ -4,6 +4,7 @@ pdf_loader.py
 End-to-end PDF ingestion pipeline for JASP manual processing.
 
 This script performs:
+0. Download pdf online sources
 1. Load PDF(s) using LlamaIndex's SimpleDirectoryReader
 2. Clean noisy headers, merge titles, and reconstruct equations
 3. Convert to structured Markdown with section headers and image placeholders
@@ -25,6 +26,89 @@ from pathlib import Path
 from loguru import logger
 from llama_index.core import SimpleDirectoryReader, Document
 import tiktoken
+import requests
+
+# -------------------------------------------------------------------------
+# download pdfs from data/raw_pdf/pdf_list.json
+# -------------------------------------------------------------------------
+
+def download_pdf(source_url: str, save_path: Path) -> bool:
+    """Download a single PDF from URL and save to disk."""
+    try:
+        logger.info(f"⬇️ Downloading {source_url}")
+
+        r = requests.get(source_url, stream=True, timeout=30)
+        r.raise_for_status()
+
+        with open(save_path, "wb") as f:
+            for chunk in r.iter_content(8192):
+                if chunk:
+                    f.write(chunk)
+
+        logger.success(f"Saved: {save_path}")
+        return True
+
+    except Exception as e:
+        logger.error(f"❌ Failed to download {source_url}: {e}")
+        return False
+
+
+
+def download_pdfs_from_json(json_file: str, output_dir: str) -> list[Path]:
+    """
+    Read PDF URLs from JSON and download them.
+    
+    Expected JSON structure:
+    {
+        "pdf": [
+            {
+                "name": "Statistical-Analysis-in-JASP-A-guide-for-students-2025",
+                "source_url": "https://...",
+                "source_name": "Statistical-Analysis-in-JASP-A-guide-for-students-2025.pdf"
+            }
+        ]
+    }
+    """
+
+    output = Path(output_dir)
+    output.mkdir(parents=True, exist_ok=True)
+
+    with open(json_file, "r") as f:
+        data = json.load(f)
+
+    pdf_items = data.get("pdf", [])
+
+    downloaded_paths = []
+    metadata_list = []
+
+    for item in pdf_items:
+        name = item["name"]
+        url = item["source_url"]
+        filename = item.get("source_name") or (name + ".pdf")
+        save_path = output / filename
+
+        success = download_pdf(url, save_path)
+
+        metadata_list.append({
+            "name": name,
+            "source_url": url,
+            "local_path": str(save_path) if success else None,
+            "success": success,
+            "filesize_bytes": save_path.stat().st_size if success else 0,
+            "timestamp": datetime.now().isoformat()
+        })
+
+        if success:
+            downloaded_paths.append(save_path)
+
+    # save summary
+    summary_path = output / "downloaded_pdfs.json"
+    with open(summary_path, "w") as f:
+        json.dump(metadata_list, f, indent=4)
+
+    logger.info(f"📄 PDF download summary saved → {summary_path}")
+
+    return downloaded_paths
 
 
 # -------------------------------------------------------------------------
@@ -164,11 +248,54 @@ def make_placeholders(tag: str) -> str:
 # -------------------------------------------------------------------------
 # 🧠 PDF → Markdown conversion
 # -------------------------------------------------------------------------
-def load_and_convert_to_markdown(data_dir: str, output_dir: str) -> List[Path]:
+
+def load_and_convert_to_markdown(
+    data_dir: str,
+    output_dir: str,
+    target_pdf: str | None = None
+) -> List[Path]:
     """Load PDFs, clean text, and save as Markdown files."""
-    docs = SimpleDirectoryReader(data_dir).load_data()
+
+    # -------------------------------------------------------------------------
+    # 🔒 Step 0 — Only include .pdf files
+    # -------------------------------------------------------------------------
+    all_pdfs = [
+        f for f in os.listdir(data_dir)
+        if f.lower().endswith(".pdf")
+    ]
+
+    if target_pdf:
+        # normalize for safety
+        target_pdf = target_pdf.lower()
+        pdf_files = [
+            str(Path(data_dir) / f)
+            for f in all_pdfs
+            if f.lower() == target_pdf
+        ]
+
+        if not pdf_files:
+            logger.error(f"❌ Target PDF '{target_pdf}' not found in folder: {data_dir}")
+            return []
+
+        logger.info(f"🎯 Processing ONLY target PDF: {target_pdf}")
+
+    else:
+        # original behavior → process all PDFs
+        pdf_files = [
+            str(Path(data_dir) / f)
+            for f in all_pdfs
+        ]
+        logger.info(f"📂 Found {len(pdf_files)} PDF(s) to process.")
+
+    # load only the filtered files
+    docs = SimpleDirectoryReader(
+        input_files=pdf_files,
+        recursive=False
+    ).load_data()
+
     os.makedirs(output_dir, exist_ok=True)
     output_paths = []
+
 
     grouped = {}
     for d in docs:
@@ -233,6 +360,9 @@ def load_and_convert_to_markdown(data_dir: str, output_dir: str) -> List[Path]:
     return output_paths
 
 
+
+
+
 # -------------------------------------------------------------------------
 # ✂️ Split Markdown into section-level docs
 # -------------------------------------------------------------------------
@@ -259,10 +389,13 @@ def split_markdown_by_sections(document_text: str) -> List[dict]:
 # -------------------------------------------------------------------------
 # 🧮 Token counting and section document building
 # -------------------------------------------------------------------------
-encoding = tiktoken.get_encoding("cl100k_base")
+
+from transformers import AutoTokenizer
+
+tokenizer = AutoTokenizer.from_pretrained("BAAI/bge-large-en-v1.5")
 
 def count_tokens(text: str) -> int:
-    return len(encoding.encode(text))
+    return len(tokenizer.encode(text, add_special_tokens=False))
 
 
 def build_section_documents(docs: List[Document]) -> List[Document]:
@@ -332,54 +465,85 @@ def save_sections_to_json(
 # 🚀 Unified pipeline entry point (CLI + importable)
 # -------------------------------------------------------------------------
 def run_pdf_ingestion_text_pipeline(
+    pdf_list_json: str,
     data_dir: str,
     markdown_dir: str,
     json_dir: str,
+    target_pdf: str | None = None,
 ) -> list[Path]:
-    """
-    Run the full end-to-end ingestion pipeline:
-    1️⃣ PDF → Markdown conversion
-    2️⃣ Markdown → Section Documents
-    3️⃣ Section Documents → JSON export
 
-    Args:
-        data_dir (str): Directory containing raw PDFs.
-        markdown_dir (str): Output directory for Markdown files.
-        json_dir (str): Output directory for JSON files.
-
-    Returns:
-        List[Path]: List of generated JSON file paths.
-    """
     logger.info("🚀 Starting full PDF ingestion pipeline...")
 
-    # Step 1: Convert PDFs to Markdown
-    markdown_paths = load_and_convert_to_markdown(data_dir, markdown_dir)
+    # ----------------------------------------------------------
+    # 0️⃣ STEP 0 — Download PDFs based on a JSON URL list
+    # ----------------------------------------------------------
+    logger.info("📥 Step 0: Downloading PDFs from online sources...")
+    downloaded_pdfs = download_pdfs_from_json(pdf_list_json, data_dir)
+
+    if not downloaded_pdfs:
+        logger.error("❌ No PDFs downloaded. Aborting pipeline.")
+        return []
+
+    logger.success(f"📥 Downloaded {len(downloaded_pdfs)} PDFs.")
+
+
+    # ----------------------------------------------------------
+    # 1️⃣ Convert PDFs → Markdown
+    # ----------------------------------------------------------
+    logger.info("📝 Step 1: Converting PDFs → Markdown...")
+    
+
+    markdown_paths = load_and_convert_to_markdown(
+        data_dir=data_dir,
+        output_dir=markdown_dir,
+        target_pdf=target_pdf
+    )
+    # ----------------------------------------------------------
+    # 2️⃣ Convert Markdown → Section Documents
+    # 3️⃣ Export Section Documents → JSON
+    # ----------------------------------------------------------
+    logger.info("📦 Step 2–3: Converting Markdown to JSON...")
 
     generated_jsons = []
 
-    # Step 2 + 3: Convert Markdown → JSON
     for md_path in markdown_paths:
         pdf_name = f"{md_path.stem}.pdf"
-        docs = [Document(
-            text=md_path.read_text(encoding="utf-8"),
-            metadata={"file_name": pdf_name}
-        )]
+
+        docs = [
+            Document(
+                text=md_path.read_text(encoding="utf-8"),
+                metadata={"file_name": pdf_name}
+            )
+        ]
 
         section_docs = build_section_documents(docs)
+
         json_out = Path(json_dir) / f"{md_path.stem}.json"
         save_sections_to_json(section_docs, str(json_out), pdf_name, str(md_path))
         generated_jsons.append(json_out)
 
-    logger.success(f"✅ Completed pipeline for {len(generated_jsons)} PDFs.")
+
+    logger.success(f"✅ Completed ingestion for {len(generated_jsons)} PDFs.")
     return generated_jsons
 
 
 # -------------------------------------------------------------------------
 # 📦 CLI execution wrapper
 # -------------------------------------------------------------------------
-if __name__ == "__main__":
-    DATA_DIR = "/Users/ywxiu/jasp-multimodal-rag/data/raw"
-    MARKDOWN_DIR = "/Users/ywxiu/jasp-multimodal-rag/data/processed/markdown"
-    JSON_DIR = "/Users/ywxiu/jasp-multimodal-rag/data/processed"
 
-    run_pdf_ingestion_text_pipeline(DATA_DIR, MARKDOWN_DIR, JSON_DIR)
+if __name__ == "__main__":
+    PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+    PDF_LIST_JSON = PROJECT_ROOT / "data/raw_pdf/pdf_list.json"
+    RAW_PDF_DIR   = PROJECT_ROOT / "data/raw_pdf"
+    MARKDOWN_DIR  = PROJECT_ROOT / "data/processed/pdf/markdown"
+    JSON_DIR      = PROJECT_ROOT / "data/processed/pdf/text"
+    target_pdf    = "Statistical-Analysis-in-JASP-A-guide-for-students-2025.pdf" # if no, run the whole folder
+
+    run_pdf_ingestion_text_pipeline(
+        str(PDF_LIST_JSON),
+        str(RAW_PDF_DIR),
+        str(MARKDOWN_DIR),
+        str(JSON_DIR),
+        target_pdf=target_pdf,   # <-- Named for clarity
+    )

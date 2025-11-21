@@ -45,5 +45,23 @@ Example:
 
 ###### update: When you make changes in VS Code:
 git add .
-git commit -m "full pipeline version-3:add github and video  "
+git commit -m "full pipeline version-4: search focused "
 git push
+
+
+|-- README.md
+|-- data
+|-- src
+    |-- ingestion
+    |-- splitting
+    |-- pipelines
+    |-- retrieval
+    |-- generation
+|-- backend_api
+|   `-- main.py
+|-- frontend
+|   `-- app.py
+|-- notebooks
+|-- poetry.lock
+|-- pyproject.toml
+|-- .gitignore
