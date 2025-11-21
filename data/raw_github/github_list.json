@@ -1,0 +1,16 @@
+{
+  "github": [
+    {
+      "source_type": "github_help",
+      "repo": "jasp-stats/jaspRegression",
+      "folder": "inst/help",
+      "source_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help"
+    },
+    {
+      "source_type": "github_help",
+      "repo": "jasp-stats/jaspMixedModels",
+      "folder": "inst/help",
+      "source_url": "https://github.com/jasp-stats/jaspMixedModels/tree/master/inst/help"
+    }
+  ]
+}

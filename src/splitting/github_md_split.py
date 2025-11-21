@@ -13,7 +13,7 @@ Pipeline:
 5. Save as JSON with "github_" prefix.
 
 run:
-    poetry run python -m src.ingestion.github_md_loader
+    poetry run python -m src.splitting.github_md_split
 ---------------------------------------------------
 """
 
@@ -30,6 +30,35 @@ from llama_index.core import Document
 from llama_index.core.schema import TextNode
 from llama_index.core.node_parser import MarkdownNodeParser
 from llama_index.core.node_parser.text import SentenceSplitter
+
+# =========================================================
+# ⚙️ a helper to add md_url metadata
+# =========================================================
+
+def load_github_md_urls(json_path="data/raw_github/github_list.json"):
+    """
+    Build a dictionary mapping repo name → base source_url for markdown files.
+    Example:
+        {
+          "jasp-stats/jaspRegression": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/"
+        }
+    """
+    json_path = Path(json_path)
+    if not json_path.exists():
+        raise FileNotFoundError(f"{json_path} not found")
+
+    data = json.loads(json_path.read_text())
+    repo_to_base_url = {}
+
+    for entry in data.get("github", []):
+        repo = entry["repo"]
+        base_url = entry["source_url"].rstrip("/") + "/"   # ensure ending slash
+        repo_to_base_url[repo] = base_url
+
+    return repo_to_base_url
+
+
+
 
 
 # =========================================================
@@ -60,10 +89,18 @@ def extract_section_title(text: str) -> str:
 def process_markdown(
     md_path: Path,
     out_dir: Path,
-    github_name: str = "jasp-stats/jaspRegression",
     token_limit: int = 500,
-) -> int:
-    """Split one markdown file and save as JSON with 'github_' prefix."""
+    repo_name: str = None,
+    md_url: str = None,
+    md_name: str = None,
+):
+    """
+    Split one markdown file into structured JSON chunks.
+    Includes:
+        - repo_name
+        - md_name
+        - md_url
+    """
 
     text = md_path.read_text(encoding="utf-8")
     parser = MarkdownNodeParser()
@@ -84,36 +121,37 @@ def process_markdown(
         token_count = count_tokens(content)
         section_title = extract_section_title(content)
 
+        # --- Determine metadata to attach ---
+        metadata_common = {
+            "doc_id": str(uuid.uuid4())[:8],
+            "source_type": "github help files",
+            "repo_name": repo_name,
+            "markdown_file": md_path.name,
+            "md_name": md_name,  # NEW
+            "md_url": md_url,    # NEW
+            "source_path": str(md_path.resolve()),
+            "section_title": section_title,
+            "processing_date": processing_time,
+        }
+
         # --- if longer than token limit → sentence split ---
         if token_count > token_limit:
             sub_texts = sentence_splitter.split_text(content)
             for sub in sub_texts:
-                sub_tok = count_tokens(sub)
                 sections.append({
                     "text": sub.strip(),
                     "metadata": {
-                        "doc_id": str(uuid.uuid4())[:8],
-                        "source_type": "github help files",
-                        "github_name": github_name,
-                        "source_path": str(md_path.resolve()),
-                        "markdown_file": md_path.name,
+                        **metadata_common,
+                        "token_length": count_tokens(sub),
                         "section_title": extract_section_title(sub),
-                        "token_length": sub_tok,
-                        "processing_date": processing_time,
                     },
                 })
         else:
             sections.append({
                 "text": content,
                 "metadata": {
-                    "doc_id": str(uuid.uuid4())[:8],
-                    "source_type": "github help files",
-                    "github_name": github_name,
-                    "source_path": str(md_path.resolve()),
-                    "markdown_file": md_path.name,
-                    "section_title": section_title,
+                    **metadata_common,
                     "token_length": token_count,
-                    "processing_date": processing_time,
                 },
             })
 
@@ -130,21 +168,77 @@ def process_directory(
     in_dir: Path = Path("data/raw_github"),
     out_dir: Path = Path("data/processed/chunks"),
     token_limit: int = 500,
-    github_name: str = "jasp-stats/jaspRegression",
 ):
-    """Process all markdown files in directory."""
+    """
+    Process all markdown files stored with repo prefix:
+    prefix__filename.md
+    Example:
+        jasp-stats_jaspRegression__RegressionLinear.md
+    """
+
+    # ----------------------------------------------------------
+    # 1. Load mapping from github_list.json
+    # ----------------------------------------------------------
+    repo_map = load_github_md_urls()
+    # repo_map example:
+    #   "jasp-stats/jaspRegression": "https://github.com/.../inst/help/"
+    #   "jasp-stats/jaspMixedModels": "https://github.com/.../inst/help/"
+
+    # Build reverse lookup for safe repo prefix
+    reverse_map = {
+        repo.replace("/", "_"): repo
+        for repo in repo_map.keys()
+    }
+
+    # ----------------------------------------------------------
+    # 2. Find markdown files
+    # ----------------------------------------------------------
     md_files = list(in_dir.rglob("*.md"))
     if not md_files:
         logger.warning(f"No markdown files found under {in_dir}")
         return
 
     logger.info(f"Found {len(md_files)} markdown files under {in_dir}")
+
     total = 0
 
+    # ----------------------------------------------------------
+    # 3. Determine repo + create md_url + md_name
+    # ----------------------------------------------------------
     for md_file in md_files:
+        fname = md_file.name
+
+        if "__" not in fname:
+            logger.warning(f"Invalid filename (missing prefix): {fname}")
+            continue
+
+        safe_repo_prefix, md_filename = fname.split("__", 1)
+
+        # Lookup original repo_name (with /)
+        if safe_repo_prefix not in reverse_map:
+            logger.warning(f"Unknown repo prefix '{safe_repo_prefix}' in file: {fname}")
+            continue
+
+        repo_name = reverse_map[safe_repo_prefix]
+        base_url = repo_map[repo_name]
+
+        # e.g. https://github.com/.../inst/help/RegressionLinear.md
+        md_url = f"{base_url}{md_filename}"
+
+        # md_name = "jasp-stats/jaspRegression__RegressionLinear.md"
+        md_name = f"{repo_name}__{md_filename}"
+
+        # ------------------------------------------------------
+        # 4. Process markdown chunks
+        # ------------------------------------------------------
         try:
             total += process_markdown(
-                md_file, out_dir, github_name=github_name, token_limit=token_limit
+                md_path=md_file,
+                out_dir=out_dir,
+                token_limit=token_limit,
+                repo_name=repo_name,
+                md_url=md_url,
+                md_name=md_name,
             )
         except Exception as e:
             logger.exception(f"Failed to process {md_file}: {e}")
@@ -156,6 +250,5 @@ if __name__ == "__main__":
     process_directory(
         in_dir=Path("data/raw_github"),
         out_dir=Path("data/processed/chunks"),
-        token_limit=500,
-        github_name="jasp-stats/jaspRegression",
+        token_limit=512
     )

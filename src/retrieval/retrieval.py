@@ -251,7 +251,8 @@ def normalize_metadata(node_item: NodeWithScore, rank: int) -> Dict:
         return {
             "rank": rank,
             "source_type": "video",
-            "title": meta.get("video_title") or meta.get("chapter_title"),
+            "title": meta.get("video_title"),
+            "section": meta.get("chapter_title") or meta.get("start_time") or meta.get("source_type"),
             "video_link": meta.get("url"),
             "timestamp": start_time_str,         # Human friendly "0:20"
             "second_offset": second_offset,      # Numeric 20
@@ -266,8 +267,9 @@ def normalize_metadata(node_item: NodeWithScore, rank: int) -> Dict:
         return {
             "rank": rank,
             "source_type": "markdown",
-            "title": meta.get("markdown_file"),
-            "source_url": meta.get("source_url"),
+            "title": meta.get("markdown_file") or meta.get("md_name"),
+            "section": meta.get("section_title"),
+            "source_url": meta.get("md_url"),
             "score": score,
             "content": text,
         }

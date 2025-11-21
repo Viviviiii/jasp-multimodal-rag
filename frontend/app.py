@@ -25,9 +25,6 @@ import requests
 # --------- Backend endpoints (adapt if needed) ----------
 RETRIEVE_URL = "http://127.0.0.1:8000/retrieve"
 GENERATE_URL = "http://127.0.0.1:8000/generate"  # or /generate_using_docs if you have that
-PDF_PREVIEW_BASE = "http://127.0.0.1:8000/preview/pdf"  # /{pdf_id}/{page}.png
-PDF_FULL_BASE = "http://127.0.0.1:8000/docs"            # /{pdf_id}.pdf
-
 
 # -------------------------------------------------------
 # Helper: PDF viewer – show original PDF page as image
@@ -51,7 +48,14 @@ def pdf_viewer(doc: dict):
     page = int(doc.get("page") or doc.get("page_number") or 1)
     pdf_url_with_page = f"{pdf_url}#page={page}"
 
-    st.markdown(f"### 📄 PDF Preview — Page {page}")
+    st.markdown(f"### Check details in Page {page}")
+   # Optional: link to open PDF in a new tab
+
+    st.markdown(
+        f"[📖 Original PDF]({pdf_url})\n\n"
+         "[📚 JASP Support Materials](https://jasp-stats.org/jasp-materials/)",
+        unsafe_allow_html=False
+    )
 
     # ----- Show full PDF using iframe -----
     st.markdown(
@@ -66,11 +70,7 @@ def pdf_viewer(doc: dict):
         unsafe_allow_html=True
     )
 
-    # Optional: link to open PDF in a new tab
-    st.markdown(
-        f"[🔗 Open full PDF in new tab]({pdf_url})",
-        unsafe_allow_html=False
-    )
+ 
 
 
 # -------------------------------------------------------
@@ -88,6 +88,13 @@ def video_viewer(doc: dict):
     if not video_link:
         st.info("No video link available in metadata.")
         return
+
+    st.markdown(
+            f"[📖 Original Video Link]({video_link})\n\n"
+            "[📚 JASP Support Materials](https://jasp-stats.org/jasp-materials/)",
+            unsafe_allow_html=False
+        )
+
 
     second_offset = doc.get("second_offset") or 0
     timestamp = doc.get("timestamp")
@@ -115,35 +122,60 @@ def video_viewer(doc: dict):
     )
 
 
-    if video_link:
-        st.markdown(
-            f'<a href="{video_link}" target="_blank">🔗 Open on YouTube</a>',
-            unsafe_allow_html=True
-        )
-
-
 # -------------------------------------------------------
 # Helper: Markdown / GitHub viewer
 # -------------------------------------------------------
+
+def to_raw_url(url: str):
+    """
+    Convert a GitHub webpage URL into raw.githubusercontent.com URL.
+    """
+    if "github.com" not in url:
+        return url
+
+    return (
+        url.replace("github.com", "raw.githubusercontent.com")
+           .replace("/blob/", "/")
+    )
+
+
 def markdown_viewer(doc: dict):
-    """
-    Display markdown or GitHub file content.
-    Assumes doc has: content (markdown) and optional repo_url.
-    """
     title = doc.get("title") or doc.get("source", "Markdown file")
-    st.markdown(f"#### 📘 {title}")
+    
+    github_url = doc.get("source_url") or doc.get("md_url")
 
-    repo_url = doc.get("repo_url")
-    if repo_url:
-        st.markdown(f"[🔗 Open in GitHub]({repo_url})")
+    if not github_url:
+        st.info("No markdown URL provided.")
+        return
 
-    content = doc.get("content") or doc.get("text") or ""
-    if content:
-        st.markdown("---")
-        st.markdown(content)
-    else:
-        st.info("No content available in metadata.")
+    st.markdown(f"#### detail: {title}")
+    st.markdown(
+            f"[📖 Original github file]({github_url})\n\n"
+            "[📚 JASP Support Materials](https://jasp-stats.org/jasp-materials/)",
+            unsafe_allow_html=False
+        )
 
+    # 🩹 Repair any mistaken /tree/ GitHub URLs
+    if "/tree/" in github_url:
+        github_url = github_url.replace("/tree/", "/blob/")
+
+    raw_url = to_raw_url(github_url)
+
+    # Fetch markdown
+    try:
+        res = requests.get(raw_url)
+        if res.status_code == 200:
+            md_text = res.text
+        else:
+            st.error(f"HTTP {res.status_code} fetching: {raw_url}")
+            return
+    except Exception as e:
+        st.error(f"Error loading markdown: {e}")
+        return
+
+    # Render markdown
+    st.markdown("---")
+    st.markdown(md_text)
 
 
 
@@ -171,49 +203,7 @@ def render_doc_preview(doc: dict):
 # -------------------------------------------------------
 def main():
     st.set_page_config(page_title="JASP RAG – Retrieval-first UI", layout="wide")
-
-    # ---------- Sidebar ----------
-    st.sidebar.title("🦞 Settings")
-
-    model = st.sidebar.selectbox(
-        "Select model (Ollama):",
-        ["mistral:7b", "llama3.2:3b", "phi3:mini"],
-    )
-
-    st.sidebar.markdown("---")
-    generate_answer_btn = st.sidebar.button("✨ Generate Answer")
-
-
-        # ---------- AI Answer block under the Generate Answer button ----------
-    st.sidebar.markdown("---")
-
-    if st.session_state["answer"]:
-        st.sidebar.markdown("### 🤖 AI Generated Answer (bonus)")
-        st.sidebar.markdown(st.session_state["answer"])
-
-        if st.session_state["logs"]:
-            with st.sidebar.expander("🪵 Logs / Debug Info"):
-                for line in st.session_state["logs"]:
-                    st.sidebar.text(line)
-
-
-    # ---------- Main Layout ----------
-    st.title("🦁 JASP RAG Protocol – Document Search")
-
-    # Query input
-    query = st.text_area(
-        "Ask a question:",
-        height=120,
-        placeholder="e.g. How to run repeated measures ANOVA in JASP?",
-        key="query_input",
-    )
-
-    # Buttons row
-    find_docs_col, _ = st.columns([1, 3])
-    with find_docs_col:
-        find_docs = st.button("🔍 Find docs")
-
-    # ---------- Session state ----------
+        # ---------- Session state ----------
     if "retrieved_docs" not in st.session_state:
         st.session_state["retrieved_docs"] = []
     if "selected_doc_idx" not in st.session_state:
@@ -223,12 +213,51 @@ def main():
     if "logs" not in st.session_state:
         st.session_state["logs"] = []
 
+    # ---------- Sidebar ----------
+    st.sidebar.title("🦄 Try AI generated Answers")
+
+    model = st.sidebar.selectbox(
+        "Select model (Ollama):",
+        ["mistral:7b", "llama3.2:3b", "phi3:mini"],
+    )
+    generate_answer_btn = st.sidebar.button("Generate Answer")
+ # ---------- AI Answer block under the Generate Answer button ----------
+
+
+    if st.session_state["answer"]:
+        st.sidebar.markdown("### Answer:")
+        st.sidebar.markdown(st.session_state["answer"])
+
+        if st.session_state["logs"]:
+            with st.sidebar.expander("🦧 Logs / Debug Info"):
+                for line in st.session_state["logs"]:
+                    st.sidebar.text(line)
+
+
+    # ---------- Main Layout ----------
+    st.title("🦁 JASP RAG Protocol")
+
+    # Query input
+    query = st.text_area(
+        "What do you want to know?",
+        height=120,
+        placeholder="e.g. How to run repeated measures ANOVA in JASP?",
+        key="query_input",
+    )
+
+    # Buttons row
+    find_docs_col, _ = st.columns([1, 3])
+    with find_docs_col:
+        find_docs = st.button("Find helpful documents")
+
+
+
     # ---------- Handle "Find docs" (retrieval only) ----------
     if find_docs:
         if not query.strip():
             st.warning("Please enter a query before searching.")
         else:
-            with st.spinner("Retrieving relevant documents..."):
+            with st.spinner("🦀 Searching..."):
                 try:
                     resp = requests.post(RETRIEVE_URL, json={"query": query})
                 except Exception as e:
@@ -253,7 +282,7 @@ def main():
        # =====================================================
         # 1) Retrieved Documents (full width ABOVE preview)
         # =====================================================
-        st.subheader("📚 Retrieved Documents")
+        st.subheader("🦞 Docs may help:")
 
         options = []
         for i, doc in enumerate(docs):
@@ -275,7 +304,10 @@ def main():
 
             # --- Section name / title ---
             section_name = (
-                doc.get("timestamp")
+                doc.get("start_page")
+                or doc.get("page")
+                or doc.get("section")
+                or doc.get("timestamp")
                 or doc.get("title")
                 or "Untitled section"
             )
@@ -287,23 +319,22 @@ def main():
             options.append(label)
 
         selected_label = st.radio(
-            "Select a document to preview:",
+            "Select one to see details:",
             options,
             index=st.session_state["selected_doc_idx"],
         )
         st.session_state["selected_doc_idx"] = options.index(selected_label)
 
-        st.markdown("---")
 
-       
         # =====================================================
         # 2) Document Preview (full width BELOW doc list)
         # =====================================================
-        st.subheader("🔍 Document Preview")
+        #st.subheader("Doc details")
 
         selected_doc = docs[st.session_state["selected_doc_idx"]]
         
         #st.write("DEBUG retrieved doc:", selected_doc)
+        #st.write("DEBUG markdown doc:", doc)
 
         render_doc_preview(selected_doc)
 
@@ -316,7 +347,7 @@ def main():
         if not query.strip():
             st.sidebar.warning("Please enter a query in the main panel first.")
         else:
-            with st.spinner("Generating AI answer (this may take a while)..."):
+            with st.spinner("👹 AI is working on it, may take a while..."):
                 try:
                     payload = {
                         "query": query,
