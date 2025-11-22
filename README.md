@@ -34,7 +34,7 @@ Example:
        → the system queries the backend and answer questions with reference.
 
 
-# struture
+# Structure
 |-- README.md #High-level overview of the project, setup instructions, and how everything works.
 
 |-- data      #Stores raw, processed, and intermediate datasets used by the RAG pipeline.
@@ -71,5 +71,8 @@ Example:
 
 
 
-
+# update: When you make changes in VS Code:
+git add .
+git commit -m "full pipeline version-5-metadata fixed "
+git push
 
