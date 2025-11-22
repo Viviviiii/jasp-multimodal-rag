@@ -42,22 +42,39 @@ git push
 
 
 |-- README.md #High-level overview of the project, setup instructions, and how everything works.
+
 |-- data      #Stores raw, processed, and intermediate datasets used by the RAG pipeline.
+
 |-- src       #Main source code containing all modular components of the ingestion→retrieval→generation pipeline.
+
     |-- ingestion  #Loads and preprocesses documents (PDFs, videos, GitHub files) into a unified format.
+
     |-- splitting  #Splits documents into chunks optimized for retrieval and LLM context usage.
+
     |-- embedding  #Generates vector embeddings for chunks using selected embedding models and store in Chroma.
+
     |-- retrieval  #Implements BM25 and vector search to retrieve the top-k relevant chunks,fusion and rerank.
+
     |-- generation #Builds prompts and sends them to an LLM to generate answers using retrieved context.
+
     |-- evaluation #Contains evaluation scripts to benchmark retrieval/generation quality.
+
 |-- backend_api
+
 |   `-- main.py    #FastAPI backend exposing /retrieve and /generate endpoints for the frontend.
+
 |-- frontend
+
 |   `-- app.py     #Streamlit UI for querying the system, showing retrieved documents, and generating answers.
+
 |-- notebooks      #Jupyter notebooks for experimentation, debugging, and evaluation.
+
 |-- poetry.lock    #Locked dependency versions ensuring reproducible environments.
+
 |-- pyproject.toml #Project configuration file defining dependencies, scripts, and metadata for Poetry.
+
 |-- .gitignore     #Specifies which files and folders Git should ignore (e.g., venvs, cache, data dumps).
+
 
 
 
