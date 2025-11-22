@@ -473,6 +473,7 @@ def rrf_fuse(results_a, results_b, k=RRF_K, top_n=TOP_AFTER_RRF):
 # CROSS-ENCODER RERANK
 # --------------------------------------------------
 
+
 def rerank_cross_encoder(nodes: List[NodeWithScore], query: str, top_k: int = TOP_FINAL) -> List[NodeWithScore]:
     """Apply cross-encoder reranking (BGE preferred) with positive-score filtering."""
 
@@ -550,6 +551,9 @@ def retrieve_top_k(query: str, top_k: int = TOP_FINAL):
     # 5️⃣ Cross-encoder rerank
     reranked = rerank_cross_encoder(fused, query, top_k=top_k)
     logger.success(f"🏁 Reranked top-{top_k} results ready")
+    for i, n in enumerate(reranked):
+        logger.debug(f"📌 RAW {i+1}: {n.node.metadata}")
+
 
     return reranked
 
@@ -560,6 +564,7 @@ def retrieve_clean(query: str, top_k: int = TOP_FINAL) -> List[Dict]:
     clean_list = []
     for i, node in enumerate(nodes, start=1):
         clean_list.append(normalize_metadata(node, i))
+        logger.debug(f"📦 retrieve_clean[{i}]: {clean_list[-1]}")
 
     return clean_list
 

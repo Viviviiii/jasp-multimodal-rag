@@ -45,7 +45,13 @@ def pdf_viewer(doc: dict):
         return
 
     # Page jump (works in most browsers / PDF viewers)
-    page = int(doc.get("page") or doc.get("page_number") or 1)
+ 
+    raw_page = doc.get("page") or doc.get("page_number") or 1
+    try:
+        page = int(raw_page)
+    except Exception:
+        page = 1   # fallback if "?" or invalid
+
     pdf_url_with_page = f"{pdf_url}#page={page}"
 
     st.markdown(f"### Check details in Page {page}")
@@ -220,7 +226,7 @@ def main():
         "Select model (Ollama):",
         ["mistral:7b", "llama3.2:3b", "phi3:mini"],
     )
-    generate_answer_btn = st.sidebar.button("Generate Answer")
+    generate_answer_btn = st.sidebar.button("Generate Answer,may take a while..")
  # ---------- AI Answer block under the Generate Answer button ----------
 
 
@@ -257,7 +263,7 @@ def main():
         if not query.strip():
             st.warning("Please enter a query before searching.")
         else:
-            with st.spinner("🦀 Searching..."):
+            with st.spinner("🦀 Searching in JASP Knowledge Base..."):
                 try:
                     resp = requests.post(RETRIEVE_URL, json={"query": query})
                 except Exception as e:
@@ -342,33 +348,29 @@ def main():
     else:
         st.info("No documents yet. Enter a query and click **Find docs** to start.")
 
+  
+
     # ---------- Handle "Generate Answer" in sidebar ----------
     if generate_answer_btn:
-        if not query.strip():
-            st.sidebar.warning("Please enter a query in the main panel first.")
-        else:
-            with st.spinner("👹 AI is working on it, may take a while..."):
-                try:
-                    payload = {
-                        "query": query,
-                        "model": model,
-                        # If your backend supports using provided docs, you can send them:
-                        # "retrieved_docs": st.session_state["retrieved_docs"],
-                    }
-                    resp = requests.post(GENERATE_URL, json=payload)
-                except Exception as e:
-                    st.sidebar.error(f"Error contacting backend: {e}")
-                else:
-                    if resp.status_code != 200:
-                        st.sidebar.error(
-                            f"Backend error {resp.status_code}: {resp.text}"
-                        )
-                    else:
-                        data = resp.json()
-                        st.session_state["answer"] = data.get("answer")
-                        st.session_state["logs"] = data.get("logs", [])
+        payload = {"query": query, "model": model}
+        with st.spinner("🐝 Generating..."):
+            try:
+                resp = requests.post(GENERATE_URL, json=payload)
+                
+            except Exception as e:
+                st.sidebar.error(f"🐞NETWORK ERROR: {e}")
+                return
 
+        if resp.status_code != 200:
+            st.sidebar.error(f"🐞BACKEND ERROR {resp.status_code}: {resp.text}")
+            return
 
+        # ✅ Save to state
+        data = resp.json()
+        st.session_state["answer"] = data.get("answer", "(No answer returned)")
+        st.session_state["logs"] = data.get("logs", [])
+        # 🔥 Force UI refresh
+        st.rerun()
 
 
 if __name__ == "__main__":
