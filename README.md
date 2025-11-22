@@ -36,7 +36,9 @@ Example:
 
 # struture
 |-- README.md #High-level overview of the project, setup instructions, and how everything works.
+
 |-- data      #Stores raw, processed, and intermediate datasets used by the RAG pipeline.
+
 |-- src       #Main source code containing all modular components of the ingestion→retrieval→generation pipeline.
 
     |-- ingestion  #Loads and preprocesses documents (PDFs, videos, GitHub files) into a unified format.
@@ -52,15 +54,21 @@ Example:
     |-- evaluation #Contains evaluation scripts to benchmark retrieval/generation quality.
 
 |-- backend_api
+
        |-- main.py    #FastAPI backend exposing /retrieve and /generate endpoints for the frontend.
 
 |-- frontend
+
        |-- app.py     #Streamlit UI for querying the system, showing retrieved documents, and generating answers.
 
 |-- notebooks      #Jupyter notebooks for experimentation, debugging, and evaluation.
+
 |-- poetry.lock    #Locked dependency versions ensuring reproducible environments.
+
 |-- pyproject.toml #Project configuration file defining dependencies, scripts, and metadata for Poetry.
+
 |-- .gitignore     #Specifies which files and folders Git should ignore (e.g., venvs, cache, data dumps).
+
 
 
 
