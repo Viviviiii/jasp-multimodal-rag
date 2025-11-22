@@ -61,11 +61,11 @@ git push
 
 |-- backend_api
 
-|   `-- main.py    #FastAPI backend exposing /retrieve and /generate endpoints for the frontend.
+       |-- main.py    #FastAPI backend exposing /retrieve and /generate endpoints for the frontend.
 
 |-- frontend
 
-|   `-- app.py     #Streamlit UI for querying the system, showing retrieved documents, and generating answers.
+       |-- app.py     #Streamlit UI for querying the system, showing retrieved documents, and generating answers.
 
 |-- notebooks      #Jupyter notebooks for experimentation, debugging, and evaluation.
 
