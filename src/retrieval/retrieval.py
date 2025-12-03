@@ -3,19 +3,23 @@
 🔎 HYBRID → RRF → CROSS-ENCODER RERANK PIPELINE
 (LlamaIndex + Chroma + Ollama, optional LangChain)
 
-1. Hybrid retrieval = BM25 (lexical) + Chroma (semantic).
-2. Reciprocal Rank Fusion (RRF) to merge the two result lists.
-3. Cross-encoder rerank with BAAI/bge-reranker-large (or SentenceTransformer fallback).
+Supported modes:
+
+Retrieval modes you defined:
+
+
+1. bm25
+2. vector
+3. bm25_vector (half from BM25, half from vector)
+4. bm25_vector_fusion
+5. bm25_vector_fusion_rerank  (default, full pipeline)
 
 ---------------------------------------------------
 Run:
-    poetry run python -m src.retrieval.retrieval --q "How to run repeated measures ANOVA in JASP?"
+    poetry run python -m src.retrieval.retrieval --q "How to run repeated measures ANOVA in JASP?" --mode bm25_vector_fusion_rerank
   
 ---------------------------------------------------
 """
-
-
-
 
 from __future__ import annotations
 import os
@@ -26,6 +30,9 @@ from pathlib import Path
 from typing import List, Dict, Union
 from loguru import logger
 import chromadb
+import math
+import os
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 # ---------- LlamaIndex core ----------
 from llama_index.core import Document, StorageContext, VectorStoreIndex
@@ -42,8 +49,6 @@ except Exception:
     except Exception as e:
         BM25Retriever = None
         logger.warning(f"BM25Retriever not found; install rank-bm25 and LlamaIndex with bm25 extras. Error: {e}")
-
-
 
 # ---------- Rerankers (FlagEmbedding BGE reranker preferred) ----------
 FlagEmbeddingReranker = None
@@ -74,10 +79,6 @@ if FlagEmbeddingReranker is None:
         except ImportError:
             logger.warning("⚠️ No cross-encoder reranker available.")
 
-
-
-
-
 # ---------- Ollama LLM Wrapper ----------
 try:
     from llama_index.llms.ollama import Ollama
@@ -97,11 +98,23 @@ BOOST_WEIGHT = 5
 RRF_K = 120
 TOP_AFTER_RRF = 10
 TOP_FINAL = 5
-SCORE_THRESHOLD = -3 
+SCORE_THRESHOLD = -3
 
 BGE_RERANKER = "BAAI/bge-reranker-large"
 ST_CE_FALLBACK = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 OLLAMA_MODEL = "mistral:7b"
+
+# --------------------------------------------------
+# Helper: retrieval modes
+# --------------------------------------------------
+
+RETRIEVAL_MODES = {
+    "bm25",
+    "vector",
+    "bm25_vector",
+    "bm25_vector_fusion",
+    "bm25_vector_fusion_rerank",
+}
 
 
 # --------------------------------------------------
@@ -113,44 +126,31 @@ def get_node_metadata(node) -> Dict:
     Robustly extract and normalize metadata from a LlamaIndex Node / Document / NodeWithScore.
     Ensures PDF metadata includes: source_type, source_url, page.
     """
-
-    # ------------------------------
-    # 1. Unwrap NodeWithScore
-    # ------------------------------
     if hasattr(node, "node"):
         node = node.node
 
-    # ------------------------------
-    # 2. Extract metadata from Node
-    # ------------------------------
     meta = getattr(node, "metadata", None)
     if meta:
         meta = dict(meta)
     else:
         meta = {}
 
-    # fallback for older versions (extra_info)
+    # extra_info is deprecated in newer LlamaIndex; most modern nodes use metadata only.
     extra = getattr(node, "extra_info", None)
-    if extra:
+    if extra and not meta:
+        # Only fall back if metadata is empty, to reduce noise
         meta.update(extra)
 
-    # fallback for nodes with source_node metadata
     source_node = getattr(node, "source_node", None)
     if source_node is not None:
         src_meta = getattr(source_node, "metadata", {}) or {}
         meta.update(src_meta)
 
-    # ------------------------------
-    # 3. Normalize metadata fields
-    # ------------------------------
-
-    # Ensure a source type exists
     if meta.get("pdf_name"):
         meta["source_type"] = "pdf"
     else:
         meta["source_type"] = meta.get("source_type", "document")
 
-    # Page number normalization
     meta["page"] = (
         meta.get("page_start")
         or meta.get("page")
@@ -158,32 +158,19 @@ def get_node_metadata(node) -> Dict:
         or None
     )
 
-    # Ensure PDF URL is preserved
     if "source_url" in meta:
         meta["source_url"] = meta["source_url"]
 
-    # Always return a flat dict
     return meta
-
-
-
 
 # -----------------------------------------------------------
 # METADATA NORMALIZATION
 # -----------------------------------------------------------
+
 def normalize_metadata(node_item: NodeWithScore, rank: int) -> Dict:
     """
-    Unify metadata into a frontend-friendly structure:
-    
-    Returns keys:
-      - source_type: pdf | video | markdown
-      - pdf_id, page_number, total_pages
-      - video_link, second_offset
-      - markdown_file, repo_url
-      - text (chunk)
-      - score
+    Unify metadata into a frontend-friendly structure.
     """
-
     node = getattr(node_item, "node", node_item)
     meta = getattr(node, "metadata", {}) or {}
     text = node.get_content()[:1000]
@@ -191,21 +178,18 @@ def normalize_metadata(node_item: NodeWithScore, rank: int) -> Dict:
 
     source_type = meta.get("source_type", "").lower()
 
-
     # ---- PDF ----
     if "pdf" in source_type:
-        # Convert page_number safely
         raw_page = meta.get("page_start") or meta.get("page") or 1
         try:
             page_number = int(raw_page)
-        except:
-            page_number = 1  # fallback: page 1
+        except Exception:
+            page_number = 1
 
-        # Convert total_pages safely
         raw_total = meta.get("total_pages") or 1
         try:
             total_pages = int(raw_total)
-        except:
+        except Exception:
             total_pages = 1
 
         return {
@@ -223,7 +207,6 @@ def normalize_metadata(node_item: NodeWithScore, rank: int) -> Dict:
     # ---- VIDEO ----
     if "video" in source_type:
 
-        # Extract raw start_time from metadata (e.g. "0:20", "1:23", "00:02:15")
         start_time_str = meta.get("start_time")
 
         def convert_to_seconds(ts):
@@ -252,15 +235,13 @@ def normalize_metadata(node_item: NodeWithScore, rank: int) -> Dict:
             "rank": rank,
             "source_type": "video",
             "title": meta.get("video_title"),
-            "section": meta.get("chapter_title") or meta.get("start_time") or meta.get("source_type"),
+            "section": meta.get("chapter_title") or meta.get("start_time") or "video description",
             "video_link": meta.get("url"),
-            "timestamp": start_time_str,         # Human friendly "0:20"
-            "second_offset": second_offset,      # Numeric 20
+            "timestamp": start_time_str,
+            "second_offset": second_offset,
             "score": score,
             "content": text,
         }
-
-
 
     # ---- MARKDOWN / GITHUB ----
     if "markdown" in source_type or "github" in source_type:
@@ -284,8 +265,6 @@ def normalize_metadata(node_item: NodeWithScore, rank: int) -> Dict:
         "content": text,
     }
 
-
-# -----------------------------------------------------------
 # --------------------------------------------------
 # LOAD DOCUMENTS FOR BM25 (Supports folder or list)
 # --------------------------------------------------
@@ -305,17 +284,15 @@ def load_docs_for_bm25(input_path: Union[str, list[str]]) -> List[Document]:
     if not json_files:
         raise FileNotFoundError(f"❌ No JSON files found in {input_path}")
 
-    all_docs = []
+    all_docs: List[Document] = []
 
     for json_path in json_files:
         with open(json_path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
-        # ✅ Handle dict-wrapped structure
         if isinstance(data, dict) and "sections" in data:
             data = data["sections"]
 
-        # ✅ Handle stringified dicts (double-encoded)
         if isinstance(data, list) and all(isinstance(x, str) for x in data):
             data = [json.loads(x) for x in data]
 
@@ -326,7 +303,7 @@ def load_docs_for_bm25(input_path: Union[str, list[str]]) -> List[Document]:
                 continue
 
             md = item.get("metadata", {})
-            flat_md = {}
+            flat_md: Dict[str, str] = {}
             for k, v in md.items():
                 if isinstance(v, list):
                     flat_md[k] = ", ".join(map(str, v))
@@ -339,20 +316,17 @@ def load_docs_for_bm25(input_path: Union[str, list[str]]) -> List[Document]:
             if "id" in item:
                 flat_md["doc_id"] = item["id"]
 
-            # ✅ Add robust metadata mapping
             flat_md["pdf_name"] = md.get("pdf_name") or source_name
             flat_md["page_start"] = md.get("page_start") or md.get("page") or None
             flat_md["section_title"] = md.get("section_title") or md.get("title") or "Unknown section"
             flat_md["section_id"] = md.get("section_id") or f"{source_name}_chunk_{item.get('id', len(all_docs))}"
 
-            # Ensure video metadata is preserved
             flat_md["start_time"] = md.get("start_time")
             flat_md["end_time"] = md.get("end_time")
             flat_md["video_title"] = md.get("video_title")
             flat_md["chapter_title"] = md.get("chapter_title")
-            flat_md["url"] = md.get("url")   # important!!
+            flat_md["url"] = md.get("url")
             flat_md["source_type"] = md.get("source_type")
-
 
             all_docs.append(Document(text=item["text"], metadata=flat_md))
 
@@ -360,9 +334,6 @@ def load_docs_for_bm25(input_path: Union[str, list[str]]) -> List[Document]:
 
     logger.success(f"✅ Total BM25 corpus size: {len(all_docs)} chunks from {len(json_files)} files.")
     return all_docs
-
-
-
 
 # --------------------------------------------------
 # BUILD RETRIEVERS
@@ -384,31 +355,35 @@ class BoostedBM25Retriever:
             video_title = str(meta.get("title", "")).lower()
             q_lower = query.lower()
 
-            # Simple keyword-based boosting
             if any(kw in section_title or kw in video_title for kw in q_lower.split()):
                 node.score += self.boost_weight
                 logger.debug(f"⚡ Boosted score by {self.boost_weight} for match in '{section_title or video_title}'")
 
             boosted_results.append(node)
 
-        # Re-sort by new scores
         boosted_results.sort(key=lambda x: x.score, reverse=True)
         return boosted_results
 
+def build_bm25_retriever(docs: List[Document], use_boost: bool = True):
+    """
+    Build a BM25 retriever, optionally wrapped with metadata-based boosting.
 
-
-def build_bm25_retriever(docs: List[Document]):
-    """Build a BM25 retriever with optional metadata boost."""
+    use_boost = False → pure BM25 (for baseline evaluation)
+    use_boost = True  → BM25 + soft filtering via metadata boosting
+    """
     if BM25Retriever is None:
         raise RuntimeError("BM25Retriever not available. Install llama-index with bm25 extras.")
+
     logger.info(f"Initializing BM25 retriever with {len(docs)} documents...")
 
     base_retriever = BM25Retriever(docs, similarity_top_k=K_BM25)
+    if not use_boost:
+        logger.info("🔹 Using pure BM25 (no metadata boosting).")
+        return base_retriever
+
+    logger.info(f"🔹 Using BoostedBM25Retriever with boost_weight={BOOST_WEIGHT}.")
     boosted_retriever = BoostedBM25Retriever(base_retriever, boost_weight=BOOST_WEIGHT)
-
     return boosted_retriever
-
-
 
 def build_vector_retriever(
     persist_dir: str = CHROMA_DIR,
@@ -430,13 +405,12 @@ def build_vector_retriever(
     retriever = index.as_retriever(similarity_top_k=K_SEMANTIC)
     return retriever
 
-
-
 # --------------------------------------------------
 # RECIPROCAL RANK FUSION (RRF)
 # --------------------------------------------------
+
 def stable_node_key(n: NodeWithScore) -> str:
-    """Generate a stable deduplication key for RRF fusion."""
+    """Generate a stable deduplication key for RRF fusion / unions."""
     node = n.node
     text = node.get_content().strip()
     meta = node.metadata or {}
@@ -446,7 +420,6 @@ def stable_node_key(n: NodeWithScore) -> str:
 
 
 def rrf_fuse(results_a, results_b, k=RRF_K, top_n=TOP_AFTER_RRF):
-    """Fuse two ranked lists using Reciprocal Rank Fusion (RRF)."""
     def scores(rr):
         s = {}
         for rank, n in enumerate(rr, start=1):
@@ -466,22 +439,27 @@ def rrf_fuse(results_a, results_b, k=RRF_K, top_n=TOP_AFTER_RRF):
         fused.append((key, s_a.get(key, 0.0) + s_b.get(key, 0.0)))
 
     fused_sorted = sorted(fused, key=lambda x: x[1], reverse=True)[:top_n]
-    return [lookup[k] for k, _ in fused_sorted]
 
+    fused_nodes = []
+    for key, fused_score in fused_sorted:
+        n = lookup[key]
+        # 🔹 overwrite score with RRF score so downstream prints & clean output see it
+        n.score = fused_score
+        fused_nodes.append(n)
+
+    return fused_nodes
 
 # --------------------------------------------------
 # CROSS-ENCODER RERANK
 # --------------------------------------------------
 
-
 def rerank_cross_encoder(nodes: List[NodeWithScore], query: str, top_k: int = TOP_FINAL) -> List[NodeWithScore]:
     """Apply cross-encoder reranking (BGE preferred) with positive-score filtering."""
-
     if not nodes:
         logger.warning("⚠️ No retrieved nodes to rerank.")
         return []
 
-    results = []
+    results: List[NodeWithScore] = []
     if FlagEmbeddingReranker is not None:
         logger.info(f"⚙️ Cross-encoder rerank with BGE model: {BGE_RERANKER}")
         reranker = FlagEmbeddingReranker(
@@ -501,7 +479,6 @@ def rerank_cross_encoder(nodes: List[NodeWithScore], query: str, top_k: int = TO
         logger.warning("⚠️ No cross-encoder available — skipping rerank.")
         results = nodes[:top_k]
 
-    # ✅ Filter out nodes with non-positive scores
     filtered = [n for n in results if getattr(n, "score", -99) > SCORE_THRESHOLD]
     logger.info(
         f"📊 Retained {len(filtered)}/{len(results)} nodes after score filtering (score > {SCORE_THRESHOLD})"
@@ -511,102 +488,278 @@ def rerank_cross_encoder(nodes: List[NodeWithScore], query: str, top_k: int = TO
 
 
 
+# helper for FastAPI backend to avoid rebuilding everything every request.
+from functools import lru_cache
 
+@lru_cache(maxsize=1)
+def get_bm25_docs():
+    return tuple(load_docs_for_bm25(CHUNKS_JSON))
+
+@lru_cache(maxsize=1)
+def get_bm25_retriever(use_boost: bool):
+    docs = list(get_bm25_docs())  # convert back to list
+    return build_bm25_retriever(docs, use_boost=use_boost)
+
+@lru_cache(maxsize=1)
+def get_vector_retriever():
+    return build_vector_retriever()
 
 # --------------------------------------------------
-# RETRIEVAL WRAPPER FUNCTION
+# RETRIEVAL WRAPPER FUNCTION WITH MODES
 # --------------------------------------------------
-def retrieve_top_k(query: str, top_k: int = TOP_FINAL):
+def retrieve_top_k(
+    query: str,
+    top_k: int = TOP_FINAL,
+    mode: str = "bm25_vector_fusion_rerank",
+):
     """
-    Run the full hybrid retrieval pipeline:
-      1. Load BM25 corpus
-      2. Build semantic + BM25 retrievers
-      3. Retrieve from both
-      4. Fuse via RRF
-      5. Rerank via cross-encoder
+    Run retrieval in one of five modes:
 
-    Returns:
-        List[NodeWithScore]: Final reranked top_k results
+    1) bm25
+       - Pure BM25 (no boosting, no vectors, no fusion, no rerank)
+
+    2) vector
+       - Pure semantic / vector retrieval (no BM25, no fusion, no rerank)
+
+    3) bm25_vector
+       - BM25 (no boost) + vector retriever
+       - Simple union: BM25 results first, then semantic results (deduplicated)
+
+    4) bm25_vector_fusion
+       - BM25 (with metadata boosting) + vector
+       - Fused using Reciprocal Rank Fusion (RRF), no cross-encoder
+
+    5) bm25_vector_fusion_rerank
+       - Same as (4) but with cross-encoder reranker on fused list
     """
-    logger.info(f"🔍 Starting retrieval pipeline for query: '{query}'")
+    mode = mode.lower().strip()
+    if mode not in RETRIEVAL_MODES:
+        logger.warning(f"Unknown mode '{mode}', falling back to 'bm25_vector_fusion_rerank'.")
+        mode = "bm25_vector_fusion_rerank"
 
-    # 1️⃣ Load corpus for BM25
-    docs = load_docs_for_bm25(CHUNKS_JSON)
+    logger.info(f"🔍 Starting retrieval pipeline for query: '{query}' (mode={mode})")
 
-    # 2️⃣ Build retrievers
+    # Special-case: vector-only mode (no BM25 corpus load needed)
+    if mode == "vector":
+        logger.info("🚩 Mode 'vector': pure semantic/vector retrieval only.")
+        semantic_retriever = get_vector_retriever()
+        sem_results = semantic_retriever.retrieve(query)
+        logger.success(f"Semantic: {len(sem_results)} results")
+        final = sem_results[:top_k]
+        for i, n in enumerate(final):
+            logger.debug(f"📌 Vector-only {i+1}: {n.node.metadata}")
+        return final
+
+    # 1️⃣ For all other modes, decide boosting + get retrievers
+    use_boost = mode in {"bm25_vector_fusion", "bm25_vector_fusion_rerank"}
+
+    bm25_retriever = get_bm25_retriever(use_boost=use_boost)
+    semantic_retriever = get_vector_retriever()
+
+
+
+
+    # ---------- MODE 1: pure BM25 ----------
+    if mode == "bm25":
+        logger.info("🚩 Mode 'bm25': pure BM25 only.")
+        bm25_results = bm25_retriever.retrieve(query)
+        logger.success(f"BM25: {len(bm25_results)} results")
+        final = bm25_results[:top_k]
+        for i, n in enumerate(final):
+            logger.debug(f"📌 BM25-only {i+1}: {n.node.metadata}")
+        return final
+
+    # From here on, we need semantic retriever as well
     semantic_retriever = build_vector_retriever()
-    bm25_retriever = build_bm25_retriever(docs)
-    
 
-    # 3️⃣ Retrieve candidates
     logger.info("⚙️ Retrieving from BM25 and semantic retrievers...")
+
     bm25_results = bm25_retriever.retrieve(query)
+    for n in bm25_results:
+        n.node.metadata["retriever"] = "bm25"
     sem_results = semantic_retriever.retrieve(query)
+    for n in sem_results:
+        n.node.metadata["retriever"] = "vector"
     logger.success(f"BM25: {len(bm25_results)} | Semantic: {len(sem_results)}")
 
-    # 4️⃣ Fuse via RRF
+
+    # ---------- MODE 3: BM25 + vectors (balanced k/2 from each, de-duplicated) ----------
+    if mode == "bm25_vector":
+        logger.info("🚩 Mode 'bm25_vector': k/2 from BM25 + k/2 from vector (no fusion, no rerank).")
+
+        # how many from each
+        k_bm25 = math.ceil(top_k / 2)
+        k_vec = top_k - k_bm25  # handles odd k
+
+        # cap by what we actually have
+        bm25_results = bm25_retriever.retrieve(query)
+        sem_results = semantic_retriever.retrieve(query)
+
+        bm25_slice = bm25_results[: min(k_bm25, len(bm25_results))]
+        sem_slice = sem_results[: min(k_vec, len(sem_results))]
+
+        # optional: tag origin (nice for debugging / thesis)
+        for n in bm25_slice:
+            n.node.metadata["retriever"] = "bm25"
+        for n in sem_slice:
+            n.node.metadata["retriever"] = "vector"
+
+        # union with de-duplication
+        seen = set()
+        combined: List[NodeWithScore] = []
+
+        def add_unique(lst):
+            for n in lst:
+                key = stable_node_key(n)
+                if key not in seen:
+                    seen.add(key)
+                    combined.append(n)
+
+        # BM25 first, then vector
+        add_unique(bm25_slice)
+        add_unique(sem_slice)
+
+        final = combined[:top_k]
+
+        logger.success(
+            f"✅ bm25_vector: requested top_k={top_k} → "
+            f"{len(bm25_slice)} from BM25, {len(sem_slice)} from vector, "
+            f"{len(final)} after de-dup."
+        )
+
+        for i, n in enumerate(final, start=1):
+            logger.debug(
+                f"📌 BM25+vector {i}: "
+                f"retriever={n.node.metadata.get('retriever')} | meta={n.node.metadata}"
+            )
+
+        return final
+
+
+
+
+    # ---------- MODE 4 & 5: Hybrid with RRF fusion ----------
     fused = rrf_fuse(sem_results, bm25_results)
     logger.success(f"🔗 Fused results (RRF): {len(fused)}")
 
-    # 5️⃣ Cross-encoder rerank
+    if mode == "bm25_vector_fusion":
+        logger.info("🚩 Mode 'bm25_vector_fusion': RRF fusion only (no cross-encoder).")
+        final = fused[:top_k]
+        for i, n in enumerate(final):
+            logger.debug(f"📌 Fused-only {i+1}: {n.node.metadata}")
+        return final
+
+    # ---------- MODE 5: Hybrid + RRF + cross-encoder ----------
+    logger.info("🚩 Mode 'bm25_vector_fusion_rerank': RRF + cross-encoder rerank.")
     reranked = rerank_cross_encoder(fused, query, top_k=top_k)
     logger.success(f"🏁 Reranked top-{top_k} results ready")
+    
     for i, n in enumerate(reranked):
         logger.debug(f"📌 RAW {i+1}: {n.node.metadata}")
-
-
     return reranked
 
+def retrieve_clean(
+    query: str,
+    top_k: int = TOP_FINAL,
+    mode: str = "bm25_vector_fusion_rerank",
+) -> List[Dict]:
+    nodes = retrieve_top_k(query, top_k=top_k, mode=mode)
 
-def retrieve_clean(query: str, top_k: int = TOP_FINAL) -> List[Dict]:
-    nodes = retrieve_top_k(query, top_k)
-
-    clean_list = []
+    clean_list: List[Dict] = []
     for i, node in enumerate(nodes, start=1):
         clean_list.append(normalize_metadata(node, i))
         logger.debug(f"📦 retrieve_clean[{i}]: {clean_list[-1]}")
 
     return clean_list
 
+
+
 # --------------------------------------------------
 # MAIN PIPELINE (SIMPLIFIED)
 # --------------------------------------------------
+
 def main():
-    parser = argparse.ArgumentParser(description="🔎 Hybrid → RRF → Cross-encoder Rerank Pipeline")
+    parser = argparse.ArgumentParser(description="🔎 Hybrid / BM25 / Vector retrieval CLI")
     parser.add_argument("--q", "--query", dest="query", type=str, required=True, help="User query string")
+    parser.add_argument(
+        "--mode",
+        type=str,
+        default="bm25_vector_fusion_rerank",
+        choices=sorted(RETRIEVAL_MODES),
+        help="Retrieval mode: bm25 | vector | bm25_vector | bm25_vector_fusion | bm25_vector_fusion_rerank",
+    )
     args = parser.parse_args()
 
     query = args.query.strip()
-    results = retrieve_top_k(query, top_k=TOP_FINAL)
+    mode = args.mode.strip()
 
+    results = retrieve_top_k(query, top_k=TOP_FINAL, mode=mode)
+
+    print(f"\n=== Retrieval mode: {mode} ===")
     for i, item in enumerate(results, 1):
-        node = getattr(item, "node", item)
-        metadata = get_node_metadata(node)
-        
-        text = node.get_content() if hasattr(node, "get_content") else getattr(node, "text", str(node))
+        clean = normalize_metadata(item, rank=i)
+        source_type = clean.get("source_type", "text")
 
-        # robust page extraction
-        page = (
-            metadata.get("page")
-            or metadata.get("page_start")
-            or metadata.get("page_number")
-            or (
-                metadata.get("section_id", "").split("_PAGE_")[-1]
-                if "PAGE_" in metadata.get("section_id", "")
-                else None
-            )
-            or "?"
-        )
+        print(f"\n⭐ Rank {i} [{source_type}]")
 
-        print(f"\n⭐ Final Rank {i}")
-        print(f" 📄 Source : {metadata.get('source', metadata.get('pdf_name', 'N/A'))}")
-        print(f" 📑 Page   : {page}")
-        print(f" 🔢 Score  : {getattr(item, 'score', 'N/A')}")
-        print(f" 🧩 Chunk  : {metadata.get('chunk_id', metadata.get('section_id', 'N/A'))}")
-        print(f" 🗒️ Text   : {text[:400]}...")
+        # ---------- PDF ----------
+        if source_type == "pdf":
+            pdf_id = clean.get("pdf_id") or "Unknown PDF"
+            page = clean.get("page_number", "?")
+            total_pages = clean.get("total_pages", "?")
+            title = clean.get("title") or "(no section title)"
+            url = clean.get("source_url") or "N/A"
+            score = clean.get("score", "N/A")
+
+            print(f" 📄 PDF      : {pdf_id}")
+            print(f" 🧩 Section  : {title}")
+            print(f" 📑 Page     : {page}/{total_pages}")
+            print(f" 🔢 Score    : {score}")
+            print(f" 🔗 URL      : {url}")
+
+        # ---------- VIDEO ----------
+        elif source_type == "video":
+            title = clean.get("title") or "(no video title)"
+            section = clean.get("section") or "(no chapter)"
+            timestamp = clean.get("timestamp") or "N/A"
+            link = clean.get("video_link") or "N/A"
+            score = clean.get("score", "N/A")
+
+            print(f" 🎥 Video    : {title}")
+            print(f" 🧩 Section  : {section}")
+            print(f" ⏱️ Time     : {timestamp}")
+            print(f" 🔢 Score    : {score}")
+            print(f" 🔗 URL      : {link}")
+
+        # ---------- MARKDOWN / GITHUB ----------
+        elif source_type == "markdown":
+            title = clean.get("title") or "(no file name)"
+            section = clean.get("section") or "(no section title)"
+            url = clean.get("source_url") or "N/A"
+            score = clean.get("score", "N/A")
+
+            print(f" 📘 Markdown : {title}")
+            print(f" 🧩 Section  : {section}")
+            print(f" 🔢 Score    : {score}")
+            print(f" 🔗 URL      : {url}")
+
+        # ---------- Fallback ----------
+        else:
+            title = clean.get("title") or "(no title)"
+            url = clean.get("source_url") or "N/A"
+            score = clean.get("score", "N/A")
+
+            print(f" 📄 Source   : {title}")
+            print(f" 🔢 Score    : {score}")
+            print(f" 🔗 URL      : {url}")
+
+        # ---------- Common: text preview ----------
+        snippet = clean.get("content", "")
+        snippet = (snippet[:400] + "...") if len(snippet) > 400 else snippet
+        print(f" 🗒️ Text     : {snippet}")
         print("-" * 60)
-    logger.info("✅ Retrieval pipeline completed successfully.")
 
+    logger.info("✅ Retrieval pipeline completed successfully.")
 
 if __name__ == "__main__":
     main()

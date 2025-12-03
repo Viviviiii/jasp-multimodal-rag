@@ -2,24 +2,21 @@
 ---------------------------------------------------
 💬 GENERATION PIPELINE (RAG FINAL STAGE)
 
-
-poetry run python -m src.generation.generation --q "How to run Bayesian Linear Mixed Models in JASP?"
+Run from CLI:
+    poetry run python -m src.generation.generation --q "How to run Bayesian Linear Mixed Models in JASP?" --mode bm25
 ---------------------------------------------------
 """
 
 from __future__ import annotations
+
 import sys
 import argparse
-from typing import List, Tuple
+from typing import List, Dict
+
 from loguru import logger
 from ollama import Client
-from typing import Dict
 
-
-
-
-
-from src.retrieval.retrieval import retrieve_top_k, NodeWithScore,retrieve_clean
+from src.retrieval.retrieval import retrieve_clean
 
 
 PROMPT_TEMPLATE = """
@@ -37,187 +34,6 @@ Answer in markdown, include source references when available.
 """
 
 
-
-# --------------------------------------------------
-# 🧩 METADATA UNPACKING (robust multi-source version)
-# --------------------------------------------------
-
-def unpack_source(doc, rank: int) -> Dict:
-    """
-    Robust metadata normalization that preserves your original
-    PDF / GitHub / Video logic, but also handles dicts safely.
-
-    Accepts:
-        - NodeWithScore objects (node.metadata)
-        - dicts from retrieve_clean()
-
-    Returns a consistent structure:
-        source_type, source, source_url, page, section, score, text, metadata
-    """
-
-    # ============================================================
-    # 1) SUPPORT BOTH NodeWithScore OBJECTS AND CLEAN DICTIONARIES
-    # ============================================================
-
-    # CASE A – NodeWithScore from retrieve_top_k()
-    if hasattr(doc, "node"):
-        node = doc.node
-        meta = getattr(node, "metadata", {}) or {}
-        text = node.get_content() if hasattr(node, "get_content") else getattr(node, "text", "")
-        score = getattr(doc, "score", None)
-
-    # CASE B – Dictionary from retrieve_clean()
-    elif isinstance(doc, dict):
-        # FIX: merge ALL top-level fields into metadata
-        meta = {}
-
-        # copy all fields except text/content/score into meta
-        for k, v in doc.items():
-            if k not in ("text", "content", "score"):
-                meta[k] = v
-
-        text = doc.get("text") or doc.get("content") or ""
-        score = doc.get("score")
-
-
-
-
-
-    # CASE C – Unexpected type
-    else:
-        logger.warning(f"unpack_source received unexpected type at rank {rank}: {type(doc)}")
-        return {
-            "rank": rank,
-            "source_type": "unknown",
-            "source": "Unknown",
-            "source_url": None,
-            "page": "?",
-            "section": "N/A",
-            "chunk_id": f"chunk_{rank}",
-            "score": None,
-            "text": "",
-            "metadata": {},
-        }
-
-    # Ensure meta is always a dict
-    if not isinstance(meta, dict):
-        meta = {}
-
-    # Safely extract basic values
-    source_type_raw = (
-        meta.get("source_type")
-        or (doc.get("source_type") if isinstance(doc, dict) else None)
-        or ""
-    )
-    source_type_raw = str(source_type_raw).lower()
-
-
-    # ============================================================
-    # 📄 PDF METADATA (fixed)
-    # ============================================================
-    if source_type_raw == "pdf" or meta.get("pdf_id"):
-        return {
-            "rank": rank,
-            "source_type": "pdf",
-
-            # FIX: use pdf_id or fallback to title
-            "source": (
-                meta.get("pdf_id")
-                or meta.get("pdf_name")
-                or meta.get("source")
-                or "PDF Document"
-            ),
-
-            "source_url": meta.get("source_url"),
-
-            # FIX: use page_number correctly
-            "page": (
-                meta.get("page_number")
-                or meta.get("page_start")
-                or meta.get("page")
-                or "?"
-            ),
-
-            # FIX: use title from retrieve_clean
-            "section": (
-                meta.get("title")
-                or meta.get("section_title")
-                or "PDF section"
-            ),
-
-            "chunk_id": meta.get("chunk_id") or f"chunk_{rank}",
-            "score": score,
-            "text": text[:1200],
-            "metadata": meta,
-        }
-
-
-
-    # ============================================================
-    # 3) GITHUB MARKDOWN BLOCK
-    # ============================================================
-    if (
-        "github" in source_type_raw
-        or meta.get("markdown_file")
-        or (isinstance(doc, dict) and doc.get("markdown_file"))
-    ):
-        return {
-            "rank": rank,
-            "source_type": "github",
-            "source": meta.get("markdown_file") or doc.get("markdown_file"),
-            "source_url": meta.get("source_url") or doc.get("source_url"),
-            "page": meta.get("section_title") or doc.get("section_title") or "-",
-            "section": meta.get("section_title") or "GitHub section",
-            "chunk_id": meta.get("doc_id") or f"chunk_{rank}",
-            "score": score,
-            "text": text[:1200],
-            "metadata": meta,
-        }
-
-    # ============================================================
-    # 4) VIDEO BLOCK
-    # ============================================================
-    if (
-        "video" in source_type_raw
-        or meta.get("video_title")
-        or (isinstance(doc, dict) and doc.get("video_title"))
-    ):
-        return {
-            "rank": rank,
-            "source_type": "video",
-            "source": meta.get("video_title") or doc.get("video_title"),
-            "source_url": meta.get("video_url") or meta.get("source_url")
-                           or doc.get("source_url"),
-            "page": meta.get("start_time") or doc.get("timestamp") or None,
-            "section": meta.get("chapter_title") or "Video segment",
-            "chunk_id": meta.get("doc_id") or f"chunk_{rank}",
-            "score": score,
-            "text": text[:1200],
-            "metadata": meta,
-        }
-
-    # ============================================================
-    # 5) FALLBACK (unknown category)
-    # ============================================================
-    return {
-        "rank": rank,
-        "source_type": source_type_raw or "unknown",
-        "source": meta.get("source")
-                   or (doc.get("source") if isinstance(doc, dict) else None)
-                   or "Unknown",
-        "source_url": meta.get("source_url") or (doc.get("source_url") if isinstance(doc, dict) else None),
-        "page": meta.get("page") or doc.get("page") if isinstance(doc, dict) else "?",
-        "section": meta.get("section_title") or "N/A",
-        "chunk_id": meta.get("doc_id") or f"chunk_{rank}",
-        "score": score,
-        "text": text[:1200] if text else "",
-        "metadata": meta,
-    }
-      
-    
-
-
-
 # --------------------------------------------------
 # 🧠 GENERATE ANSWER (Ollama, with/without docs)
 # --------------------------------------------------
@@ -229,8 +45,16 @@ def generate_answer_from_docs(
     prompt_template: str = PROMPT_TEMPLATE,
 ) -> str:
     """
-    Generate an answer using Ollama, given a list of flattened doc dicts
-    from `retrieve_clean`.
+    Generate an answer using Ollama, given a list of doc dicts
+    from `retrieve_clean`, each already containing metadata.
+
+    Expected doc fields (depending on source type):
+        - source_type: "pdf" | "markdown" | "video" | ...
+        - title, pdf_id, markdown_file, video_title
+        - section, section_title
+        - page_number, page, timestamp
+        - content or text
+        - score
     """
 
     client = Client()
@@ -266,18 +90,39 @@ def generate_answer_from_docs(
 
     # ✅ Case 2: Normal RAG generation with retrieved context
     context_blocks = []
-    for src_info in docs:  # docs is already clean_sources
-        text = (src_info.get("text") or "").strip()
+    for src_info in docs:
+        text = (src_info.get("text") or src_info.get("content") or "").strip()
         if max_chars_per_doc:
             text = text[:max_chars_per_doc]
 
-        header = (
-            f"[{src_info['rank']}] {src_info['source']} "
-            f"(sec:{src_info['section']} | p:{src_info['page']})"
+        rank = src_info.get("rank", "?")
+
+        # Prefer source-specific titles, but never invent anything
+        title = (
+            src_info.get("title")
+            or src_info.get("pdf_id")
+            or src_info.get("markdown_file")
+            or src_info.get("video_title")
+            or src_info.get("source")
+            or "Source"
         )
 
-        context_blocks.append(f"{header}\n{text}")
+        section = (
+            src_info.get("section")
+            or src_info.get("section_title")
+            or "-"
+        )
 
+        # Page can be page_number, page, or timestamp (for video)
+        page = (
+            src_info.get("page_number")
+            or src_info.get("page")
+            or src_info.get("timestamp")
+            or "-"
+        )
+
+        header = f"[{rank}] {title} (sec:{section} | p:{page})"
+        context_blocks.append(f"{header}\n{text}")
 
     prompt = prompt_template.format(
         query=query,
@@ -301,38 +146,54 @@ def generate_answer_from_docs(
 
 
 # --------------------------------------------------
-# 🧩 MAIN PIPELINE ENTRYPOINT (for backend + CLI)
+# 🧩 MAIN PIPELINE (for backend + CLI)
 # --------------------------------------------------
-def run_generation_pipeline(query: str, model: str = "mistral:7b"):
+def run_generation_pipeline(
+    query: str,
+    model: str = "mistral:7b",
+    mode: str = "bm25_vector_fusion_rerank",
+):
     """
     Unified pipeline used by both CLI and FastAPI backend.
     Uses the same retrieval (`retrieve_clean`) as the /retrieve endpoint,
     then calls Ollama to generate an answer.
-    """
-    logger.info(f"🎯 Running generation pipeline for query: {query}")
 
-    # 1️⃣ Retrieve top chunks (same as /retrieve, so no HF/meta-tensor issues)
+    IMPORTANT:
+    - We do NOT reinterpret or reshape metadata here.
+    - We only add:
+        • rank    (1-based)
+        • text    (unified from text/content)
+    Everything else comes directly from retrieve_clean().
+    """
+    logger.info(f"🎯 Running generation pipeline for query: {query} (mode={mode})")
+
+    # 1️⃣ Retrieve top chunks with selected mode
     try:
-        raw_docs = retrieve_clean(query)
+        raw_docs = retrieve_clean(query, mode=mode)  # already "clean" dicts
     except Exception as e:
         logger.error(f"❌ Retrieval failed in generation pipeline: {e}")
         raw_docs = []
 
-    logger.info(f"Retrieved {len(raw_docs)} chunks")
+    logger.info(f"Retrieved {len(raw_docs)} chunks in mode={mode}")
 
-    # 2️⃣ Normalize metadata for frontend
-    clean_sources = [unpack_source(doc, rank=i + 1) for i, doc in enumerate(raw_docs)]
-    
+    # 2️⃣ Just add rank + unified text, do NOT reinterpret metadata
+    sources: List[Dict] = []
+    for i, d in enumerate(raw_docs, 1):
+        doc = dict(d)  # shallow copy
+        doc["rank"] = i
+        doc["text"] = doc.get("text") or doc.get("content") or ""
+        sources.append(doc)
 
     # 3️⃣ Generate contextual answer with Ollama
-    final_answer = generate_answer_from_docs(query, clean_sources, model=model)
+    final_answer = generate_answer_from_docs(query, sources, model=model)
 
     # 4️⃣ Return final structured result
     return {
         "query": query,
         "model": model,
+        "retrieval_mode": mode,
         "answer": final_answer,
-        "sources": clean_sources,
+        "sources": sources,
     }
 
 
@@ -348,24 +209,104 @@ def main():
         default="How to split data files in JASP?",
     )
     parser.add_argument("--model", type=str, default="mistral:7b")
+    parser.add_argument(
+        "--mode",
+        type=str,
+        default="bm25_vector_fusion_rerank",
+        choices=[
+            "bm25",
+            "vector",
+            "bm25_vector",
+            "bm25_vector_fusion",
+            "bm25_vector_fusion_rerank",
+        ],
+        help="Retrieval mode used before generation.",
+    )
     args = parser.parse_args()
 
-    result = run_generation_pipeline(args.query, args.model)
+    result = run_generation_pipeline(args.query, args.model, mode=args.mode)
 
     print("\n" + "=" * 80)
     print("🧠 FINAL ANSWER\n" + "-" * 80)
     print(result["answer"])
 
-    print("\n📚 SOURCES")
+    print("\n📚 SOURCES (mode: {})".format(result.get("retrieval_mode", args.mode)))
     for s in result["sources"]:
-        print(f"[{s['rank']}] {s['source']} p.{s['page']} | sec:{s['section']}")
+        source_type = str(s.get("source_type", "text")).lower()
+
+        print("\n----------------------------------------")
+        print(f"[{s.get('rank', '?')}] ({source_type})")
+
+        # ---------- PDF ----------
+        if source_type == "pdf":
+            pdf_id = s.get("pdf_id") or s.get("title") or "PDF Document"
+            page = s.get("page_number") or s.get("page") or "?"
+            total_pages = s.get("total_pages", "?")
+            section = s.get("title") or s.get("section") or "(no section title)"
+            url = s.get("source_url") or "N/A"
+            score = s.get("score", "N/A")
+
+            print(f" 📄 PDF      : {pdf_id}")
+            print(f" 🧩 Section  : {section}")
+            print(f" 📑 Page     : {page}/{total_pages}")
+            print(f" 🔢 Score    : {score}")
+            print(f" 🔗 URL      : {url}")
+
+        # ---------- VIDEO ----------
+        elif source_type == "video":
+            title = s.get("title") or s.get("video_title") or "(no video title)"
+            section = s.get("section") or s.get("chapter_title") or "Video segment"
+            timestamp = s.get("timestamp") or s.get("page") or "N/A"
+            url = s.get("video_link") or s.get("source_url") or "N/A"
+            score = s.get("score", "N/A")
+
+            print(f" 🎥 Video    : {title}")
+            print(f" 🧩 Section  : {section}")
+            print(f" ⏱️ Time     : {timestamp}")
+            print(f" 🔢 Score    : {score}")
+            print(f" 🔗 URL      : {url}")
+
+        # ---------- MARKDOWN / GITHUB ----------
+        elif source_type == "markdown":
+            title = s.get("title") or s.get("markdown_file") or "(no file name)"
+            section = s.get("section") or s.get("section_title") or "(no section title)"
+            url = s.get("source_url") or "N/A"
+            score = s.get("score", "N/A")
+
+            print(f" 📘 Markdown : {title}")
+            print(f" 🧩 Section  : {section}")
+            print(f" 🔢 Score    : {score}")
+            print(f" 🔗 URL      : {url}")
+
+        # ---------- Fallback ----------
+        else:
+            title = (
+                s.get("title")
+                or s.get("source")
+                or s.get("pdf_id")
+                or s.get("markdown_file")
+                or "(no title)"
+            )
+            section = s.get("section") or s.get("section_title") or "N/A"
+            page = s.get("page") or s.get("page_number") or s.get("timestamp") or "?"
+            url = s.get("source_url") or "N/A"
+            score = s.get("score", "N/A")
+
+            print(f" 📄 Source   : {title}")
+            print(f" 🧩 Section  : {section}")
+            print(f" 📑 Page     : {page}")
+            print(f" 🔢 Score    : {score}")
+            print(f" 🔗 URL      : {url}")
+
+        # Optional: short snippet
+        snippet = (s.get("text") or s.get("content") or "").strip()
+        if snippet:
+            if len(snippet) > 300:
+                snippet = snippet[:300] + "..."
+            print(f" 🗒️ Text     : {snippet}")
+
+    print("\n")
 
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-

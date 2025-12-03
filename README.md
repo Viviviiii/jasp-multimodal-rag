@@ -73,6 +73,6 @@ Example:
 
 # update: When you make changes in VS Code:
 git add .
-git commit -m "full pipeline version-5-metadata fixed "
+git commit -m "full pipeline version-6-add 5 retrival modes "
 git push
 
