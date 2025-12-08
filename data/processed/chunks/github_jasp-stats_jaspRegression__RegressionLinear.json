@@ -1,0 +1,229 @@
+{
+  "sections": [
+    {
+      "text": "Linear Regression\n==========================\n\nLinear regression allows the user to model a linear relationship between one or more explanatory variable(s) (predictors) and a continuous dependent (response) variable.",
+      "metadata": {
+        "doc_id": "c31d8ab2",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__RegressionLinear.md",
+        "md_name": "jasp-stats/jaspRegression__RegressionLinear.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/RegressionLinear.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__RegressionLinear.md",
+        "section_title": "Linear Regression",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 63
+      }
+    },
+    {
+      "text": "### Assumptions\n---\n- Continuous response variable.\n- Linearity and additivity: The response variable is linearly related to all predictors and the effects of the predictors are additive.\n- Independence of residuals: The residuals are uncorrelated with each other.\n- Homoscedasticity: The error variance of each predictor is constant across all values of that predictor.\n- Normality of residuals: The residuals are normally distributed with mean zero.",
+      "metadata": {
+        "doc_id": "d547458c",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__RegressionLinear.md",
+        "md_name": "jasp-stats/jaspRegression__RegressionLinear.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/RegressionLinear.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__RegressionLinear.md",
+        "section_title": "### Assumptions",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 100
+      }
+    },
+    {
+      "text": "### Input\n---",
+      "metadata": {
+        "doc_id": "099f64b4",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__RegressionLinear.md",
+        "md_name": "jasp-stats/jaspRegression__RegressionLinear.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/RegressionLinear.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__RegressionLinear.md",
+        "section_title": "### Input",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 7
+      }
+    },
+    {
+      "text": "#### Assignment Box\n- Dependent: Dependent (response) variable.\n- Method: Specify the order in which the predictors are entered into the model (i.e., hierarchical regression analysis). A block of one or more predictor(s) represents one step in the hierarchy.\n        Note that the present release does not allow for more than one block.\n\t- Enter: All predictors are entered into the model simultaneously (forced entry).\n\t- Backward: All predictors are entered simultaneously, and then removed sequentially based on the criterion specified in \"Stepping method criteria\".\n\t- Forward: Predictors are entered sequentially based on the criterion specified in \"Stepping method criteria\".\n\t- Stepwise: Predictors are entered sequentially based on the criterion specified in \"Stepping method criteria\"; after each step, the least useful predictor is removed.\n- Covariates: Continuous predictor variable(s). If ordinal variables are entered it is assumed that their levels are equidistant. Hence, ordinal variables are treated as continuous predictor variables.\n- Factors: Categorical predictors variable(s). Ordinal variables here are treated as categorical predictor variables, thus, the ordinal information is ignored.\n- WLS Weights: The weights used for weighted least square regression.",
+      "metadata": {
+        "doc_id": "157c9910",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__RegressionLinear.md",
+        "md_name": "jasp-stats/jaspRegression__RegressionLinear.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/RegressionLinear.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__RegressionLinear.md",
+        "section_title": "#### Assignment Box",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 271
+      }
+    },
+    {
+      "text": "### Model\n- Components and model terms: \n    - Components: All the independent variables that can be included in the model. \n    - Model terms: The independent variables in the model. By default, all the main effects of the specified independent variables are included in the model. To include interactions, click multiple variables (e.g., by holding the ctrl/cmd button on your keyboard while clicking) and drag those into the `Model Terms` box. \n    - Add to null model: The independent variables included in the model can be selected to add to the null model.\n- Include intercept:\n  - Include the intercept in the regression model.",
+      "metadata": {
+        "doc_id": "9e9ed8d4",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__RegressionLinear.md",
+        "md_name": "jasp-stats/jaspRegression__RegressionLinear.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/RegressionLinear.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__RegressionLinear.md",
+        "section_title": "### Model",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 129
+      }
+    },
+    {
+      "text": "### Statistics\n- Regression coefficients:\n\t- Estimates: Unstandardized and standardized coefficient estimates, standard errors, t-values, and their corresponding p-values.\n    - From `...` bootstraps: By selecting this option, bootstrapped estimation is applied. By default, the number of replications is set to 1000. This can be changed into the desired number. \n  - Confidence Intervals: By selecting this option, confidence intervals for the estimated mean difference will be included. By default the confidence level is set to 95%. This can be changed into the desired percentage. \n  - Tolerance and VIF: Display Tolerance and Variance Inflation Factor for each predictor in the model to assess multicollinearity.\n  - Vovk-Sellke Maximum *p*-Ratio: The bound 1/(-e *p* log(*p*)) is derived from the shape of the *p*-value distribution. Under the null hypothesis (H<sub>0</sub>) it is uniform(0,1), and under the alternative (H<sub>1</sub>) it is decreasing in *p*, e.g., a beta(&#945;, 1) distribution, where 0 < &#945; < 1. The Vovk-Sellke MPR is obtained by choosing the shape &#945; of the distribution under H<sub>1</sub> such that the obtained *p*-value is *maximally diagnostic*. The value is then the ratio of the densities at point *p* under H<sub>0</sub> and H<sub>1</sub>.\nFor example, if the two-sided *p*-value equals .05, the Vovk-Sellke MPR equals 2.46, indicating that this *p*-value is at most 2.46 times more likely to occur under H<sub>1</sub> than under H<sub>0</sub>.\n\n- Model Summary: \n  - R squared change: Change in R squared between the different steps in Backward, Forward, and Stepwise regression,  with corresponding significance test (i.e., df1, df2, p-value).\n  - F change: Change in F between the different steps in Backward, Forward, and Stepwise regression,  with corresponding significance test (i.e., df1, df2, p-value).",
+      "metadata": {
+        "doc_id": "f6f81441",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__RegressionLinear.md",
+        "md_name": "jasp-stats/jaspRegression__RegressionLinear.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/RegressionLinear.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__RegressionLinear.md",
+        "section_title": "### Statistics",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 518
+      }
+    },
+    {
+      "text": "- F change: Change in F between the different steps in Backward, Forward, and Stepwise regression,  with corresponding significance test (i.e., df1, df2, p-value).\n  - AIC and BIC: Display Akaike Information Criterion and Bayesian Information Criterion. \n  - Durbin-Watson: Durbin-Watson statistic to test the autocorrelation of the residuals.\n\n- Display:\n  - Model fit: Separate ANOVA table for each model (i.e., each step in Backward, Forward, and Stepwise regression).\n  - Descriptives: Samples size, sample mean, sample standard deviation, and standard error of the mean.\n  - Part and partial correlations: Semipartial and partial correlations.\n  - Coefficient covariance matrix: Display the covariance matrix of the predictor variables, per model.\n  - Collinearity diagnostics: Collinearity statistics, eigenvalues, condition indices, and variance proportions.\n\n- Residuals:\n  - Statistics: Display descriptive statistics of the residuals and predicted values.\n  - Casewise diagnostic: Casewise and summarized diagnostics for the residuals.\n    - Standard residual > 3: Outliers outside x standard deviations: Display diagnostics for cases where the absolute value of the standardized residual is larger than x; default is x=3.\n    - Cook's distance > 1 : Display diagnostics for cases where the value of Cook’s distance is larger than x; default is x = 1. \n    - All cases: Display diagnostics for all cases.\n  - Cases are marked as influential in the table, according to the following thresholds:\n    - DFBETAS: When the absolute value of DFBETAS is greater than 1.      \n    - DFFITS: When the absolute value of DFFITS is greater than 3 * sqrt(k/(n-k)) where k refers to the number of parameters in the model and n refers to the sample size.\n    - Covariance ratio: When the covariance ratio is greater than 3 * k/(n-k).\n    - Cook's distance: When Cook's distance exceeds the 50th percentile of the F distribution with (k, n-k) degrees of freedom.\n    - Leverages: When the leverages are greater than 3 * k/n.\n  - Append residuals to data: Save the residuals of the most complex model as a new column in the data file.",
+      "metadata": {
+        "doc_id": "f6f81441",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__RegressionLinear.md",
+        "md_name": "jasp-stats/jaspRegression__RegressionLinear.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/RegressionLinear.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__RegressionLinear.md",
+        "section_title": "- F change: Change in F between the different steps in Backward, Forward, and Stepwise...",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 500
+      }
+    },
+    {
+      "text": "### Method Specification\n- Stepping Method Criteria:\n  - Use p value: Use p-value as criterion for adding and removing predictors in Backward, Forward, and Stepwise regression.\n    - Entry: Add predictor if p-value of regression coefficient < x; default is x=0.05.\n    - Removal: Remove predictor if p-value of regression coefficient > x; default is x=0.1.\n  - Use F value: Use F-value as criterion for adding and removing predictors.\n    - Entry: Add predictor if F-value (t^2) of regression coefficient is > x; default is x=3.84.\n    - Removal: Remove predictor if F-value (t^2) of regression coefficient is < x; default is x=2.71.",
+      "metadata": {
+        "doc_id": "f9ffee61",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__RegressionLinear.md",
+        "md_name": "jasp-stats/jaspRegression__RegressionLinear.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/RegressionLinear.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__RegressionLinear.md",
+        "section_title": "### Method Specification",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 163
+      }
+    },
+    {
+      "text": "### Plots\n\n- Residual plots: If the assumptions of the linear regression model are tenable, then these residuals should scatter randomly about a horizontal line. Any systematic pattern or clustering of the residuals suggests a model violation(s).\n  - Residuals vs. dependent: Scatterplot of the values of the residuals against the dependent variable. \n  - Residuals vs. covariates:  Scatterplot of the values of the residuals against the predictor variables. \n  - Residuals vs. predicted:  Scatterplot of the values of the residuals against the predicted values. \n  - Residuals vs. histogram:  Histogram of the values of the residuals. \n    - Standardized residuals: Use standardized residuals instead.\n  - Q-Q plot standardized residuals: Checks the validity of the distributional assumption of the data set. Specifically, the plot illustrates whether the residuals are normally distributed.\n  - Partial plots: These plots are scatterplots of the residuals from 2 regressions - regressing the dependent variable on all of the other predictors, and regressing that particular predictor (as dependent variable) on all of the other predictors - then plotting the residuals against each other.",
+      "metadata": {
+        "doc_id": "64245cb3",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__RegressionLinear.md",
+        "md_name": "jasp-stats/jaspRegression__RegressionLinear.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/RegressionLinear.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__RegressionLinear.md",
+        "section_title": "### Plots",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 254
+      }
+    },
+    {
+      "text": "### Output\n---",
+      "metadata": {
+        "doc_id": "de3d944e",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__RegressionLinear.md",
+        "md_name": "jasp-stats/jaspRegression__RegressionLinear.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/RegressionLinear.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__RegressionLinear.md",
+        "section_title": "### Output",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 7
+      }
+    },
+    {
+      "text": "#### Linear Regression\n\nModel Summary:\n- Model: Regression model (one for each step in Backward, Forward, and Stepwise regression).\n- R: Multiple correlation coefficient R.\n- R squared: R squared value, i.e., proportion of the total variance that is explained by the regression model.\n- Adjusted R squared: Adjusted R squared value.\n- RMSE:\tRoot-mean-square error.\n- R squared change: Change in R squared value.\n- F change: Change in F-value.\n- df1: Numerator degrees of freedom of F change.\n- df2: Denominator degrees of freedom of F change.\n- p: p-value for F change.\n- Durbin-Watson: Durbin-Watson statistic.\n\nANOVA:\n- Model: Regression model (one for each step in Backward, Forward, and Stepwise regression).\n- Sum of Squares: Sum of squares for the regression model (Regression) and the residual (Residual), and total sum of squares (Total).\n- df: Degrees of freedom for the regression model (Regression) and the residual (Residual), and total degrees of freedom (Total).\n- Mean Square: Mean squares for the regression model (Regression) and the residual (Residual).\n- F: F-value.\n- p: p-value.\n\nCoefficients:\n- Model: Regression model (one for each step in Backward, Forward, and Stepwise regression).\n- Unstandardized: Unstandardized regression coefficients.\n- Standard Error: Standard error of the regression coefficients.\n- Standardized: Standardized regression coefficients.\n- t-value: t-value for testing the null hypothesis that the population regression coefficient equals 0.\n- p: p-value.\n- % CI: The confidence interval for the unstandardized regression coefficient. By default this is set to 95%. \n  - Lower: The lower bound of the confidence interval. \n  - Upper: The upper bound of the confidence interval.\n- Collinearity Statistics:\n  - Tolerance: Inverse of the Variance Inflation Factor (VIF).\n  - VIF: Variance Inflation Factor; large values indicate multicollinearity.",
+      "metadata": {
+        "doc_id": "2348f5b4",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__RegressionLinear.md",
+        "md_name": "jasp-stats/jaspRegression__RegressionLinear.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/RegressionLinear.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__RegressionLinear.md",
+        "section_title": "#### Linear Regression",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 444
+      }
+    },
+    {
+      "text": "- Collinearity Statistics:\n  - Tolerance: Inverse of the Variance Inflation Factor (VIF).\n  - VIF: Variance Inflation Factor; large values indicate multicollinearity. Calculated as VIF = det(R<sub>11</sub>) * det(R<sub>22</sub>) / det(R), where R is the covariance matrix of the regression coefficients (excluding intercept), R<sub>11</sub> is a submatrix of R of the predictor for which VIF is calculated, and R<sub>22</sub> is a submatrix of R of the other predictors (Fox & Monette, 1992).\n  \nBootstrapped Coefficients:\n- Model: Regression model (one for each step in Backward, Forward, and Stepwise regression).\n- Unstandardized: Unstandardized regression coefficients.\n- Bias: Standardized regression coefficients.\n- Standard Error: Standard error of the regression coefficients.\n- % CI: The bootstrapped confidence interval for the unstandardized regression coefficient. By default this is set to 95%. \n  - Lower: The lower bound of the confidence interval. \n  - Upper: The upper bound of the confidence interval.\n\nDescriptives:\n- N: Sample size.\n- Mean: Sample mean.\n- SD: Sample standard deviation.\n- SE: Standard error of the mean.\n\nPart And Partial Correlations:\n- Model: Regression model (one for each step in Backward, Forward, and Stepwise regression).\n- Partial: Partial correlations between the predictor variables and dependent variable.\n- Part:  Semipartial correlations between the predictor variables and dependent variable.\n\n\nCoefficients:\n- [lower]%: Lower bound of the user-defined x% confidence intervals for the regression coefficients.\n- [upper]%: Upper bound of the user-defined x% confidence intervals for the regression coefficients.",
+      "metadata": {
+        "doc_id": "2348f5b4",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__RegressionLinear.md",
+        "md_name": "jasp-stats/jaspRegression__RegressionLinear.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/RegressionLinear.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__RegressionLinear.md",
+        "section_title": "- Collinearity Statistics:",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 391
+      }
+    },
+    {
+      "text": "Coefficients:\n- [lower]%: Lower bound of the user-defined x% confidence intervals for the regression coefficients.\n- [upper]%: Upper bound of the user-defined x% confidence intervals for the regression coefficients.\n\n\nCoefficients Covariance Matrix:\n- Displays the covariance matrix of the coefficients of the predictors for each regression model considered (Model).\n\nCollinearity Diagnostics:\n- Displays for each regression model considered (Model) and for each element of the scaled uncentered cross-product matrix (Dimension):\n  - Eigenvalue.\n  - Condition Index.\n  - Variance Proportions for each term in the regression equation.\n\nCasewise Diagnostics:\n - For each flagged case (Case Number) displays:\n    - Standardized (Std.) residual. Alternatively called also studentized residual.\n    - The value on the dependent variable.\n    - Predicted value.\n    - Residual.\n    - Cook's distance.\n\nResidual Statistics:\n- Displays the minimum (Minimum), maximum (Maximum), mean (Mean), standard deviation (SD), and the sample size (N) for:\n - Predicted Value.\n - Residual.\n - Standardized (Std.) predicted value.\n - Standardized (Std.) residual.",
+      "metadata": {
+        "doc_id": "2348f5b4",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__RegressionLinear.md",
+        "md_name": "jasp-stats/jaspRegression__RegressionLinear.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/RegressionLinear.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__RegressionLinear.md",
+        "section_title": "Coefficients:",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 246
+      }
+    },
+    {
+      "text": "### References\n-------\n- Field, A.P., Miles, J., & Field, Z. (2012). *Discovering statistics using R*. London: Sage.\n- Fox, J. & Monette, G. (1992). Generalized Collinearity Diagnostics. *Journal of the American Statistical Association, 87*(417), 178-183.\n- Moore, D.S., McCabe, G.P., & Craig, B.A. (2012). *Introduction to the practice of statistics (7th ed.)*. New York, NY: W.H. Freeman and Company.\n- Sellke, T., Bayarri, M. J., & Berger, J. O. (2001). Calibration of *p* values for testing precise null hypotheses. *The American Statistician, 55*(1), 62-71.\n- Stevens, J.P. (2009). *Applied multivariate statistics for the social sciences (5th ed.)*. New York, NY: Routledge.",
+      "metadata": {
+        "doc_id": "69366e10",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__RegressionLinear.md",
+        "md_name": "jasp-stats/jaspRegression__RegressionLinear.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/RegressionLinear.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__RegressionLinear.md",
+        "section_title": "### References",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 234
+      }
+    },
+    {
+      "text": "### R Packages\n----\n- boot\n- car\n- ggplot2\n- lmtest\n- matrixStats\n- stats",
+      "metadata": {
+        "doc_id": "453681ee",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__RegressionLinear.md",
+        "md_name": "jasp-stats/jaspRegression__RegressionLinear.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/RegressionLinear.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__RegressionLinear.md",
+        "section_title": "### R Packages",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 28
+      }
+    }
+  ]
+}

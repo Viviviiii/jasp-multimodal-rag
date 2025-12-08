@@ -1,0 +1,274 @@
+{
+  "sections": [
+    {
+      "text": "Bayesian Correlation\n===\n\nThe Bayesian Correlation analysis allows for the estimation of the population correlation, as well as the comparison of hypotheses. The three comparisons are (i) between the null hypothesis (H0) that the correlation between pairs of variables equal 0, and the alternative hypothesis (H1) that the population correlation takes its value between -1 and 1; (ii) between H0 and the alternative hypothesis (H+) that the population correlation is positive; and (iii) between H0 and the alternative hypothesis (H-) that the population correlation is negative. All possible pairs of the specified variables are analyzed.",
+      "metadata": {
+        "doc_id": "541ebc63",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "md_name": "jasp-stats/jaspRegression__CorrelationBayesian.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/CorrelationBayesian.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "section_title": "Bayesian Correlation",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 130
+      }
+    },
+    {
+      "text": "### Assumptions (Pearson's rho)\n- Continuous variables\n- The data are a random sample from the population\n- The pairs of variables follow a bivariate normal distribution in the population\n- The relationship between the pairs of variables is linear",
+      "metadata": {
+        "doc_id": "8332285f",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "md_name": "jasp-stats/jaspRegression__CorrelationBayesian.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/CorrelationBayesian.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "section_title": "### Assumptions (Pearson's rho)",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 49
+      }
+    },
+    {
+      "text": "### Assumptions (Kendall's tau)\n- Ordinal or continuous variables\n- The data are a random sample from the population\n- The relationship between the pairs of variables is monotonic",
+      "metadata": {
+        "doc_id": "a7443e5b",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "md_name": "jasp-stats/jaspRegression__CorrelationBayesian.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/CorrelationBayesian.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "section_title": "### Assumptions (Kendall's tau)",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 38
+      }
+    },
+    {
+      "text": "### Input\n---",
+      "metadata": {
+        "doc_id": "9cf0430a",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "md_name": "jasp-stats/jaspRegression__CorrelationBayesian.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/CorrelationBayesian.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "section_title": "### Input",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 7
+      }
+    },
+    {
+      "text": "#### Population Correlation Coefficient\n- Pearson's rho: Pearson's product moment correlation coefficient.\n- Kendall's tau-b: Kendall's tau-b rank-order correlation coefficient to quantify the monotonic association between two variables.",
+      "metadata": {
+        "doc_id": "26da49b9",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "md_name": "jasp-stats/jaspRegression__CorrelationBayesian.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/CorrelationBayesian.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "section_title": "#### Population Correlation Coefficient",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 52
+      }
+    },
+    {
+      "text": "#### Alt. Hypothesis\n- Correlated: Two-sided alternative hypothesis that the population correlation does not equal 0.\n- Correlated positively: One-sided alternative hypothesis that the population correlation is greater than 0.\n- Correlated negatively: One-sided alternative hypothesis that the population correlation is lower than 0.",
+      "metadata": {
+        "doc_id": "2c5a32da",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "md_name": "jasp-stats/jaspRegression__CorrelationBayesian.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/CorrelationBayesian.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "section_title": "#### Alt. Hypothesis",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 60
+      }
+    },
+    {
+      "text": "#### Bayes Factor\n- BF<sub>10</sub>: By selecting this option, the Bayes factor will show evidence for the alternative hypothesis relative to the null hypothesis. This option is selected by default.\n- BF<sub>01</sub> : By selecting this option, the Bayes factor will show evidence for the null hypothesis relative to the alternative hypothesis. This is equal to 1/BF<sub>10</sub>.\n- Log(BF<sub>10</sub>) : By selecting this option, the natural logarithm of BF<sub>10</sub>, BF<sub>m</sub>, BF<sub>Inclusion</sub>, BF<sub>10, U</sub> will be displayed in the output.",
+      "metadata": {
+        "doc_id": "e4f14883",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "md_name": "jasp-stats/jaspRegression__CorrelationBayesian.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/CorrelationBayesian.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "section_title": "#### Bayes Factor",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 170
+      }
+    },
+    {
+      "text": "#### Additional Options\n- Display pairwise table: Display a table where one row corresponds to one pair of the specified variables. If unticked, the results are presented in matrix format, with variable names in the columns and rows.\n- Report Bayes factors: Report Bayes factor for each test.\n- Flag supported correlations: Indicate which correlation coefficients yield Bayes factors greater than 10, 30, and 100.\n- Sample size: Report the sample size for each test.\n- Credible intervals: Display central 95% credible intervals for the correlation coefficient.\n- Linearity test: For each pair A - B, tests if A is better predicted as a linear function of B, i.e., l := A ~ 1 + B, or a quadratic function of B, i.e., q := A ~ 1 + B + B^2.\nUses the default settings for Bayesian regression, i.e., a JZS-prior with alpha set to 0.354 and for the model prior a beta binomial distribution with alpha = 1 and beta = 1. Note that since only two models are considered the model prior is equivalent to a uniform model prior.",
+      "metadata": {
+        "doc_id": "7e982bed",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "md_name": "jasp-stats/jaspRegression__CorrelationBayesian.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/CorrelationBayesian.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "section_title": "#### Additional Options",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 244
+      }
+    },
+    {
+      "text": "#### Plots\n- Correlation matrix: Display a grid of scatterplots for each possible combination of the selected variables. These are placed above the diagonal.\n  - Densities for variables: Display histogram and the corresponding density plot for each variable. These are placed on the diagonal.\n  - Posteriors under H<sub>1</sub>: Display posterior distribution of the correlation coefficient for each possible combination of the selected variables. These are placed below the diagonal.",
+      "metadata": {
+        "doc_id": "838ac089",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "md_name": "jasp-stats/jaspRegression__CorrelationBayesian.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/CorrelationBayesian.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "section_title": "#### Plots",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 96
+      }
+    },
+    {
+      "text": "#### Prior\n- Stretched beta prior width: Width of the scaled beta distribution on the correlation under the alterative hypothesis; default is 1. The lower this value, the more concentrated the prior density is around 0. Value must be between 0 and 2.",
+      "metadata": {
+        "doc_id": "64d17838",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "md_name": "jasp-stats/jaspRegression__CorrelationBayesian.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/CorrelationBayesian.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "section_title": "#### Prior",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 53
+      }
+    },
+    {
+      "text": "### Plot Individual Pairs\n- Correlation coefficient to plot:\n  - Pearson's rho: Pearson's product moment correlation coefficient.\n  - Kendall's tau-b: Kendall's tau-b rank-order correlation coefficient to quantify the monotonic association between two variables.\n\n- Scatterplot: Displays scatterplots for each specified pair of variables.\n\n- Prior and posterior: Displays the prior and posterior distribution of the correlation under the alternative hypothesis for each specified pair of variables.\n  - Estimation info: Adds the median and the 95% credible interval of the posterior distribution of the effect size.\n  - Testing info: Adds the Bayes factor computed with the user-defined prior; adds a probability wheel depicting the odds of the data under the null vs. alternative hypothesis (under the assumption that the null and alternative hypotheses were equal probable a priori, i.e., P(H0)=P(H1)=1/2); adds indicators representing the prior and posterior at the test point (e.g., rho=0), the ratio between these two values equals the Bayes factor.\n\n- Bayes factor robustness check: Displays the Bayes factor as a function of the width of the stretched beta prior on the correlation for each specified pair of variables. The width of the kappa prior is varied between 0 and 2.\n  - Additional info: Adds the Bayes factor computed with the user-defined prior and the maximum obtainable Bayes factor.\n\n- Sequential analysis: Displays the development of the Bayes factor as the data come in using the user-defined prior for each specified pair of variables.\n  - Additional info: Adds the Bayes factor computed with the user-defined prior; adds a probability wheel depicting the odds of the data under the null vs. alternative hypothesis; shows the decisiveness of the evidence in terms of Jeffreys' (1961) evidence categories.",
+      "metadata": {
+        "doc_id": "38ce2f76",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "md_name": "jasp-stats/jaspRegression__CorrelationBayesian.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/CorrelationBayesian.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "section_title": "### Plot Individual Pairs",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 389
+      }
+    },
+    {
+      "text": "### Options\n- Missing values:\n  - Exclude cases pairwise\n  - Exclude cases listwise\n- Repeatability:\n  - Set seed: Gives the option to set a seed for your analysis. Setting a seed will exclude random processes influencing an analysis.",
+      "metadata": {
+        "doc_id": "b043ce1c",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "md_name": "jasp-stats/jaspRegression__CorrelationBayesian.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/CorrelationBayesian.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "section_title": "### Options",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 48
+      }
+    },
+    {
+      "text": "### Output\n---",
+      "metadata": {
+        "doc_id": "e79f9f4a",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "md_name": "jasp-stats/jaspRegression__CorrelationBayesian.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/CorrelationBayesian.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "section_title": "### Output",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 7
+      }
+    },
+    {
+      "text": "#### Bayesian Correlation Table\n- n: sample size.\n- Pearson's r: Pearson product-moment correlation coefficient.\n- Kendall's tau: Kendall's rank correlation coefficient.\n- BF10 (or BF01): Bayes factor. If one-sided test is requested:\n  - BF+0: Bayes factor that quantifies evidence for the one-sided alternative hypothesis that the population correlation is higher than 0.\n  - BF-0: Bayes factor that quantifies evidence for the one-sided alternative hypothesis that the population correlation is lower than 0.\n  - BF0+: Bayes factor that quantifies evidence for the null hypothesis relative to the one-sided alternative hypothesis that the population correlation is higher than 0.\n  - BF0-: Bayes factor that quantifies evidence for the null hypothesis relative to the one-sided alternative hypothesis that the population correlation is lower than 0.\n- Credible interval: Central credible intervals for the correlation coefficient.\n\n- Flag supported correlations: Correlations that are supported to the Bayes factor are marked with (see Jeffreys (1961) for evidence categories).\n  - *BF > 10 if the data are at least 10 times more likely under the chosen hypothesis (see Hypothesis above).\n  - **BF > 30 if the data are at least 30 times more likely under the chosen hypothesis (see Hypothesis above).\n  - ***BF > 100 if the data are at least 100 times more likely under the chosen hypothesis (see Hypothesis above).",
+      "metadata": {
+        "doc_id": "de123c26",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "md_name": "jasp-stats/jaspRegression__CorrelationBayesian.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/CorrelationBayesian.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "section_title": "#### Bayesian Correlation Table",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 308
+      }
+    },
+    {
+      "text": "#### Bayesian Correlation Matrix Plot\n- Displays a (matrix of) scatterplot(s) between the variables (in the upper off-diagonal entries of the matrix). The black line represents the least-square regression line.\n    - Densities for variables: Displays a histogram and the corresponding density plot for each variable in the diagonal entries of the matrix.\n    - Posteriors under H1: Displays density plot(s) of the posterior of the correlation(s) under the alternative hypothesis in the lower off-diagonal entries of the matrix.",
+      "metadata": {
+        "doc_id": "f0ca2f21",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "md_name": "jasp-stats/jaspRegression__CorrelationBayesian.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/CorrelationBayesian.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "section_title": "#### Bayesian Correlation Matrix Plot",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 114
+      }
+    },
+    {
+      "text": "#### Bayesian Correlation Pairwise Plots\n- Scatterplot:\n  - Displays the scatterplot of the correlation pairs.\n\n- Prior and Posterior:\n  - Displays the prior (dashed line) and posterior (solid line) distribution of the correlation under the alternative hypothesis; The horizontal solid line represents the width of the 95% credible interval of the posterior distribution.\n    - Estimation info: Displays the median and the 95% credible interval of the posterior distribution of the effect size.\n    - Testing info: Displays the Bayes factor computed with the user-defined prior; displays a probability wheel depicting the odds of the data under the null vs. alternative hypothesis (under the assumption that the null and alternative hypotheses were equal probable a priori, i.e., P(H0)=P(H1)=1/2); displays indicators (gray circles) representing the prior and posterior at the test point (e.g., rho=0), the ratio between these two values equals the Bayes factor.\n\n- Bayes factor robustness check:\n  - Displays the Bayes factor as a function of the width of the beta prior on the correlation.\n    - Additional info: The red circle represents the maximum obtainable Bayes factor; the gray circle represents the Bayes factor computed with the user-defined prior.\n\n- Sequential analysis:\n  - Displays the development of the Bayes factor as a function of the number of observations (n) using the user-defined prior.\n    - Additional info: Displays the Bayes factor computed with the user-defined prior; displays a probability wheel depicting the odds of the data under the null vs. alternative hypothesis; shows the decisiveness of the evidence in terms of Jeffreys' (1961) evidence categories.",
+      "metadata": {
+        "doc_id": "a93aff9e",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "md_name": "jasp-stats/jaspRegression__CorrelationBayesian.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/CorrelationBayesian.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "section_title": "#### Bayesian Correlation Pairwise Plots",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 356
+      }
+    },
+    {
+      "text": "### References\n---\n- Jeffreys, H. (1961). *Theory of probability (3rd ed.)*. Oxford, UK: Oxford University Press.\n- Ly, A., Verhagen, A. J., & Wagenmakers, E.-J. (2016). Harold Jeffreys's default Bayes factor hypothesis tests: Explanation, extension, and application in psychology. *Journal of Mathematical Psychology, 72*, 19-31.\n- Ly, A., Marsman, M., & Wagenmakers, E.-J. (2018).  Analytic Posteriors for Pearson’s Correlation Coefficient. *Statistica Neerlandica, 72*(1), 4-13\n- Rouder, J. N., & Morey R. D. (2012). Default Bayes factors for model selection in regression. *Multivariate Behavioral Research, 47*, 877-903.\n- van Doorn, J.B., Ly, A., Marsman, M. & Wagenmakers, E.-J. (2018). Bayesian Inference for Kendall’s Rank Correlation Coefficient. *The American Statistician*,  72, 303-308.\n- Wagenmakers, E.-J., Lodewyckx, T., Kuriyal, H., and Grasman, R. (2010). Bayesian hypothesis testing for psychologists: A tutorial on the Savage-Dickey method. *Cognitive Psychology, 60*, 158-189.\n- Wetzels, R., & Wagenmakers, E.-J. (2012). A default Bayesian hypothesis test for correlations and partial correlations. *Psychonomic Bulletin & Review, 19*, 1057-1064.",
+      "metadata": {
+        "doc_id": "99827184",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "md_name": "jasp-stats/jaspRegression__CorrelationBayesian.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/CorrelationBayesian.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "section_title": "### References",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 381
+      }
+    },
+    {
+      "text": "### R Packages\n---\n- hypergeo\n- ggplot2\n- stats",
+      "metadata": {
+        "doc_id": "b6601c5f",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "md_name": "jasp-stats/jaspRegression__CorrelationBayesian.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/CorrelationBayesian.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__CorrelationBayesian.md",
+        "section_title": "### R Packages",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 19
+      }
+    }
+  ]
+}

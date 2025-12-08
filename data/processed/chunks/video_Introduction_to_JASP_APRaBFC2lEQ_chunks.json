@@ -1,0 +1,171 @@
+{
+  "sections": [
+    {
+      "text": "This video demonstrates the basic functionality of JASP.\n \nConnect with JASP:\nWebsite: https://jasp-stats.org\nTwitter: https://twitter.com/JASPStats\nFacebook: https://www.facebook.com/JASPStats\nGitHub: https://github.com/jasp-stats/\n \nVoiced by Gracia Edwards.\nText, editing and animations by Robbert de Vries.",
+      "metadata": {
+        "video_id": "APRaBFC2lEQ",
+        "video_title": "Introduction to JASP",
+        "author": "JASP Statistics",
+        "url": "https://www.youtube.com/watch?v=APRaBFC2lEQ",
+        "source_type": "video_transcript",
+        "processing_date": "2025-12-08T17:42:05.346029",
+        "source": "description",
+        "section_id": "APRaBFC2lEQ_desc_0",
+        "token_length": 98
+      }
+    },
+    {
+      "text": "this is jasp the free and user-friendly way to do statistics with jasp you can analyze your data and present your results in a simple and intuitive way using both classical frequentest and Bayesian analyzes",
+      "metadata": {
+        "video_id": "APRaBFC2lEQ",
+        "video_title": "Introduction to JASP",
+        "author": "JASP Statistics",
+        "url": "https://www.youtube.com/watch?v=APRaBFC2lEQ",
+        "source_type": "video_transcript",
+        "processing_date": "2025-12-08T17:42:05.346029",
+        "source": "chapter",
+        "chapter_title": "Intro",
+        "start_time": "0:00",
+        "end_time": "0:20",
+        "section_id": "APRaBFC2lEQ_ch1_part0",
+        "token_length": 44
+      }
+    },
+    {
+      "text": "intuitive way using both classical frequentest and Bayesian analyzes you can access your data set either locally on your computer or on the open science framework the data Library allows you to engage and play around with some pre-selected data sets",
+      "metadata": {
+        "video_id": "APRaBFC2lEQ",
+        "video_title": "Introduction to JASP",
+        "author": "JASP Statistics",
+        "url": "https://www.youtube.com/watch?v=APRaBFC2lEQ",
+        "source_type": "video_transcript",
+        "processing_date": "2025-12-08T17:42:05.346029",
+        "source": "chapter",
+        "chapter_title": "Data Library",
+        "start_time": "0:20",
+        "end_time": "0:32",
+        "section_id": "APRaBFC2lEQ_ch2_part0",
+        "token_length": 48
+      }
+    },
+    {
+      "text": "and play around with some pre-selected data sets in the ribbon at the top you can see the primary modules which contain the most popular statistical analyzes in the social sciences in addition to your standard collection of classical frequentest analyzes jasp also offers their Beijing counterparts this way Jas promotes a more inclusive and informative approach to statistical inference",
+      "metadata": {
+        "video_id": "APRaBFC2lEQ",
+        "video_title": "Introduction to JASP",
+        "author": "JASP Statistics",
+        "url": "https://www.youtube.com/watch?v=APRaBFC2lEQ",
+        "source_type": "video_transcript",
+        "processing_date": "2025-12-08T17:42:05.346029",
+        "source": "chapter",
+        "chapter_title": "Primary Modules",
+        "start_time": "0:32",
+        "end_time": "0:56",
+        "section_id": "APRaBFC2lEQ_ch3_part0",
+        "token_length": 70
+      }
+    },
+    {
+      "text": "and informative approach to statistical inference in addition you can click on the plus sign in the upper right corner to add more modules you can also conduct more advanced analyzes in jasp for instance the same module based on the Levan package by E3 seal allows you to perform structural equation modeling in addition with our summary stats module you can re-analyze and examine published findings without needing the original data also you can engage with more advanced modules such as the machine learning module or network analysis module while you are conducting your analysis the changes you make are immediately reflected in the output panel on the right on the right your results will update in",
+      "metadata": {
+        "video_id": "APRaBFC2lEQ",
+        "video_title": "Introduction to JASP",
+        "author": "JASP Statistics",
+        "url": "https://www.youtube.com/watch?v=APRaBFC2lEQ",
+        "source_type": "video_transcript",
+        "processing_date": "2025-12-08T17:42:05.346029",
+        "source": "chapter",
+        "chapter_title": "Advanced Modules",
+        "start_time": "0:56",
+        "end_time": "1:38",
+        "section_id": "APRaBFC2lEQ_ch4_part0",
+        "token_length": 127
+      }
+    },
+    {
+      "text": "panel on the right on the right your results will update in real time this is just one example of how jasp is user-friendly and Interactive jasp was also designed to support many aspects of scientific work including writing an article or a report features in the output can be renamed as the labels and axes while titles and the Order of analyzes can be changed to that end with a few simple mouse clicks you can copy the tables in jasp and paste them into your word processor this way you have an APA style table with no fuss this copy paste functionality is also available for all of the plots in jasp moreover you can save the plots in standard file formats such as dot PNG or dot EPS to accompany your article submission",
+      "metadata": {
+        "video_id": "APRaBFC2lEQ",
+        "video_title": "Introduction to JASP",
+        "author": "JASP Statistics",
+        "url": "https://www.youtube.com/watch?v=APRaBFC2lEQ",
+        "source_type": "video_transcript",
+        "processing_date": "2025-12-08T17:42:05.346029",
+        "source": "chapter",
+        "chapter_title": "UserFriendly",
+        "start_time": "1:38",
+        "end_time": "2:30",
+        "section_id": "APRaBFC2lEQ_ch5_part0",
+        "token_length": 147
+      }
+    },
+    {
+      "text": "dot EPS to accompany your article submission we aim to facilitate scientific openness and transparency this is why jasp makes it easy for you to reproduce and review the analyzes of your students collaborators and colleagues you can also annotate analyzes within jasp which allows you to create a record of the rationale behind your analyzes and give the proper interpretation of your results this benefits open science peer review and collaboration with colleagues it can also benefit teaching by encouraging concrete interaction with students",
+      "metadata": {
+        "video_id": "APRaBFC2lEQ",
+        "video_title": "Introduction to JASP",
+        "author": "JASP Statistics",
+        "url": "https://www.youtube.com/watch?v=APRaBFC2lEQ",
+        "source_type": "video_transcript",
+        "processing_date": "2025-12-08T17:42:05.346029",
+        "source": "chapter",
+        "chapter_title": "Open Science",
+        "start_time": "2:30",
+        "end_time": "3:04",
+        "section_id": "APRaBFC2lEQ_ch6_part0",
+        "token_length": 96
+      }
+    },
+    {
+      "text": "also benefit teaching by encouraging concrete interaction with students you can also edit your data file within jasp with the data sync feature you can access the raw data by double clicking on one of the cells in jasp for example you or your colleagues could add newly collected observations or add a new composite measure changes meant to the data are immediately reflected in your Jasper analyzes see the link in the description below for a separate data editing tutorial you can easily publish your just results directly to the open science framework and this allows other people to see your results without needing their own OSF account and without needing to install jasp on their machine see the link in the description below for a separate jasp OSF tutorial video",
+      "metadata": {
+        "video_id": "APRaBFC2lEQ",
+        "video_title": "Introduction to JASP",
+        "author": "JASP Statistics",
+        "url": "https://www.youtube.com/watch?v=APRaBFC2lEQ",
+        "source_type": "video_transcript",
+        "processing_date": "2025-12-08T17:42:05.346029",
+        "source": "chapter",
+        "chapter_title": "Data Sync",
+        "start_time": "3:04",
+        "end_time": "3:51",
+        "section_id": "APRaBFC2lEQ_ch7_part0",
+        "token_length": 143
+      }
+    },
+    {
+      "text": "the description below for a separate jasp OSF tutorial video our team is constantly working to equip Jazz with new features and new state-of-the-art statistical analyzes working together with collaborators from all over the world jasp is now available in multiple languages such as German Spanish Portuguese and Chinese",
+      "metadata": {
+        "video_id": "APRaBFC2lEQ",
+        "video_title": "Introduction to JASP",
+        "author": "JASP Statistics",
+        "url": "https://www.youtube.com/watch?v=APRaBFC2lEQ",
+        "source_type": "video_transcript",
+        "processing_date": "2025-12-08T17:42:05.346029",
+        "source": "chapter",
+        "chapter_title": "Languages",
+        "start_time": "3:51",
+        "end_time": "4:09",
+        "section_id": "APRaBFC2lEQ_ch8_part0",
+        "token_length": 64
+      }
+    },
+    {
+      "text": "in multiple languages such as German Spanish Portuguese and Chinese when you visit our website jasp hyphenstats.org you can interact with the Jazz team in various ways first you can ask statistical questions on the jasp Forum second you can attend our annual summer workshop in Amsterdam the home of jasp third you can post feature requests and suggestions for improvement on the Jazz GitHub page and finally you can follow jasp on Twitter or on Facebook these are just some of the features that Jasper has to offer for in-depth tutorials subscribe to the Jazz YouTube channel or follow the link in the description to go to our website thanks for watching [Music]",
+      "metadata": {
+        "video_id": "APRaBFC2lEQ",
+        "video_title": "Introduction to JASP",
+        "author": "JASP Statistics",
+        "url": "https://www.youtube.com/watch?v=APRaBFC2lEQ",
+        "source_type": "video_transcript",
+        "processing_date": "2025-12-08T17:42:05.346029",
+        "source": "chapter",
+        "chapter_title": "Interactions",
+        "start_time": "4:09",
+        "end_time": "4:57",
+        "section_id": "APRaBFC2lEQ_ch9_part0",
+        "token_length": 134
+      }
+    }
+  ]
+}

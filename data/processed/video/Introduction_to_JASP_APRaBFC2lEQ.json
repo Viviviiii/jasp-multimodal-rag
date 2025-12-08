@@ -1,0 +1,677 @@
+{
+  "video_id": "APRaBFC2lEQ",
+  "name": "Introduction to JASP",
+  "url": "https://www.youtube.com/watch?v=APRaBFC2lEQ",
+  "category": "Analysis",
+  "language": "en",
+  "metadata": {
+    "video_id": "APRaBFC2lEQ",
+    "url": "https://www.youtube.com/watch?v=APRaBFC2lEQ",
+    "title": "Introduction to JASP",
+    "description": "This video demonstrates the basic functionality of JASP.\n \nConnect with JASP:\nWebsite: https://jasp-stats.org\nTwitter: https://twitter.com/JASPStats\nFacebook: https://www.facebook.com/JASPStats\nGitHub: https://github.com/jasp-stats/\n \nVoiced by Gracia Edwards.\nText, editing and animations by Robbert de Vries.",
+    "author": "JASP Statistics",
+    "publish_date": "20221005",
+    "duration": 297,
+    "chapters": [
+      {
+        "start_time": 0.0,
+        "title": "Intro",
+        "end_time": 20.0,
+        "text": "this is jasp the free and user-friendly way to do statistics with jasp you can analyze your data and present your results in a simple and intuitive way using both classical frequentest and Bayesian analyzes"
+      },
+      {
+        "start_time": 20.0,
+        "title": "Data Library",
+        "end_time": 32.0,
+        "text": "intuitive way using both classical frequentest and Bayesian analyzes you can access your data set either locally on your computer or on the open science framework the data Library allows you to engage and play around with some pre-selected data sets"
+      },
+      {
+        "start_time": 32.0,
+        "title": "Primary Modules",
+        "end_time": 56.0,
+        "text": "and play around with some pre-selected data sets in the ribbon at the top you can see the primary modules which contain the most popular statistical analyzes in the social sciences in addition to your standard collection of classical frequentest analyzes jasp also offers their Beijing counterparts this way Jas promotes a more inclusive and informative approach to statistical inference"
+      },
+      {
+        "start_time": 56.0,
+        "title": "Advanced Modules",
+        "end_time": 98.0,
+        "text": "and informative approach to statistical inference in addition you can click on the plus sign in the upper right corner to add more modules you can also conduct more advanced analyzes in jasp for instance the same module based on the Levan package by E3 seal allows you to perform structural equation modeling in addition with our summary stats module you can re-analyze and examine published findings without needing the original data also you can engage with more advanced modules such as the machine learning module or network analysis module while you are conducting your analysis the changes you make are immediately reflected in the output panel on the right on the right your results will update in"
+      },
+      {
+        "start_time": 98.0,
+        "title": "UserFriendly",
+        "end_time": 150.0,
+        "text": "panel on the right on the right your results will update in real time this is just one example of how jasp is user-friendly and Interactive jasp was also designed to support many aspects of scientific work including writing an article or a report features in the output can be renamed as the labels and axes while titles and the Order of analyzes can be changed to that end with a few simple mouse clicks you can copy the tables in jasp and paste them into your word processor this way you have an APA style table with no fuss this copy paste functionality is also available for all of the plots in jasp moreover you can save the plots in standard file formats such as dot PNG or dot EPS to accompany your article submission"
+      },
+      {
+        "start_time": 150.0,
+        "title": "Open Science",
+        "end_time": 184.0,
+        "text": "dot EPS to accompany your article submission we aim to facilitate scientific openness and transparency this is why jasp makes it easy for you to reproduce and review the analyzes of your students collaborators and colleagues you can also annotate analyzes within jasp which allows you to create a record of the rationale behind your analyzes and give the proper interpretation of your results this benefits open science peer review and collaboration with colleagues it can also benefit teaching by encouraging concrete interaction with students"
+      },
+      {
+        "start_time": 184.0,
+        "title": "Data Sync",
+        "end_time": 231.0,
+        "text": "also benefit teaching by encouraging concrete interaction with students you can also edit your data file within jasp with the data sync feature you can access the raw data by double clicking on one of the cells in jasp for example you or your colleagues could add newly collected observations or add a new composite measure changes meant to the data are immediately reflected in your Jasper analyzes see the link in the description below for a separate data editing tutorial you can easily publish your just results directly to the open science framework and this allows other people to see your results without needing their own OSF account and without needing to install jasp on their machine see the link in the description below for a separate jasp OSF tutorial video"
+      },
+      {
+        "start_time": 231.0,
+        "title": "Languages",
+        "end_time": 249.0,
+        "text": "the description below for a separate jasp OSF tutorial video our team is constantly working to equip Jazz with new features and new state-of-the-art statistical analyzes working together with collaborators from all over the world jasp is now available in multiple languages such as German Spanish Portuguese and Chinese"
+      },
+      {
+        "start_time": 249.0,
+        "title": "Interactions",
+        "end_time": 297,
+        "text": "in multiple languages such as German Spanish Portuguese and Chinese when you visit our website jasp hyphenstats.org you can interact with the Jazz team in various ways first you can ask statistical questions on the jasp Forum second you can attend our annual summer workshop in Amsterdam the home of jasp third you can post feature requests and suggestions for improvement on the Jazz GitHub page and finally you can follow jasp on Twitter or on Facebook these are just some of the features that Jasper has to offer for in-depth tutorials subscribe to the Jazz YouTube channel or follow the link in the description to go to our website thanks for watching [Music]"
+      }
+    ]
+  },
+  "transcript": {
+    "segments": [
+      {
+        "text": "this is jasp the free and user-friendly",
+        "start": 5.06,
+        "duration": 4.66
+      },
+      {
+        "text": "way to do statistics",
+        "start": 7.919,
+        "duration": 4.501
+      },
+      {
+        "text": "with jasp you can analyze your data and",
+        "start": 9.72,
+        "duration": 4.44
+      },
+      {
+        "text": "present your results in a simple and",
+        "start": 12.42,
+        "duration": 3.84
+      },
+      {
+        "text": "intuitive way using both classical",
+        "start": 14.16,
+        "duration": 6.36
+      },
+      {
+        "text": "frequentest and Bayesian analyzes",
+        "start": 16.26,
+        "duration": 6.179
+      },
+      {
+        "text": "you can access your data set either",
+        "start": 20.52,
+        "duration": 4.08
+      },
+      {
+        "text": "locally on your computer or on the open",
+        "start": 22.439,
+        "duration": 3.901
+      },
+      {
+        "text": "science framework",
+        "start": 24.6,
+        "duration": 4.14
+      },
+      {
+        "text": "the data Library allows you to engage",
+        "start": 26.34,
+        "duration": 4.5
+      },
+      {
+        "text": "and play around with some pre-selected",
+        "start": 28.74,
+        "duration": 3.839
+      },
+      {
+        "text": "data sets",
+        "start": 30.84,
+        "duration": 3.899
+      },
+      {
+        "text": "in the ribbon at the top you can see the",
+        "start": 32.579,
+        "duration": 4.5
+      },
+      {
+        "text": "primary modules which contain the most",
+        "start": 34.739,
+        "duration": 4.5
+      },
+      {
+        "text": "popular statistical analyzes in the",
+        "start": 37.079,
+        "duration": 4.201
+      },
+      {
+        "text": "social sciences",
+        "start": 39.239,
+        "duration": 3.901
+      },
+      {
+        "text": "in addition to your standard collection",
+        "start": 41.28,
+        "duration": 4.98
+      },
+      {
+        "text": "of classical frequentest analyzes jasp",
+        "start": 43.14,
+        "duration": 5.939
+      },
+      {
+        "text": "also offers their Beijing counterparts",
+        "start": 46.26,
+        "duration": 5.52
+      },
+      {
+        "text": "this way Jas promotes a more inclusive",
+        "start": 49.079,
+        "duration": 4.921
+      },
+      {
+        "text": "and informative approach to statistical",
+        "start": 51.78,
+        "duration": 4.38
+      },
+      {
+        "text": "inference",
+        "start": 54.0,
+        "duration": 4.26
+      },
+      {
+        "text": "in addition you can click on the plus",
+        "start": 56.16,
+        "duration": 4.26
+      },
+      {
+        "text": "sign in the upper right corner to add",
+        "start": 58.26,
+        "duration": 4.26
+      },
+      {
+        "text": "more modules",
+        "start": 60.42,
+        "duration": 4.26
+      },
+      {
+        "text": "you can also conduct more advanced",
+        "start": 62.52,
+        "duration": 4.02
+      },
+      {
+        "text": "analyzes in jasp",
+        "start": 64.68,
+        "duration": 4.439
+      },
+      {
+        "text": "for instance the same module based on",
+        "start": 66.54,
+        "duration": 5.399
+      },
+      {
+        "text": "the Levan package by E3 seal allows you",
+        "start": 69.119,
+        "duration": 5.161
+      },
+      {
+        "text": "to perform structural equation modeling",
+        "start": 71.939,
+        "duration": 4.801
+      },
+      {
+        "text": "in addition with our summary stats",
+        "start": 74.28,
+        "duration": 5.1
+      },
+      {
+        "text": "module you can re-analyze and examine",
+        "start": 76.74,
+        "duration": 4.919
+      },
+      {
+        "text": "published findings without needing the",
+        "start": 79.38,
+        "duration": 5.279
+      },
+      {
+        "text": "original data also you can engage with",
+        "start": 81.659,
+        "duration": 5.161
+      },
+      {
+        "text": "more advanced modules such as the",
+        "start": 84.659,
+        "duration": 4.021
+      },
+      {
+        "text": "machine learning module or network",
+        "start": 86.82,
+        "duration": 4.5
+      },
+      {
+        "text": "analysis module while you are conducting",
+        "start": 88.68,
+        "duration": 5.22
+      },
+      {
+        "text": "your analysis the changes you make are",
+        "start": 91.32,
+        "duration": 4.38
+      },
+      {
+        "text": "immediately reflected in the output",
+        "start": 93.9,
+        "duration": 4.02
+      },
+      {
+        "text": "panel on the right",
+        "start": 95.7,
+        "duration": 4.8
+      },
+      {
+        "text": "on the right your results will update in",
+        "start": 97.92,
+        "duration": 5.4
+      },
+      {
+        "text": "real time this is just one example of",
+        "start": 100.5,
+        "duration": 4.799
+      },
+      {
+        "text": "how jasp is user-friendly and",
+        "start": 103.32,
+        "duration": 3.42
+      },
+      {
+        "text": "Interactive",
+        "start": 105.299,
+        "duration": 3.901
+      },
+      {
+        "text": "jasp was also designed to support many",
+        "start": 106.74,
+        "duration": 4.919
+      },
+      {
+        "text": "aspects of scientific work including",
+        "start": 109.2,
+        "duration": 5.34
+      },
+      {
+        "text": "writing an article or a report features",
+        "start": 111.659,
+        "duration": 5.041
+      },
+      {
+        "text": "in the output can be renamed as the",
+        "start": 114.54,
+        "duration": 5.039
+      },
+      {
+        "text": "labels and axes while titles and the",
+        "start": 116.7,
+        "duration": 5.58
+      },
+      {
+        "text": "Order of analyzes can be changed",
+        "start": 119.579,
+        "duration": 4.921
+      },
+      {
+        "text": "to that end with a few simple mouse",
+        "start": 122.28,
+        "duration": 4.799
+      },
+      {
+        "text": "clicks you can copy the tables in jasp",
+        "start": 124.5,
+        "duration": 5.039
+      },
+      {
+        "text": "and paste them into your word processor",
+        "start": 127.079,
+        "duration": 5.341
+      },
+      {
+        "text": "this way you have an APA style table",
+        "start": 129.539,
+        "duration": 4.441
+      },
+      {
+        "text": "with no fuss",
+        "start": 132.42,
+        "duration": 4.2
+      },
+      {
+        "text": "this copy paste functionality is also",
+        "start": 133.98,
+        "duration": 5.759
+      },
+      {
+        "text": "available for all of the plots in jasp",
+        "start": 136.62,
+        "duration": 5.64
+      },
+      {
+        "text": "moreover you can save the plots in",
+        "start": 139.739,
+        "duration": 5.64
+      },
+      {
+        "text": "standard file formats such as dot PNG or",
+        "start": 142.26,
+        "duration": 6.18
+      },
+      {
+        "text": "dot EPS to accompany your article",
+        "start": 145.379,
+        "duration": 4.921
+      },
+      {
+        "text": "submission",
+        "start": 148.44,
+        "duration": 4.56
+      },
+      {
+        "text": "we aim to facilitate scientific openness",
+        "start": 150.3,
+        "duration": 5.82
+      },
+      {
+        "text": "and transparency this is why jasp makes",
+        "start": 153.0,
+        "duration": 5.459
+      },
+      {
+        "text": "it easy for you to reproduce and review",
+        "start": 156.12,
+        "duration": 4.46
+      },
+      {
+        "text": "the analyzes of your students",
+        "start": 158.459,
+        "duration": 4.741
+      },
+      {
+        "text": "collaborators and colleagues",
+        "start": 160.58,
+        "duration": 5.019
+      },
+      {
+        "text": "you can also annotate analyzes within",
+        "start": 163.2,
+        "duration": 4.679
+      },
+      {
+        "text": "jasp which allows you to create a record",
+        "start": 165.599,
+        "duration": 4.621
+      },
+      {
+        "text": "of the rationale behind your analyzes",
+        "start": 167.879,
+        "duration": 4.86
+      },
+      {
+        "text": "and give the proper interpretation of",
+        "start": 170.22,
+        "duration": 3.78
+      },
+      {
+        "text": "your results",
+        "start": 172.739,
+        "duration": 3.72
+      },
+      {
+        "text": "this benefits open science peer review",
+        "start": 174.0,
+        "duration": 5.099
+      },
+      {
+        "text": "and collaboration with colleagues it can",
+        "start": 176.459,
+        "duration": 4.681
+      },
+      {
+        "text": "also benefit teaching by encouraging",
+        "start": 179.099,
+        "duration": 5.161
+      },
+      {
+        "text": "concrete interaction with students",
+        "start": 181.14,
+        "duration": 5.28
+      },
+      {
+        "text": "you can also edit your data file within",
+        "start": 184.26,
+        "duration": 4.44
+      },
+      {
+        "text": "jasp with the data sync feature",
+        "start": 186.42,
+        "duration": 4.8
+      },
+      {
+        "text": "you can access the raw data by double",
+        "start": 188.7,
+        "duration": 5.64
+      },
+      {
+        "text": "clicking on one of the cells in jasp for",
+        "start": 191.22,
+        "duration": 5.34
+      },
+      {
+        "text": "example you or your colleagues could add",
+        "start": 194.34,
+        "duration": 4.92
+      },
+      {
+        "text": "newly collected observations or add a",
+        "start": 196.56,
+        "duration": 4.319
+      },
+      {
+        "text": "new composite measure",
+        "start": 199.26,
+        "duration": 3.54
+      },
+      {
+        "text": "changes meant to the data are",
+        "start": 200.879,
+        "duration": 3.601
+      },
+      {
+        "text": "immediately reflected in your Jasper",
+        "start": 202.8,
+        "duration": 3.9
+      },
+      {
+        "text": "analyzes see the link in the description",
+        "start": 204.48,
+        "duration": 4.2
+      },
+      {
+        "text": "below for a separate data editing",
+        "start": 206.7,
+        "duration": 4.58
+      },
+      {
+        "text": "tutorial",
+        "start": 208.68,
+        "duration": 2.6
+      },
+      {
+        "text": "you can easily publish your just results",
+        "start": 212.28,
+        "duration": 4.679
+      },
+      {
+        "text": "directly to the open science framework",
+        "start": 214.34,
+        "duration": 5.08
+      },
+      {
+        "text": "and this allows other people to see your",
+        "start": 216.959,
+        "duration": 4.86
+      },
+      {
+        "text": "results without needing their own OSF",
+        "start": 219.42,
+        "duration": 4.26
+      },
+      {
+        "text": "account and without needing to install",
+        "start": 221.819,
+        "duration": 4.801
+      },
+      {
+        "text": "jasp on their machine see the link in",
+        "start": 223.68,
+        "duration": 4.74
+      },
+      {
+        "text": "the description below for a separate",
+        "start": 226.62,
+        "duration": 5.22
+      },
+      {
+        "text": "jasp OSF tutorial video",
+        "start": 228.42,
+        "duration": 5.94
+      },
+      {
+        "text": "our team is constantly working to equip",
+        "start": 231.84,
+        "duration": 4.679
+      },
+      {
+        "text": "Jazz with new features and new",
+        "start": 234.36,
+        "duration": 4.739
+      },
+      {
+        "text": "state-of-the-art statistical analyzes",
+        "start": 236.519,
+        "duration": 4.921
+      },
+      {
+        "text": "working together with collaborators from",
+        "start": 239.099,
+        "duration": 4.56
+      },
+      {
+        "text": "all over the world jasp is now available",
+        "start": 241.44,
+        "duration": 4.92
+      },
+      {
+        "text": "in multiple languages such as German",
+        "start": 243.659,
+        "duration": 6.541
+      },
+      {
+        "text": "Spanish Portuguese and Chinese",
+        "start": 246.36,
+        "duration": 6.98
+      },
+      {
+        "text": "when you visit our website jasp",
+        "start": 250.2,
+        "duration": 5.34
+      },
+      {
+        "text": "hyphenstats.org you can interact with",
+        "start": 253.34,
+        "duration": 5.799
+      },
+      {
+        "text": "the Jazz team in various ways first you",
+        "start": 255.54,
+        "duration": 5.34
+      },
+      {
+        "text": "can ask statistical questions on the",
+        "start": 259.139,
+        "duration": 4.681
+      },
+      {
+        "text": "jasp Forum second you can attend our",
+        "start": 260.88,
+        "duration": 5.16
+      },
+      {
+        "text": "annual summer workshop in Amsterdam the",
+        "start": 263.82,
+        "duration": 5.04
+      },
+      {
+        "text": "home of jasp third you can post feature",
+        "start": 266.04,
+        "duration": 4.92
+      },
+      {
+        "text": "requests and suggestions for improvement",
+        "start": 268.86,
+        "duration": 5.279
+      },
+      {
+        "text": "on the Jazz GitHub page and finally you",
+        "start": 270.96,
+        "duration": 5.16
+      },
+      {
+        "text": "can follow jasp on Twitter or on",
+        "start": 274.139,
+        "duration": 3.361
+      },
+      {
+        "text": "Facebook",
+        "start": 276.12,
+        "duration": 3.18
+      },
+      {
+        "text": "these are just some of the features that",
+        "start": 277.5,
+        "duration": 3.84
+      },
+      {
+        "text": "Jasper has to offer for in-depth",
+        "start": 279.3,
+        "duration": 4.2
+      },
+      {
+        "text": "tutorials subscribe to the Jazz YouTube",
+        "start": 281.34,
+        "duration": 4.02
+      },
+      {
+        "text": "channel or follow the link in the",
+        "start": 283.5,
+        "duration": 4.44
+      },
+      {
+        "text": "description to go to our website thanks",
+        "start": 285.36,
+        "duration": 5.18
+      },
+      {
+        "text": "for watching",
+        "start": 287.94,
+        "duration": 2.6
+      },
+      {
+        "text": "[Music]",
+        "start": 293.35,
+        "duration": 3.159
+      }
+    ],
+    "full_text": "this is jasp the free and user-friendly way to do statistics with jasp you can analyze your data and present your results in a simple and intuitive way using both classical frequentest and Bayesian analyzes you can access your data set either locally on your computer or on the open science framework the data Library allows you to engage and play around with some pre-selected data sets in the ribbon at the top you can see the primary modules which contain the most popular statistical analyzes in the social sciences in addition to your standard collection of classical frequentest analyzes jasp also offers their Beijing counterparts this way Jas promotes a more inclusive and informative approach to statistical inference in addition you can click on the plus sign in the upper right corner to add more modules you can also conduct more advanced analyzes in jasp for instance the same module based on the Levan package by E3 seal allows you to perform structural equation modeling in addition with our summary stats module you can re-analyze and examine published findings without needing the original data also you can engage with more advanced modules such as the machine learning module or network analysis module while you are conducting your analysis the changes you make are immediately reflected in the output panel on the right on the right your results will update in real time this is just one example of how jasp is user-friendly and Interactive jasp was also designed to support many aspects of scientific work including writing an article or a report features in the output can be renamed as the labels and axes while titles and the Order of analyzes can be changed to that end with a few simple mouse clicks you can copy the tables in jasp and paste them into your word processor this way you have an APA style table with no fuss this copy paste functionality is also available for all of the plots in jasp moreover you can save the plots in standard file formats such as dot PNG or dot EPS to accompany your article submission we aim to facilitate scientific openness and transparency this is why jasp makes it easy for you to reproduce and review the analyzes of your students collaborators and colleagues you can also annotate analyzes within jasp which allows you to create a record of the rationale behind your analyzes and give the proper interpretation of your results this benefits open science peer review and collaboration with colleagues it can also benefit teaching by encouraging concrete interaction with students you can also edit your data file within jasp with the data sync feature you can access the raw data by double clicking on one of the cells in jasp for example you or your colleagues could add newly collected observations or add a new composite measure changes meant to the data are immediately reflected in your Jasper analyzes see the link in the description below for a separate data editing tutorial you can easily publish your just results directly to the open science framework and this allows other people to see your results without needing their own OSF account and without needing to install jasp on their machine see the link in the description below for a separate jasp OSF tutorial video our team is constantly working to equip Jazz with new features and new state-of-the-art statistical analyzes working together with collaborators from all over the world jasp is now available in multiple languages such as German Spanish Portuguese and Chinese when you visit our website jasp hyphenstats.org you can interact with the Jazz team in various ways first you can ask statistical questions on the jasp Forum second you can attend our annual summer workshop in Amsterdam the home of jasp third you can post feature requests and suggestions for improvement on the Jazz GitHub page and finally you can follow jasp on Twitter or on Facebook these are just some of the features that Jasper has to offer for in-depth tutorials subscribe to the Jazz YouTube channel or follow the link in the description to go to our website thanks for watching [Music]"
+  }
+}

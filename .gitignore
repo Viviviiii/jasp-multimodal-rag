@@ -1,62 +1,8 @@
-# ----------------------
-# Python
-# ----------------------
+
 __pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-*.so
-*.egg-info/
-*.egg
-*.log
-
-# ----------------------
-# Environments
-# ----------------------
-.venv/
-env/
-venv/
-ENV/
-
-# ----------------------
-# Poetry / Pip
-# ----------------------
+.pytest_cache/
+.vscode/
+logs/
+src/__pycache__/
 poetry.lock
 
-# ----------------------
-# Jupyter / VS Code
-# ----------------------
-.ipynb_checkpoints/
-.vscode/
-*.code-workspace
-
-# ----------------------
-# Data (keep raw small PDFs if needed)
-# ----------------------
-notebooks
-data/processed/
-data/images/
-*.db
-*.sqlite
-data/chromadb/
-data/chroma/
-data/test
-data/test_QA
-data/vector_store/chroma_db
-*.parquet
-data/page_images/
-data/vector_store/*
-
-# ----------------------
-# Cache
-# ----------------------
-.cache/
-*.tmp
-*.swp
-*.swo
-
-# ----------------------
-# OS-specific
-# ----------------------
-.DS_Store
-Thumbs.db

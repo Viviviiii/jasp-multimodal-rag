@@ -1,0 +1,50 @@
+{
+  "sections": [
+    {
+      "text": "This video demonstrates how to run a repeated measures ANOVA in JASP.",
+      "metadata": {
+        "video_id": "CWRmc2t1Vlo",
+        "video_title": "JASP repeated measures ANOVA and post hoc tests",
+        "author": "Melissa Ferguson",
+        "url": "https://www.youtube.com/watch?v=CWRmc2t1Vlo",
+        "source_type": "video_transcript",
+        "processing_date": "2025-12-08T17:42:05.375217",
+        "source": "description",
+        "section_id": "CWRmc2t1Vlo_desc_0",
+        "token_length": 17
+      }
+    },
+    {
+      "text": "so now that we've run our descriptive data we need to run our Nova and again please note that here these are our participant pit numbers identifying the participants and this is the direction of rotation and each participant participated in each condition the understated condition the accurate condition and the overstated condition so we're going to go up here to an NOA and we're going to select the repeated measures an NOA so again that was an no no repeated measures in NOA and now we want we have a repeated measures Factor RM Factor 1 so we're going to put visual feedback and my level one is accurate we'll say understated my level two is accurate I need a new level overstated now if I had a second factor a second an independent variable I would put that here but I don't so as soon as I click out of that you see they're all populated here so now what I need to do is drag and drop these things over here make sure it's the correct one alternatively I can highlight it and click the arrow and so you're going to see right here is going to populate my information so here I have my repeated measures Nova table it's my for visual feedback it gives me my degrees of freedom 2 and 94 it gives me an F value and it gives me a P value and here it does say that the test of sphericity indicates that um the Assumption of sphericity is violated and this happens when the variances um of the differences between the different combinations of your groups aren't equal it's kind of like the homogene homogeneity of variance for between subjects and NOA um and because of that we need to do a certain type of correction so we're going to go back over to our data and we're going to do a greenhouse geyser correction and that'll be explained more on the canvas assignment page if you'd like to learn more about that so now what it does it just makes some adjustments you're still going to report your degrees of freedom of 2 and 94 and I'll go over on",
+      "metadata": {
+        "video_id": "CWRmc2t1Vlo",
+        "video_title": "JASP repeated measures ANOVA and post hoc tests",
+        "author": "Melissa Ferguson",
+        "url": "https://www.youtube.com/watch?v=CWRmc2t1Vlo",
+        "source_type": "video_transcript",
+        "processing_date": "2025-12-08T17:42:05.375217",
+        "source": "transcript_fallback",
+        "start_time": "0:01",
+        "end_time": "2:24",
+        "section_id": "CWRmc2t1Vlo_fallback_0",
+        "token_length": 434
+      }
+    },
+    {
+      "text": "the assignment page again what those degrees of freedom mean here we have our F value and we have our P value and you can see that didn't change the F value or the P value at all really now we already ran a script of Statistics up here but you could click this little box here and it will provide you a some as well and it does give you kind of the important stuff so now since I have significance I'm going to come over here to my post talk tests and I'm going to pick one so I'm going to pick the Bon fani and again the sheffy is probably I think the most conservative Bon fan is the one I'm just most familiar with for um a repeated measures design and so the assignment page also provides a little bit more information on why we chose the bonani post talk test if you'd like to know so again I just clicked the the test that I wanted to run we ran the two key remember for the between subjects zova then I needed to move visual feedback it was here I just needed that's my condition my factor and so then it populates it here and the nice thing about jasp as compared to SPSS is it doesn't repeat all of the comparisons for you so it tells you that the P value is adjusted for comparing a family of three and it gives you understated compared to Accurate this is the mean difference this isn't the mean this is this is the difference between these two conditions and then it gives you your P value which is 01 Which is less than that 05 compares understated to overstated that's also less than 05 and then accurate to overstated and that is also significant so it tells you all of your basically everything is significant Here sign significantly different again these are the mean differences this is not what you report in your um write up or your table or your figure okay these are the mean differences is the difference between these two conditions the mean and the SD or the SE is what you report",
+      "metadata": {
+        "video_id": "CWRmc2t1Vlo",
+        "video_title": "JASP repeated measures ANOVA and post hoc tests",
+        "author": "Melissa Ferguson",
+        "url": "https://www.youtube.com/watch?v=CWRmc2t1Vlo",
+        "source_type": "video_transcript",
+        "processing_date": "2025-12-08T17:42:05.375217",
+        "source": "transcript_fallback",
+        "start_time": "2:22",
+        "end_time": "4:31",
+        "section_id": "CWRmc2t1Vlo_fallback_1",
+        "token_length": 406
+      }
+    }
+  ]
+}

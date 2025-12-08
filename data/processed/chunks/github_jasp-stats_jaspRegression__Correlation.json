@@ -1,0 +1,274 @@
+{
+  "sections": [
+    {
+      "text": "Correlation\n===\n\nThe Correlation analysis allows estimation of the population correlation, as well as testing the null hypothesis that the population correlation between pairs of variables equals 0. All possible pairs of the specified variables are analyzed.",
+      "metadata": {
+        "doc_id": "55060bce",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__Correlation.md",
+        "md_name": "jasp-stats/jaspRegression__Correlation.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/Correlation.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__Correlation.md",
+        "section_title": "Correlation",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 42
+      }
+    },
+    {
+      "text": "### Assumptions (Pearson's rho)\n- Continuous variables.\n- The data are a random sample from the population.\n- The pairs of variables follow a bivariate normal distribution in the population.\n- The relationship between the pairs of variables is linear.",
+      "metadata": {
+        "doc_id": "e0d9aa21",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__Correlation.md",
+        "md_name": "jasp-stats/jaspRegression__Correlation.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/Correlation.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__Correlation.md",
+        "section_title": "### Assumptions (Pearson's rho)",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 53
+      }
+    },
+    {
+      "text": "### Assumptions (Spearman's rho & Kendall's tau)\n- Ordinal or continuous variables.\n- The data are a random sample from the population.\n- The relationship between the pairs of variables is monotonic.",
+      "metadata": {
+        "doc_id": "76761b17",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__Correlation.md",
+        "md_name": "jasp-stats/jaspRegression__Correlation.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/Correlation.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__Correlation.md",
+        "section_title": "### Assumptions (Spearman's rho & Kendall's tau)",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 48
+      }
+    },
+    {
+      "text": "### Input\n---",
+      "metadata": {
+        "doc_id": "e3958f82",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__Correlation.md",
+        "md_name": "jasp-stats/jaspRegression__Correlation.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/Correlation.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__Correlation.md",
+        "section_title": "### Input",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 7
+      }
+    },
+    {
+      "text": "#### Assignment Box\n- Variables: Variables for which to compute the correlation coefficient.\n- Partial out: Variables to partial out in order to compute partial correlations.",
+      "metadata": {
+        "doc_id": "e33b323f",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__Correlation.md",
+        "md_name": "jasp-stats/jaspRegression__Correlation.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/Correlation.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__Correlation.md",
+        "section_title": "#### Assignment Box",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 34
+      }
+    },
+    {
+      "text": "#### Sample Correlation Coefficient\n- Pearson's r: Pearson's product moment correlation coefficient.\n- Spearman: Spearman's rank-order correlation coefficient to quantify the monotonic association between two variables.\n- Kendall's tau-b: Kendall's tau-b rank-order correlation coefficient to quantify the monotonic association between two variables.",
+      "metadata": {
+        "doc_id": "a14c64df",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__Correlation.md",
+        "md_name": "jasp-stats/jaspRegression__Correlation.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/Correlation.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__Correlation.md",
+        "section_title": "#### Sample Correlation Coefficient",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 75
+      }
+    },
+    {
+      "text": "#### Alt. Hypothesis\n- Correlated: Two-sided alternative hypothesis that the population correlation does not equal 0.\n- Correlated positively: One-sided alternative hypothesis that the population correlation is greater than 0.\n- Correlated negatively: One-sided alternative hypothesis that the population correlation is lower than 0.",
+      "metadata": {
+        "doc_id": "bfc8f496",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__Correlation.md",
+        "md_name": "jasp-stats/jaspRegression__Correlation.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/Correlation.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__Correlation.md",
+        "section_title": "#### Alt. Hypothesis",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 60
+      }
+    },
+    {
+      "text": "#### Additional Options\n- Display pairwise: Display a table where one row corresponds to one pair of the specified variables, and the scatter plots are shown individually for each pair. If unticked, the results are presented in matrix format, with variable names in the columns and rows.\n- Report significance: Display the p-value corresponding to the observed correlation.\n- Flag significant correlations: Mark statistically significant correlations.\n- Confidence Intervals: Confidence intervals for the population correlation (only available for the Pearson correlation).\n  - Interval: Coverage of the confidence interval in percentages.\n  - From `...` bootstraps: By selecting this option, bootstrapped estimation is applied. By default, the number of replications is set to 1000. This can be changed into the desired number. \n- Vovk-Selke maximum p-ratio: The bound 1/(-e p log(p)) is derived from the shape of the p-value distribution. Under the null hypothesis (H<sub>0</sub>) it is uniform (0,1), and under the alternative (H<sub>1</sub>) it is decreasing in p, e.g., a beta (α, 1) distribution, where 0 < α < 1. The Vovk-Sellke MPR is obtained by choosing the shape α of the distribution under H1 such that the obtained p-value is maximally diagnostic. The value is then the ratio of the densities at point p under H<sub>0</sub> and H<sub>1</sub>. For example, if the two-sided p-value equals .05, the Vovk-Sellke MPR equals 2.46, indicating that this p-value is at most 2.46 times more likely to occur under H1 than under H<sub>0</sub>.\n- Effect size (Fisher's z): The Fisher transformed effect size with standard error. \n- Sample size: The number of complete observations for a given pair of variables.\n- Covariance: The covariance between each pair of variables.",
+      "metadata": {
+        "doc_id": "318a244d",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__Correlation.md",
+        "md_name": "jasp-stats/jaspRegression__Correlation.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/Correlation.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__Correlation.md",
+        "section_title": "#### Additional Options",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 446
+      }
+    },
+    {
+      "text": "#### Plots\n- Scatter plots: Display a scatter plots for each possible combination of the selected variables. In a matrix format, these are placed above the diagonal.\n  - Densities for variables: Display histogram and the corresponding density plot for each variable. In a matrix format, these are placed on the diagonal.\n  - Statistics: Display the correlation coefficient(s) in the plot. This option also adds the x% confidence interval(s) as specified in the \"Confidence Intervals\" option.\n- Heatmap: Display a correlation heatmap for Pearson, Spearman, and Kendall's tau B coefficients separately.",
+      "metadata": {
+        "doc_id": "a8e68ada",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__Correlation.md",
+        "md_name": "jasp-stats/jaspRegression__Correlation.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/Correlation.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__Correlation.md",
+        "section_title": "#### Plots",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 129
+      }
+    },
+    {
+      "text": "#### Assumption checks\n\n- Multivariate normality\n  - Shapiro:  Generalized Shapiro-Wilk test for multivariate normality by Villasenor-Alva and Gonzalez-Estrada (2009), using the mvShapiroTest package.\n\n- Pairwise normality\n  - Shapiro: For each possible combination of the selected variables, computes the Shapiro-Wilk statistic to test the null hypothesis that the variable pair has a bivariate normal distribution.",
+      "metadata": {
+        "doc_id": "fdfab12b",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__Correlation.md",
+        "md_name": "jasp-stats/jaspRegression__Correlation.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/Correlation.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__Correlation.md",
+        "section_title": "#### Assumption checks",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 94
+      }
+    },
+    {
+      "text": "#### Options\n\n- Missing values\n  - Exclude cases pairwise: Uses all complete observations for each individual pair of variables.\n  - Exclude cases listwise: Uses only complete cases across all variables.",
+      "metadata": {
+        "doc_id": "e7d3b19c",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__Correlation.md",
+        "md_name": "jasp-stats/jaspRegression__Correlation.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/Correlation.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__Correlation.md",
+        "section_title": "#### Options",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 39
+      }
+    },
+    {
+      "text": "### Output\n---",
+      "metadata": {
+        "doc_id": "92fe21de",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__Correlation.md",
+        "md_name": "jasp-stats/jaspRegression__Correlation.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/Correlation.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__Correlation.md",
+        "section_title": "### Output",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 7
+      }
+    },
+    {
+      "text": "#### Correlation Table\n- Pearson r: Pearson's product-moment correlation coefficient.\n- Spearman rho: Spearman's rank correlation coefficient.\n- Kendall tau:  Kendall's tau b rank correlation coefficient.\n- p: The p-value.\n  - Significant correlations are marked with:\n    - *p < .05 if the correlation is significant at alpha=.05 level.\n    - **p < .01 if the correlation is significant at alpha=.01 level.\n    - ***p < .001 if the correlation is significant at alpha=.001 level.\n- Vovk-Sellke Maximum *p*-Ratio: For an explanation, see Vovk-Sellke under `Options`.\n- Upper x% CI: Upper bound of the x% confidence interval for the population correlation.\n- Lower x% CI: Lower bound of the x% confidence interval for the population correlation.\n- Effect size (Fisher's z): Fisher transformed effect size.\n- SE effect size: Standard error of the effect size.\n- n: Sample size.",
+      "metadata": {
+        "doc_id": "914440d9",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__Correlation.md",
+        "md_name": "jasp-stats/jaspRegression__Correlation.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/Correlation.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__Correlation.md",
+        "section_title": "#### Correlation Table",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 220
+      }
+    },
+    {
+      "text": "#### Assumption checks\n\n- Shapiro-Wilk: The Shapiro-Wilk statistic\n- p: The p-value of the assumption check",
+      "metadata": {
+        "doc_id": "82691c22",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__Correlation.md",
+        "md_name": "jasp-stats/jaspRegression__Correlation.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/Correlation.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__Correlation.md",
+        "section_title": "#### Assumption checks",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 30
+      }
+    },
+    {
+      "text": "#### Correlation Plot\n- Scatter plots: Displays a (matrix of) scatter plot(s) between the variables (in the upper off-diagonal entries of the matrix). The black line represents the least-square regression line\n    - Densities for variables: Displays a histogram and the corresponding density plot for each variable.\n    - Statistics: Displays the correlation coefficient(s) and, if requested, also the corresponding x% confidence interval(s)\n      - r: Pearson's product-moment correlation coefficient\n      - rho: Spearman's order correlation coefficient\n      - tau: Kendall's tau b order correlation coefficient",
+      "metadata": {
+        "doc_id": "2a8a17a3",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__Correlation.md",
+        "md_name": "jasp-stats/jaspRegression__Correlation.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/Correlation.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__Correlation.md",
+        "section_title": "#### Correlation Plot",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 127
+      }
+    },
+    {
+      "text": "#### Heatmap\n- Displays a correlation heatmap for Pearson, Spearman, and Kendall's tau separately. The heatmap is symmetric along the diagonal. Blue colors correspond to positive correlation coefficients, red colors correspond to negative correlation coefficients. The saturation of colors reflects the absolute value of the correlation coefficient. If \"Flag significant correlations\" is selected, the significant correlations are marked with:\n  - *p < 0.05 if the correlation is significant at alpha=.05 level.\n  - **p < .01 if the correlation is significant at alpha=.01 level.\n  - ***p < .001 if the correlation is significant at alpha=.001 level.",
+      "metadata": {
+        "doc_id": "196a55c6",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__Correlation.md",
+        "md_name": "jasp-stats/jaspRegression__Correlation.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/Correlation.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__Correlation.md",
+        "section_title": "#### Heatmap",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 143
+      }
+    },
+    {
+      "text": "### References\n-------\n- Moore, D. S., McCabe, G. P., & Craig, B. A. (2012). *Introduction to the practice of statistics (7th ed.)*. New York, NY: W. H. Freeman and Company.\n- Whitlock, M. C., & Schluter, D. (2015). *The analysis of biological data (2nd ed.)*. Greenwood Village, Colorado: Roberts and Company Publishers.\n- Sellke, T., Bayarri, M. J., & Berger, J. O. (2001). Calibration of *p* values for testing precise null hypotheses. *The American Statistician, 55*(1), 62-71.\n- Caruso, J.C., & Cliff, N. (1997). Empirical Size, Coverage, and Power of Confidence Intervals for Spearman's Rho. *Educational and Psychological Measurement, 57*(4), 637-654.\n-\tVillasenor-Alva, J.A. and Gonzalez-Estrada, E. (2009). A generalization of Shapiro-Wilk's test for multivariate normality. *Communications in Statistics: Theory and Methods*, 38, 1870-1883.\n- Xu, W., Hou, Y., Hung, Y.S., & Zou, Y. (2013). A comparative analysis of Spearman’s rho and Kendall’s tau in normal and contaminated normal models. *Signal Processing, 93*, 261-276.",
+      "metadata": {
+        "doc_id": "45f85882",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__Correlation.md",
+        "md_name": "jasp-stats/jaspRegression__Correlation.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/Correlation.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__Correlation.md",
+        "section_title": "### References",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 343
+      }
+    },
+    {
+      "text": "### R Packages\n---\n- ggplot2\n- grid\n- stats\n- ppcor",
+      "metadata": {
+        "doc_id": "820243b2",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspRegression",
+        "markdown_file": "jasp-stats_jaspRegression__Correlation.md",
+        "md_name": "jasp-stats/jaspRegression__Correlation.md",
+        "md_url": "https://github.com/jasp-stats/jaspRegression/tree/master/inst/help/Correlation.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspRegression__Correlation.md",
+        "section_title": "### R Packages",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 20
+      }
+    }
+  ]
+}

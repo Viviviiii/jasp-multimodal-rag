@@ -1,0 +1,214 @@
+{
+  "sections": [
+    {
+      "text": "Bayesian Linear Mixed Models\n===\n\nBayesian Linear Mixed Models allow you to model a linear relationship between one or more explanatory variable(s) and a continuous dependent variable in cases where the observations are not independent, but clustered given one or several random effects grouping factors (e.g., repeated measures across participants or items, children within schools). An introduction to this model class and the concepts introduced below is provided in <a href=\"http://singmann.org/download/publications/singmann_kellen-introduction-mixed-models.pdf\">Singmann and Kellen (2019)</a>.",
+      "metadata": {
+        "doc_id": "192efe22",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspMixedModels",
+        "markdown_file": "jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "md_name": "jasp-stats/jaspMixedModels__MixedModelsBLMM.md",
+        "md_url": "https://github.com/jasp-stats/jaspMixedModels/tree/master/inst/help/MixedModelsBLMM.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "section_title": "Bayesian Linear Mixed Models",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 135
+      }
+    },
+    {
+      "text": "### Assumptions\n- Continuous response variable.\n- Linearity and additivity: The response variable is linearly related to all predictors and the effects of the predictors are additive.\n- Independence of errors: The errors are uncorrelated with each other after taking the model (i.e., fixed effects and random effects structure) into account.\n- Homoscedasticity: The error variance of each predictor is constant across all values of that predictor.\n- Normality of errors: The errors are normally distributed with mean zero.\n\nThe analysis uses orthonormal contrasts such that the marginal prior on all fixed effects is identical for categorical (nominal and ordinal) predictors (R uses dummy encoding by default). This scheme is used for better interpretability of models with interactions. However, the fixed and random effects estimates will differ from those obtained from R with default settings. We advise using the 'Estimated marginal means' section for obtaining mean estimates at individual factor levels. For comparing the mean estimates, use the contrasts option.\n\nThe analysis uses a long data format.\n\nThe prior distributions are weakly informative and should be well-behaved in parameter estimation settings. The module uses the default prior distribution settings of the rstanarm R package which defines normal(location = 0, scale = 2.5) prior distributions on scaled and centered model coefficients.",
+      "metadata": {
+        "doc_id": "a4fe131b",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspMixedModels",
+        "markdown_file": "jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "md_name": "jasp-stats/jaspMixedModels__MixedModelsBLMM.md",
+        "md_url": "https://github.com/jasp-stats/jaspMixedModels/tree/master/inst/help/MixedModelsBLMM.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "section_title": "### Assumptions",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 279
+      }
+    },
+    {
+      "text": "### Input",
+      "metadata": {
+        "doc_id": "c8d337a0",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspMixedModels",
+        "markdown_file": "jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "md_name": "jasp-stats/jaspMixedModels__MixedModelsBLMM.md",
+        "md_url": "https://github.com/jasp-stats/jaspMixedModels/tree/master/inst/help/MixedModelsBLMM.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "section_title": "### Input",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 4
+      }
+    },
+    {
+      "text": "#### Assignment Box\n  - Dependent variable: Dependent (response) variable.\n  - Fixed effects variables: Variables used as the fixed effects predictors (the model terms can be specified under `Model` section). These are usually the variables of primary scientific interest.\n  - Random effects grouping factors: Categorical variable(s) specifying clusters of observations (i.e., several observations per level of a random effects grouping factor). These are typically variables, such as participant or item, one wants to generalize over. Factors with very few levels (i.e., less then five or six levels) should not be used as random effects grouping factors and the number of levels of the random effects grouping factors determines the power of the test of the fixed effects (Westfall, Kenny, & Judd, 2014). The random effect structure (i.e., random intercepts, random slopes, and correlations among random effects parameters) can be specified under `Model` - `Random effects`. The default random effects structure is the automatically determined \"maximal random effects structure justified by the design\" (Barr, Levy, Scheepers, & Tily, 2013).",
+      "metadata": {
+        "doc_id": "94d95d38",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspMixedModels",
+        "markdown_file": "jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "md_name": "jasp-stats/jaspMixedModels__MixedModelsBLMM.md",
+        "md_url": "https://github.com/jasp-stats/jaspMixedModels/tree/master/inst/help/MixedModelsBLMM.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "section_title": "#### Assignment Box",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 239
+      }
+    },
+    {
+      "text": "#### Run Analysis \nPress the button to run the analysis. Model relevant changes in the settings will not be applied until the button is pressed.",
+      "metadata": {
+        "doc_id": "44654b8d",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspMixedModels",
+        "markdown_file": "jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "md_name": "jasp-stats/jaspMixedModels__MixedModelsBLMM.md",
+        "md_url": "https://github.com/jasp-stats/jaspMixedModels/tree/master/inst/help/MixedModelsBLMM.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "section_title": "#### Run Analysis",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 30
+      }
+    },
+    {
+      "text": "### Output\n- Estimated grand mean and estimated differences from the grand mean for all levels of each fixed effects model term. It can be changed to estimated marginal means in the `Options` section.\n  - Level: Levels of the fixed effects model term.\n  - Estimate: This column contains the independent variables or their interaction.\n  - SE: Standard error of the estimate.\n  - 95% CI: 95% credible interval.\n    - Lower: Lower bound of the credible interval.\n    - Upper: Upper bound of the credible interval.\n  - R-hat: Convergence diagnostic comparing within and between chains estimates of model parameters. Values larger than 1.01 indicates possible convergence problems.\n  - ESS (bulk): Estimated sample size in the middle of the distribution. Small values render the parameter estimates unprecise. \n  - ESS (tail): Estimated sample size in the tails of the distribution. Small values render the bounds of credible intervals unprecise.",
+      "metadata": {
+        "doc_id": "515c0c5d",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspMixedModels",
+        "markdown_file": "jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "md_name": "jasp-stats/jaspMixedModels__MixedModelsBLMM.md",
+        "md_url": "https://github.com/jasp-stats/jaspMixedModels/tree/master/inst/help/MixedModelsBLMM.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "section_title": "### Output",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 187
+      }
+    },
+    {
+      "text": "### Model\n- Components and model terms: \n    - Model components: All the fixed effects variables that can be included in the model. \n    - Fixed effects: The independent variables in the model. By default, all the main effects of the specified independent variables and their interactions are included in the model. To include interactions, click multiple variables (e.g., by holding the ctrl/cmd button on your keyboard while clicking) and drag those into the `Fixed effects` box.\n    - Random effects: The random effects organized by random effects grouping factors. By default, all of the random effects corresponding to the fixed effects are included and JASP internally checks and removes non-estimable random effects. That is, the default corresponds to the \"maximal random effects structure justified by the design\" (Barr, Levy, Scheepers, & Tily, 2013). Unticking the boxes on the left of the variable names removes the random effect from corresponding random effects grouping factor.\n     - Correlations: Whether the correlations between the random effects parameters within each random effects grouping factor should be estimated.",
+      "metadata": {
+        "doc_id": "36367715",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspMixedModels",
+        "markdown_file": "jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "md_name": "jasp-stats/jaspMixedModels__MixedModelsBLMM.md",
+        "md_url": "https://github.com/jasp-stats/jaspMixedModels/tree/master/inst/help/MixedModelsBLMM.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "section_title": "### Model",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 222
+      }
+    },
+    {
+      "text": "### Options\n- Burnin: Number of iterations reserved for burnin.\n- Iterations: Total number of iterations.\n- Chains: Number of chains.\n- Adapt delta: Average target proposal acceptance of each step. Increasing `Adapt delta` results in better-behaved chains, but also longer fitting times.\n- Maximum treedepth: The cap for number of trees evaluated during each iteration. Prevents excessively long execution times.\n- Show: What should be the default output.\n  - Differences from intercept: A table for each fixed effects term will be created in the default output and it will show the differences from the grand mean for each of the terms' levels (or one standard deviation distance for continuous terms). This option is selected by default.\n  - Marginal means: A table for each fixed effects term will be created in the default output and it will show the estimated marginal mean for each of the terms' levels (or one standard deviation distance for continuous terms). \n- Fixed effects estimates: Shows the estimated fixed effect coefficients.\n- Variance/correlation estimates: Shows the estimated residual variances and variances/correlations of random effects coefficients.\n- Confidence interval: Width of the confidence interval.\n- Repeatability: Gives the option to set a seed for your analysis. Setting a seed will exclude random processes influencing an analysis. Affects only parametric bootstrap and jitter in plots.",
+      "metadata": {
+        "doc_id": "f5504bb3",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspMixedModels",
+        "markdown_file": "jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "md_name": "jasp-stats/jaspMixedModels__MixedModelsBLMM.md",
+        "md_url": "https://github.com/jasp-stats/jaspMixedModels/tree/master/inst/help/MixedModelsBLMM.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "section_title": "### Options",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 281
+      }
+    },
+    {
+      "text": "### MCMC diagnostics\n- Model terms: Fixed effects model terms whose MCMC chains can be diagnosed.\n- Selected term: Fixed effects model term which chain will be diagnosed.\n- Selected term (2): Fixed effects model term which chain will be diagnosed. Only available if `Plot type` is Scatterplot (selected term is plotted on the y-axis).\n- Plot type: Different types of MCMC diagnostics plots. The plotted values correspond to the fixed effect terms displayed in the default output. Those are the deviations from estimated grand mean by default but can be changed to estimated marginal means in the `Options` section.\n  - Traceplot: Traceplot of the individual chains.\n  - Scatterplot: Scatterplot of two model terms.\n  - Histogram: Histogram of the posterior samples.\n  - Density: Overlying densities of samples from each chain.\n  - Autocorrelations: Average autocorrelations across all chains.",
+      "metadata": {
+        "doc_id": "63306bdc",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspMixedModels",
+        "markdown_file": "jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "md_name": "jasp-stats/jaspMixedModels__MixedModelsBLMM.md",
+        "md_url": "https://github.com/jasp-stats/jaspMixedModels/tree/master/inst/help/MixedModelsBLMM.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "section_title": "### MCMC diagnostics",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 201
+      }
+    },
+    {
+      "text": "### Plots\n- Model factors: Categorical or ordinal fixed effects variables that can be used for visualization.\n  - Horizontal axis: Variables that will be plotted on the horizontal axis.\n  - Separate lines: Variables that will be plotted \"inside\" the plot as different traces/lines.\n  - Separate plots: Variables which levels will be split across different plots.\n- Random effect grouping factors: Random effect grouping factors that can be used for data aggregation of data shown in the background.\n  - Background data show: The level of aggregation for the response variable. I.e., if participants are selected, the individual data points in the background are their averages across the combinations of levels of fixed effect factors selected in the `Horizontal axis`, `Separate lines`, and `Separate plots`.\n - Confidence interval method: Type of standard error on which the error bars will be based. Default is \"model\", which plots model-based standard errors.\n - Confidence interval: The width of the confidence interval.\n - Background geom: Geom that will be used to display the aggregated response variable.\n  - Transparency: Transparency of the geom.\n  - Jitter width: Width of the jitter.\n  - Jitter height: Height of the jitter.\n  - Geom width: Width of the geoms.\n  - Dodge: Spacing between the geoms.\n- Distinguish factor levels: How the factor levels should be distinguished.\n  - Color\n  - Shape\n  - Linetype\n  - Fill\n- Theme: A theme of the plots.\n- Legend position: Whether and where should be the legend plotted.\n- Color background data: Color of the aggregated response variable.\n- Relative size text: Relative size of the plotted text.\n- Relative size foreground data: Relative size of the foreground data (confidence interval bars, etc...).\n- Estimates table: Display numerical summary of the plotted objects.",
+      "metadata": {
+        "doc_id": "0193e10f",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspMixedModels",
+        "markdown_file": "jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "md_name": "jasp-stats/jaspMixedModels__MixedModelsBLMM.md",
+        "md_url": "https://github.com/jasp-stats/jaspMixedModels/tree/master/inst/help/MixedModelsBLMM.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "section_title": "### Plots",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 379
+      }
+    },
+    {
+      "text": "### Estimated marginal means\n- Model variables: Fixed effects variables that can be used for computing estimated marginal means.\n- Selected variables: Variables for which the estimated marginal means will be computed.\n- Confidence interval: Width of the confidence interval.\n- SD factor covariates: What should be the \"levels\" of continuous variables (expressed in standard deviations) for which are the estimated marginal means computed.\n- Specify contrasts: Creates a table for specifying contrasts based on the estimated marginal means.\n- Contrasts: A table created by checking `Specify contrasts` checkbox. \n  - The first column contains indices of rows corresponding to the estimated marginal means output table. \n  - Columns with variable names contain the combinations of variables level for each estimated marginal mean.\n  - Columns named Contrast `x` are used for specifying the contrasts. To set a contrast between two marginal means, enter -1 and 1 to the corresponding rows. Interactions can be tested by specifying differences between the changes in marginal means of one variable across levels of another variable.",
+      "metadata": {
+        "doc_id": "09337306",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspMixedModels",
+        "markdown_file": "jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "md_name": "jasp-stats/jaspMixedModels__MixedModelsBLMM.md",
+        "md_url": "https://github.com/jasp-stats/jaspMixedModels/tree/master/inst/help/MixedModelsBLMM.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "section_title": "### Estimated marginal means",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 206
+      }
+    },
+    {
+      "text": "### Estimated trends/conditional slopes\n- Continuous variables: Continuous fixed effects variables that can be used for estimating the conditional slopes.\n- Trend variable: Variables for which the estimated conditional slopes will be computed.\n- Model variables: Fixed effects variables over which the conditional slopes can be computed.\n- Selected variables: Variables over which the the conditional slopes will be computed.\n- Confidence interval: Width of the confidence interval.\n- SD factor covariates: What should be the \"levels\" of continuous variables (expressed in standard deviations) over which the conditional slopes are computed.\n- Specify contrasts: Creates a table for specifying contrasts based on the estimated conditional slopes.\n- Contrasts: A table created by checking `Specify contrasts` checkbox. \n  - The first column contains indices of rows corresponding to the estimated conditional slopes output table. \n  - Columns with variable names contain the combinations of variables level for each estimated conditional slope.\n  - Columns named Contrast `x` are used for specifying the contrasts. To set a contrast between two conditional slopes, enter -1 and 1 to the corresponding rows. Interactions can be tested by specifying differences between the changes in conditional slopes of one variable across levels of another variable.",
+      "metadata": {
+        "doc_id": "6fc4fd58",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspMixedModels",
+        "markdown_file": "jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "md_name": "jasp-stats/jaspMixedModels__MixedModelsBLMM.md",
+        "md_url": "https://github.com/jasp-stats/jaspMixedModels/tree/master/inst/help/MixedModelsBLMM.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "section_title": "### Estimated trends/conditional slopes",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 240
+      }
+    },
+    {
+      "text": "### References\n---\n- Barr, D. J., Levy, R., Scheepers, C., & Tily, H. J. (2013). Random effects structure for confirmatory hypothesis testing: Keep it maximal. *Journal of Memory and Language*, 68(3), 255–278. https://doi.org/10.1016/j.jml.2012.11.001\n- Singmann, H., & Kellen, D. (2019). An Introduction to Mixed Models for Experimental Psychology. In D. H. Spieler & E. Schumacher (Eds.), *New Methods in Cognitive Psychology* (pp. 4–31). Psychology Press. http://singmann.org/download/publications/singmann_kellen-introduction-mixed-models.pdf\n- Westfall, J., Kenny, D. A., & Judd, C. M. (2014). Statistical power and optimal design in experiments in which samples of participants respond to samples of stimuli. *Journal of Experimental Psychology: General*, 143(5), 2020–2045. https://doi.org/10.1037/xge0000014",
+      "metadata": {
+        "doc_id": "8f6e4004",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspMixedModels",
+        "markdown_file": "jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "md_name": "jasp-stats/jaspMixedModels__MixedModelsBLMM.md",
+        "md_url": "https://github.com/jasp-stats/jaspMixedModels/tree/master/inst/help/MixedModelsBLMM.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "section_title": "### References",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 259
+      }
+    },
+    {
+      "text": "### R Packages\n---\n- stanova\n- rstan\n- rstanarm\n- emmeans\n- loo\n- ggplot2\n- stats",
+      "metadata": {
+        "doc_id": "99fdda59",
+        "source_type": "github help files",
+        "repo_name": "jasp-stats/jaspMixedModels",
+        "markdown_file": "jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "md_name": "jasp-stats/jaspMixedModels__MixedModelsBLMM.md",
+        "md_url": "https://github.com/jasp-stats/jaspMixedModels/tree/master/inst/help/MixedModelsBLMM.md",
+        "source_path": "/Users/ywxiu/jasp-multimodal-rag/data/raw_github/jasp-stats_jaspMixedModels__MixedModelsBLMM.md",
+        "section_title": "### R Packages",
+        "processing_date": "2025-12-08T18:40:52",
+        "token_length": 32
+      }
+    }
+  ]
+}
