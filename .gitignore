@@ -6,4 +6,11 @@ logs/
 src/__pycache__/
 poetry.lock
 .DS_Store
+notebooks/
 notebooks/*
+**/notebooks/
+
+# macOS metadata
+.DS_Store
+.AppleDouble
+.LSOverride
