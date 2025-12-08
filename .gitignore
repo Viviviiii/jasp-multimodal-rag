@@ -1,8 +1,9 @@
-
+# files not shown in repo
 __pycache__/
 .pytest_cache/
 .vscode/
 logs/
 src/__pycache__/
 poetry.lock
-
+.DS_Store
+.gitignore
