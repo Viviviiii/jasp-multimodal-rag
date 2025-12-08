@@ -6,4 +6,4 @@ logs/
 src/__pycache__/
 poetry.lock
 .DS_Store
-notebooks/
+notebooks/*
