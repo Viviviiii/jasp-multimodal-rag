@@ -1,10 +1,37 @@
-# src/pipelines/split_long_sections.py
+
 """
-Run:
+2_pdf:
+Token-based splitting of enriched PDF sections for embedding.
+
+This script takes the final enriched PDF JSON files produced by
+`pdf_text_add_image_description.py` (in `data/processed/pdf/final_enriched/`)
+and splits any overly long sections into smaller, embedding-friendly chunks.
+
+High-level behavior
+-------------------
+1. Load section-level JSON for one or all manuals from:
+       data/processed/pdf/final_enriched/*.json
+2. For each section:
+   - If its token length (using the embedding tokenizer) is ≤ MAX_TOKENS
+     → keep as-is.
+   - If it is longer than MAX_TOKENS
+     → split into smaller chunks using `SentenceSplitter`, with overlap.
+3. Update `metadata.token_length` for each chunk.
+4. Save all resulting chunks to:
+       data/processed/chunks/manual_<PDF_NAME>.json
+
+Typical usage
+-------------
+Split all manuals:
+
     poetry run python -m src.splitting.manual_split
-or:
-    poetry run python -m src.splitting.manual_split --pdf Statistical-Analysis-in-JASP-A-guide-for-students-2025
+
+Split a single manual (base name, without `.json`):
+
+    poetry run python -m src.splitting.manual_split \\
+        --pdf Statistical-Analysis-in-JASP-A-guide-for-students-2025
 """
+
 
 import json
 from pathlib import Path
@@ -28,12 +55,58 @@ MAX_TOKENS = 500
 # -------------------------------------------------------------------------
 # 🧠 CORE FUNCTION: split one file
 # -------------------------------------------------------------------------
+
 def split_json_sections_into_chunks(
     input_json: Path,
     output_dir: Path = OUTPUT_DIR,
     embed_model: str = EMBED_MODEL,
     max_tokens: int = MAX_TOKENS,
 ) -> Path:
+    """
+    Split long PDF sections from a JSON file into smaller token-based chunks.
+
+    This function is designed to work on the final enriched PDF JSONs created by
+    the PDF ingestion + image-description pipeline. It ensures that every
+    section fed into the embedding/indexing step stays below a configurable
+    token limit.
+
+    Behavior:
+        • Load sections from `input_json` (list or {"sections": [...]})
+        • For each section:
+            - Compute token length using `embed_model`'s tokenizer.
+            - If `token_length <= max_tokens` → keep the section unchanged.
+            - If `token_length > max_tokens`:
+                · Use `SentenceSplitter` to break the text into overlapping chunks.
+                · For each chunk:
+                    - Copy original metadata.
+                    - Add `sub_section_id` (e.g. "<section_id>_part1").
+                    - Recompute `token_length` for the chunk.
+        • Log a summary of token length stats across all chunks.
+        • Save the result as:
+
+              output_dir / f"manual_{<input_json.stem>}.json"
+
+          with the structure: {"sections": [ ... ]}
+
+    Args:
+        input_json:
+            Path to the enriched PDF JSON file to split, typically from
+            `data/processed/pdf/final_enriched/`.
+
+        output_dir:
+            Directory where the chunked JSON will be written
+            (default: `data/processed/chunks/`).
+
+        embed_model:
+            Hugging Face model name used to tokenize text for length checks
+            (default: `"BAAI/bge-large-en-v1.5"`).
+
+        max_tokens:
+            Maximum allowed token length for a section before splitting.
+
+    Returns:
+        Path to the output JSON file containing all (possibly split) sections.
+    """
 
     logger.info(f"📥 Loading sections from: {input_json}")
     with open(input_json, "r", encoding="utf-8") as f:

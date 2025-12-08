@@ -1,27 +1,60 @@
+
 """
 ------------------------------------------------------------
-🎬 VIDEO SPLITTING PIPELINE (TOKEN-BASED + 10% MARGIN + READABLE TIMESTAMPS)
+2_video:
+Video splitting pipeline → retrievable transcript chunks
 ------------------------------------------------------------
-Purpose:
-    Prepare retrievable video chunks for hybrid RAG (BM25 + Chroma),
-    preserving timestamps and token boundaries.
+
+This module turns processed video JSON files (from
+`src/ingestion/video_transcript_loader.py`) into clean, token-limited
+sections that can be retrieved and ranked alongside PDFs and GitHub docs.
 
 Input:
     data/processed/video/<video_name>_<video_id>.json
+
 Output:
     data/processed/chunks/video_<video_name>_<video_id>_chunks.json
 
-Logic:
-    ✅ If chapters exist → split each chapter with SentenceSplitter (≈500 tokens)
-    ✅ If no chapters → merge transcript segments until ≈500 tokens (+10% tolerance)
-    ✅ start_time & end_time stored in "mm:ss" format
-    ✅ Count tokens using BAAI/bge-large-en-v1.5 tokenizer
-    ✅ Unified "sections" JSON schema
+High-level behavior
+-------------------
+1. Load per-video JSON containing:
+     • metadata (title, author, url, chapters, etc.)
+     • transcript segments with timestamps
+2. Create retrievable sections from:
+     • the video description
+     • uploader-defined chapters (if available)
+     • or, if no chapters exist, token-based groups of transcript segments.
+3. Use the BAAI/bge-large-en-v1.5 tokenizer to:
+     • estimate token length
+     • split long text into chunks (~500 tokens) with overlap via
+       `SentenceSplitter`.
+4. Attach rich metadata to each section:
+     • video_id, video_title, author, url
+     • source ("description", "chapter", or "transcript_fallback")
+     • chapter_title (if applicable)
+     • start_time / end_time in "mm:ss" format
+     • token_length
+     • processing_date
 
-Usage:
+Chunking rules
+--------------
+✅ If chapters exist:
+    - Use chapter-level text (`metadata.chapters[i].text`) as input.
+    - Split each chapter into ≈500-token chunks with overlap.
+
+✅ If no chapters exist:
+    - Merge transcript segments until ~500 tokens (with +10% margin).
+    - Each chunk keeps accurate start/end timestamps.
+
+Usage
+-----
+Split all processed videos into retrievable sections:
+
     poetry run python -m src.splitting.video_split
+
 ------------------------------------------------------------
 """
+
 
 import json
 from pathlib import Path

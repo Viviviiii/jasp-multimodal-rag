@@ -1,28 +1,38 @@
+
 """
 ------------------------------------------------------------
-🎥 VIDEO TRANSCRIPT LOADER (Loguru Version)
-------------------------------------------------------------
-Purpose:
-    Batch-load video metadata and transcripts for multiple
-    YouTube videos defined in:
-        data/raw_video/video.json
+1_video:
+Video Ingestion
 
-    Each video’s metadata + transcript are fetched using
-    your original, verified functions (fetch_video_info and
-    fetch_transcript), then saved to:
-        data/processed/video/<video_name>_<video_id>.json
+This module ingests JASP-related YouTube videos and prepares them for the
+RAG pipeline by:
 
-Features:
-    ✅ Creates output folder automatically
-    ✅ Reuses your tested metadata + transcript fetchers
-    ✅ Skips videos already processed
-    ✅ Clean, informative filenames
-    ✅ Full Loguru logging (console + rotating log file)
+1. Reading a list of videos from `data/raw_video/video.json`
+2. Fetching video metadata (title, description, uploader, chapters, etc.)
+3. Downloading subtitles/transcript (JSON3) via `yt-dlp`
+4. Converting transcript segments into:
+   - a full-text transcript
+   - chapter-level text (if uploader chapters exist)
+5. Saving a structured JSON per video under `data/processed/video/`
 
-Usage:
+Each output JSON contains:
+  - basic video metadata (id, title, description, url, author, publish date, duration)
+  - the enriched `metadata.chapters` list (with attached `text`)
+  - the full transcript segments
+
+CLI usage
+---------
+Run the full video ingestion pipeline for all videos defined in
+`data/raw_video/video.json`:
+
     poetry run python -m src.ingestion.video_transcript_loader
+
+The processed per-video JSON files will be saved into:
+
+    data/processed/video/
 ------------------------------------------------------------
 """
+
 
 import os
 import re
@@ -192,16 +202,41 @@ def fetch_transcript(url: str, lang: str = "en") -> Dict[str, Any]:
 # ------------------------------------------------------------
 # 💾 Process and save video transcripts
 # ------------------------------------------------------------
-
 def process_and_save_videos(videos: List[Dict[str, Any]]):
     """
-    Fetch metadata + transcripts for each video and save to JSON.
+    Fetch metadata + transcripts for each video and save as structured JSON.
 
-    Updates:
-      - If metadata contains chapters, attach chapter 'text' directly to
-        meta['chapters'] based on transcript timestamps.
-      - If no chapters exist, replace meta['chapters'] with one item:
-        [{"text": "<full transcript>"}].
+    For each entry in `videos` (typically loaded from `data/raw_video/video.json`):
+
+      1. Fetch video metadata with `yt-dlp`:
+         - video_id, title, description, author, publish_date, duration
+         - uploader-defined chapters (if available)
+
+      2. Fetch transcript/subtitles in JSON3 format (preferred language):
+         - build a list of time-stamped segments: {text, start, duration}
+         - join all segments into `full_text`
+
+      3. Enrich chapters with text:
+         - if uploader chapters exist, attach a `text` field to each chapter
+           containing the transcript between its start and end time.
+         - if no chapters exist, create a single pseudo-chapter:
+           `metadata["chapters"] = [{"text": "<full transcript>"}]`.
+
+      4. Write a JSON file per video into `data/processed/video/`, including:
+         - top-level fields: video_id, name, url, category, language
+         - `metadata`: enriched video metadata (including chapters with text)
+         - `transcript`: original transcript segments + full_text
+
+    Args:
+        videos:
+            A list of video configuration dicts, typically from
+            `load_video_list()`. Each item should contain at least:
+              - "url": the YouTube URL
+              - "name": a human-readable name
+              - optional: "language" (default "en"), "category"
+
+    Returns:
+        None. One JSON file is written per video.
     """
 
     def _collect_text_between(t0: float, t1: float, segs: List[Dict[str, Any]]) -> str:

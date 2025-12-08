@@ -1,25 +1,59 @@
+
 """
 ---------------------------------------------------
-🔎 HYBRID → RRF → CROSS-ENCODER RERANK PIPELINE
-(LlamaIndex + Chroma + Ollama, optional LangChain)
-
-Supported modes:
-
-Retrieval modes you defined:
-
-
-1. bm25
-2. vector
-3. bm25_vector (half from BM25, half from vector)
-4. bm25_vector_fusion
-5. bm25_vector_fusion_rerank  (default, full pipeline)
-
+4:
+ Hybrid retrieval pipeline (BM25 + vectors + rerank)
 ---------------------------------------------------
-Run:
-    poetry run python -m src.retrieval.retrieval --q "How to run repeated measures ANOVA in JASP?" --mode bm25_vector_fusion_rerank
-  
+
+This module implements the core retrieval logic for the JASP RAG system.
+It combines:
+
+  • BM25 keyword search over all chunked documents
+  • semantic vector retrieval from the ChromaDB store
+  • Reciprocal Rank Fusion (RRF) for hybrid ranking
+  • optional cross-encoder reranking (BGE or MiniLM)
+
+Data sources (all unified as "sections" JSON → chunks):
+  • PDF manuals (page-level sections)
+  • GitHub Markdown help files
+  • YouTube video transcripts (with timestamps)
+
+
+Supported retrieval modes
+-------------------------
+1. `bm25`
+   Pure BM25 keyword retrieval (no vectors, no fusion, no rerank).
+
+2. `vector`
+   Pure semantic / vector retrieval from ChromaDB.
+
+3. `bm25_vector`
+   Simple mix: k/2 from BM25 + k/2 from vector, merged and deduplicated.
+
+4. `bm25_vector_fusion`
+   BM25 (with metadata boosting) + vector → fused with RRF (no cross-encoder).
+
+5. `bm25_vector_fusion_rerank`  (default, full pipeline)
+   Same as (4), then reranked by a cross-encoder (BGE or MiniLM fallback).
+
+CLI usage
+---------
+Quick manual test from the terminal:
+
+    poetry run python -m src.retrieval.retrieval \\
+        --q "How to run repeated measures ANOVA in JASP?" \\
+        --mode bm25_vector_fusion_rerank
+
+In code, the main entrypoints are:
+
+    from src.retrieval.retrieval import retrieve_top_k, retrieve_clean
+
+    nodes = retrieve_top_k("your query", mode="bm25_vector_fusion_rerank")
+    clean = retrieve_clean("your query", mode="bm25_vector_fusion_rerank")
+
 ---------------------------------------------------
 """
+
 
 from __future__ import annotations
 import os
@@ -513,25 +547,56 @@ def retrieve_top_k(
     mode: str = "bm25_vector_fusion_rerank",
 ):
     """
-    Run retrieval in one of five modes:
+    Run retrieval in one of the supported hybrid modes and return raw Nodes.
 
-    1) bm25
-       - Pure BM25 (no boosting, no vectors, no fusion, no rerank)
+    Modes:
+        "bm25"
+            • Pure BM25 keyword retrieval.
+            • Uses the BM25 corpus loaded from chunked JSON files.
+            • No vector search, no fusion, no reranker.
 
-    2) vector
-       - Pure semantic / vector retrieval (no BM25, no fusion, no rerank)
+        "vector"
+            • Pure semantic/vector retrieval.
+            • Uses embeddings stored in the ChromaDB collection.
+            • No BM25, no fusion, no reranker.
 
-    3) bm25_vector
-       - BM25 (no boost) + vector retriever
-       - Simple union: BM25 results first, then semantic results (deduplicated)
+        "bm25_vector"
+            • Simple combination: k/2 results from BM25 + k/2 from vector.
+            • Both lists are deduplicated based on text/ID.
+            • No RRF fusion, no cross-encoder.
 
-    4) bm25_vector_fusion
-       - BM25 (with metadata boosting) + vector
-       - Fused using Reciprocal Rank Fusion (RRF), no cross-encoder
+        "bm25_vector_fusion"
+            • Hybrid retrieval:
+                - BM25 (with optional metadata-based boosting)
+                - semantic/vector retriever
+              → fused via Reciprocal Rank Fusion (RRF).
+            • No cross-encoder reranking.
 
-    5) bm25_vector_fusion_rerank
-       - Same as (4) but with cross-encoder reranker on fused list
+        "bm25_vector_fusion_rerank"
+            • Full pipeline (default):
+                1) BM25 (+ boosting) + semantic retriever
+                2) RRF fusion of both ranked lists
+                3) Cross-encoder reranking (BGE reranker if available,
+                   otherwise MiniLM fallback)
+                4) Filter out extremely low scores using SCORE_THRESHOLD.
+
+    Args:
+        query:
+            Natural language query string.
+
+        top_k:
+            Number of final results to return (after fusion/rerank if applicable).
+
+        mode:
+            Retrieval mode name. If an unknown mode is passed, it falls back
+            to `"bm25_vector_fusion_rerank"`.
+
+    Returns:
+        A list of `NodeWithScore` objects (LlamaIndex), which can be passed
+        to `normalize_metadata(...)` or to `retrieve_clean(...)` to obtain
+        a frontend-friendly dict representation.
     """
+
     mode = mode.lower().strip()
     if mode not in RETRIEVAL_MODES:
         logger.warning(f"Unknown mode '{mode}', falling back to 'bm25_vector_fusion_rerank'.")

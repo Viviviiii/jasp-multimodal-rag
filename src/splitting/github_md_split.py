@@ -1,21 +1,42 @@
+
 """
 ---------------------------------------------------
-🧩 GitHub Markdown Splitter → Structured Chunks (Final)
+2_github:
+GitHub Markdown Splitter → Structured Chunks
 ---------------------------------------------------
-Input:  data/raw_github/*.md
-Output: data/processed/chunks/github_<filename>.json
 
-Pipeline:
-1. Parse markdown structure with LlamaIndex MarkdownNodeParser.
-2. Count tokens using BAAI/bge-large-en-v1.5 tokenizer.
-3. If > 500 tokens → sentence split via LlamaIndex SentenceSplitter.
-4. Use first phrase (or line) of text as section_title.
-5. Save as JSON with "github_" prefix.
+This module converts raw GitHub Markdown files (downloaded by
+`src/ingestion/github_md_loader.py`) into clean, token-limited chunks that
+can be embedded by the RAG pipeline.
 
-run:
+Input:
+    data/raw_github/<repo_prefix>__<filename>.md
+
+Output:
+    data/processed/chunks/github_<filename>.json
+
+What it does:
+-------------
+1. Parse Markdown structure using `LlamaIndex`'s `MarkdownNodeParser`.
+2. Extract text nodes and compute token length using the
+   BAAI/bge-large-en-v1.5 tokenizer.
+3. If a node exceeds the token limit (default: 500 tokens), split it using
+   `SentenceSplitter` with overlap for smoother retrieval.
+4. Use the first non-empty line (or first short phrase) as the section title.
+5. Attach metadata such as:
+      • repo_name        (e.g., "jasp-stats/jaspRegression")
+      • markdown_file    (local filename)
+      • md_url           (source GitHub URL)
+      • section_title
+      • token_length
+      • processing_date
+6. Save all resulting chunks as JSON with a consistent `"github_"` prefix.
+
+Run manually:
     poetry run python -m src.splitting.github_md_split
 ---------------------------------------------------
 """
+
 
 import os
 import json

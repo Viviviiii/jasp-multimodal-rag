@@ -1,17 +1,39 @@
+
 """
 ---------------------------------------------------
-🧠 EMBEDDING STORE PIPELINE v6 (LLAMAINDEX + CHROMA)
+3:
+Embedding store pipeline (LlamaIndex + ChromaDB)
 ---------------------------------------------------
-Features:
-✅ Supports multiple JSON sources (folder or list)
-✅ Stable document IDs (no duplicates on re-run)
-✅ Tracks embeddings already stored vs newly added
-✅ Persists to ChromaDB for unified retrieval
----------------------------------------------------
+
+This module is the final step before retrieval: it takes all chunked JSON
+documents (from `data/processed/chunks/`), embeds their text with a Hugging
+Face model, and stores the vectors in a persistent ChromaDB collection.
+
+Input:
+    • One or more JSON chunk files, each with:
+        { "sections": [ { "text": "...", "metadata": {...} }, ... ] }
+      Typically located in:
+        data/processed/chunks/
+
+Output:
+    • A ChromaDB collection on disk at:
+        data/vector_store/chroma_db/
+      with all documents embedded and ready for vector retrieval.
+
+Key features
+------------
+✅ Supports multiple JSON sources (single file, folder, or list of paths)  
+✅ Stable document IDs via MD5 hash (prevents duplicates on re-run)  
+✅ Skips already-embedded documents by checking existing IDs in Chroma  
+✅ Uses `BAAI/bge-large-en-v1.5` (by default) via `HuggingFaceEmbedding`  
+✅ Exposes a single `embed_and_store(...)` function and a CLI entrypoint
+
 Run standalone:
     poetry run python -m src.embedding.embedding_store
+
 ---------------------------------------------------
 """
+
 
 import os
 import json
@@ -122,7 +144,6 @@ def load_all_chunks(input_path: Union[str, list[str]]) -> List[Document]:
 # ---------------------------------------------------
 # EMBEDDING + STORAGE PIPELINE
 # ---------------------------------------------------
-
 def embed_and_store(
     input_path: Union[str, list[str], List[Document]] = DEFAULT_JSON_PATH,
     persist_dir: str = CHROMA_DIR,
@@ -131,8 +152,60 @@ def embed_and_store(
 ):
     """
     Incremental-safe embedding + storage pipeline for ChromaDB.
-    Prevents duplicate embeddings even on re-runs.
+
+    This function takes chunked documents (from JSON or preloaded
+    `Document` objects), embeds their text using a Hugging Face model,
+    and stores them in a persistent ChromaDB collection. It is designed
+    to be safe to re-run: existing document IDs are detected and skipped,
+    so no duplicate embeddings are created.
+
+    Behavior:
+        1. Load all chunks as `Document` objects:
+             - If `input_path` is a directory → load all `*.json` files.
+             - If `input_path` is a file path → load that file only.
+             - If `input_path` is a list of paths → load each file.
+             - If `input_path` is a list of `Document` objects →
+               use them directly.
+
+        2. Initialize the embedding model:
+             - Default: `BAAI/bge-large-en-v1.5` via `HuggingFaceEmbedding`.
+
+        3. Connect to (or create) a ChromaDB collection at `persist_dir`
+           with name `collection_name`.
+
+        4. Retrieve existing document IDs from Chroma and filter out
+           any `Document` whose `id_` is already present.
+
+        5. Embed only the new documents and add:
+             - embeddings
+             - raw text
+             - flattened metadata
+             - IDs
+
+        6. Optionally run a small retrieval sanity check to ensure
+           the collection is usable by LlamaIndex.
+
+    Args:
+        input_path:
+            Either:
+              - a directory containing chunked JSON files,
+              - a single JSON file path,
+              - a list of JSON file paths, or
+              - a list of pre-constructed `Document` objects.
+
+        persist_dir:
+            Filesystem path where the ChromaDB database is stored.
+
+        collection_name:
+            Name of the Chroma collection (e.g. `"jasp_manual_embeddings_v2"`).
+
+        embed_model_name:
+            Hugging Face model name to use for text embeddings.
+
+    Returns:
+        None. Embeddings are written to the ChromaDB collection on disk.
     """
+
 
     logger.info("🚀 Initializing embedding model and Chroma vector store...")
 

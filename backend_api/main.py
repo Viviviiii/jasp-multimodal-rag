@@ -1,39 +1,57 @@
+
+
 """
 ---------------------------------------------------
-🌐 FASTAPI BACKEND for Local RAG + Ollama Generation
-
-The backend receives your text as a request and sends a response back to the frontend
+6:
+ FastAPI backend for local JASP RAG + Ollama
 ---------------------------------------------------
 
-Exposes REST endpoints for:
+This service exposes a simple HTTP API for the JASP RAG system. It connects:
 
-1. /retrieve
-   - Runs the retrieval pipeline (BM25 / vector / hybrid).
-   - Returns clean metadata for PDFs, GitHub markdown, and videos.
-   - Used by the frontend to show "docs that may help".
+  • retrieval  →  src.retrieval.retrieval.retrieve_clean
+  • generation →  src.generation.generation.run_generation_pipeline
+  • PDF preview rendering → PyMuPDF (fitz)
 
-2. /generate
-   - Runs the full RAG pipeline: retrieval + LLM generation.
-   - Uses the same retrieval modes as /retrieve.
-   - Returns the answer + the sources actually used.
+Exposed endpoints
+-----------------
+1. POST /retrieve
+   - Runs the retrieval pipeline (BM25 / vector / hybrid/..).
+   - Returns cleaned, normalized metadata for:
+       • PDFs (manual pages)
+       • GitHub markdown help files
+       • YouTube videos (with timestamps)
+   - Used by the frontend to show “docs that may help”.
 
-3. /preview/pdf/{pdf_id}/{page}
+2. POST /generate
+   - Runs the full RAG pipeline: retrieval + LLM generation (via Ollama).
+   - Uses the same retrieval modes as `/retrieve`.
+   - Returns:
+       • answer (markdown)
+       • sources actually used in the prompt.
+
+3. GET /preview/pdf/{pdf_id}/{page}
    - On-demand, cached rendering of a single PDF page as PNG.
-   - Allows the frontend to show full-page previews.
+   - Allows the frontend to show high-res page previews.
 
-4. /config/retrieval-modes
-   - Lists all available retrieval modes and the default.
-   - Useful for building dropdowns in the UI.
+4. GET /config/retrieval-modes
+   - Lists all supported retrieval modes and the default.
+   - Useful for building dropdowns / toggles in the UI.
 
-Test interactively:
-   
-Swagger UI (interactive)👉 http://127.0.0.1:8000/docs
-read-only documentation 👉 http://127.0.0.1:8000/redoc
+5. GET /
+   - Simple health-check endpoint (`{"status": "ok"}`).
 
-Run:
+Interactive docs
+----------------
+Swagger UI (interactive) 👉  http://127.0.0.1:8000/docs  
+ReDoc (read-only)       👉  http://127.0.0.1:8000/redoc
+
+Run locally:
+
     poetry run uvicorn backend_api.main:app --reload --port 8000
+
 ---------------------------------------------------
 """
+
 
 import os
 from pathlib import Path
@@ -57,7 +75,7 @@ from src.generation.generation import run_generation_pipeline
 RetrievalMode = Literal[
     "bm25",
     "vector",
-    "bm25_vector",
+    #"bm25_vector",
     "bm25_vector_fusion",
     "bm25_vector_fusion_rerank",
 ]
@@ -65,7 +83,7 @@ RetrievalMode = Literal[
 RETRIEVAL_MODES: List[RetrievalMode] = [
     "bm25",
     "vector",
-    "bm25_vector",
+   # "bm25_vector",
     "bm25_vector_fusion",
     "bm25_vector_fusion_rerank",
 ]

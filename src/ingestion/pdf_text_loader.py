@@ -1,20 +1,42 @@
-"""
-pdf_loader.py
---------------
-End-to-end PDF ingestion pipeline for JASP manual processing.
 
-This script performs:
-0. Download pdf online sources
-1. Load PDF(s) using LlamaIndex's SimpleDirectoryReader
-2. Clean noisy headers, merge titles, and reconstruct equations
-3. Convert to structured Markdown with section headers and image placeholders
-4. Split Markdown into section-level chunks
-5. Compute token counts and add metadata
-6. Export both Markdown and JSON outputs
 
-Usage:
-    poetry run python src/ingestion/pdf_text_loader.py
 """
+1_pdf_a:
+PDF text ingestion for JASP manuals.
+
+This module implements a full PDF → Markdown → section JSON pipeline tailored
+for the JASP student manual and similar documentation.
+
+High-level steps
+----------------
+1. Read a list of PDF sources from `data/raw_pdf/pdf_list.json`.
+2. Download each PDF into `data/raw_pdf/`.
+3. Extract and clean page text (remove noisy headers/footers).
+4. Detect section titles, normalize equations and tables.
+5. Convert each PDF into a single cleaned Markdown file.
+6. Split Markdown into section-level documents with metadata
+   (section title, page numbers, token length).
+7. Export section-level documents to JSON for downstream RAG indexing.
+
+Typical CLI usage
+-----------------
+Run the full pipeline for the configured PDFs:
+
+    poetry run python -m src.ingestion.pdf_text_loader
+
+Typical Python usage
+--------------------
+    from src.ingestion.pdf_text_loader import run_pdf_ingestion_text_pipeline
+
+    run_pdf_ingestion_text_pipeline(
+        pdf_list_json="data/raw_pdf/pdf_list.json",
+        data_dir="data/raw_pdf",
+        markdown_dir="data/processed/pdf/markdown",
+        json_dir="data/processed/pdf/text",
+        target_pdf=None,  # or "Statistical-Analysis-in-JASP-A-guide-for-students-2025.pdf"
+    )
+"""
+
 
 import re
 import os
@@ -464,6 +486,7 @@ def save_sections_to_json(
 # -------------------------------------------------------------------------
 # 🚀 Unified pipeline entry point (CLI + importable)
 # -------------------------------------------------------------------------
+
 def run_pdf_ingestion_text_pipeline(
     pdf_list_json: str,
     data_dir: str,
@@ -471,6 +494,52 @@ def run_pdf_ingestion_text_pipeline(
     json_dir: str,
     target_pdf: str | None = None,
 ) -> list[Path]:
+
+    """
+    End-to-end PDF text ingestion pipeline.
+
+    This function orchestrates all steps needed to go from online JASP PDFs
+    to section-level JSON files that can be indexed by the RAG system.
+
+    Steps:
+        0. Download all PDFs listed in `pdf_list_json` into `data_dir`.
+        1. Convert each PDF into a cleaned, section-structured Markdown file.
+        2. Split Markdown into section-level LlamaIndex `Document` objects.
+        3. Save each PDF's sections as JSON in `json_dir`.
+
+    Args:
+        pdf_list_json:
+            Path to `pdf_list.json` containing a list of PDF sources.
+            Expected structure:
+
+                {
+                  "pdf": [
+                    {
+                      "name": "Statistical-Analysis-in-JASP-A-guide-for-students-2025",
+                      "source_url": "https://...",
+                      "source_name": "Statistical-Analysis-in-JASP-A-guide-for-students-2025.pdf"
+                    },
+                    ...
+                  ]
+                }
+
+        data_dir:
+            Directory where raw PDF files are stored / downloaded.
+
+        markdown_dir:
+            Output directory where intermediate Markdown files are written.
+
+        json_dir:
+            Output directory where final section-level JSON files are saved.
+
+        target_pdf:
+            Optional single PDF filename (e.g. "Statistical-Analysis-in-JASP-A-guide-for-students-2025.pdf").
+            If provided, only that PDF is processed; otherwise, all PDFs in `data_dir` are processed.
+
+    Returns:
+        A list of paths to the generated section-level JSON files,
+        one per processed PDF.
+    """
 
     logger.info("🚀 Starting full PDF ingestion pipeline...")
 

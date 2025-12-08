@@ -33,6 +33,7 @@ poetry.lock
 # ----------------------
 # Data (keep raw small PDFs if needed)
 # ----------------------
+notebooks
 data/processed/
 data/images/
 *.db

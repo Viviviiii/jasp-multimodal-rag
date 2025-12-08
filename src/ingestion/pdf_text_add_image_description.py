@@ -1,19 +1,54 @@
-"""
-add_image_description.py
-------------------------
-Unified section-level image extraction, summarization, and dispatching
-for JASP manual PDFs.
 
-This pipeline performs:
-1️⃣ Extract images from each relevant PDF page
-2️⃣ Summarize each image using an Ollama/LLaVA model
-3️⃣ Save a page-level JSON of image summaries (for audit or reuse)
-4️⃣ Dispatch summarized images into section placeholders from text JSON
-   → up to `max_per_placeholder` images per placeholder
-
-Run:
-    poetry run python src/ingestion/pdf_text_add_image_description.py
 """
+1_pdf_b:
+Image extraction and description pipeline for JASP PDF sections.
+
+This module enriches section-level text JSON (from `pdf_text_loader.py`) with image paths and short, model-generated descriptions. 
+It is designed for JASP manuals and similar PDF documentation.
+
+High-level steps
+----------------
+1. Extract images from each PDF page using PyMuPDF (fitz), skipping tiny
+   or boilerplate images (logos, icons).
+2. Summarize each image with an Ollama/LLaVA vision-language model.
+3. Save page-level image summaries to JSON for audit and reuse.
+4. Match page-level images to section-level placeholders produced by
+   `pdf_text_loader.py` and append image descriptions to the section text.
+5. Recompute token lengths for each enriched section and save a final
+   JSON file ready for RAG spilliting,embedding and indexing.
+
+Typical CLI usage
+-----------------
+Process all PDFs in the default folder:
+
+    poetry run python -m src.ingestion.pdf_text_add_image_description
+
+Or only a single PDF:
+
+    poetry run python -m src.ingestion.pdf_text_add_image_description \\
+        --pdf "Statistical-Analysis-in-JASP-A-guide-for-students-2025.pdf"
+
+Typical Python usage
+--------------------
+    from src.ingestion.pdf_text_add_image_description import (
+        add_image_descriptions_pipeline,
+        run_pdf_add_image_descriptions_batch,
+    )
+
+    # Single PDF
+    final_json = add_image_descriptions_pipeline(
+        pdf_path="data/raw_pdf/Statistical-Analysis-in-JASP-A-guide-for-students-2025.pdf",
+        text_json_path="data/processed/pdf/text/Statistical-Analysis-in-JASP-A-guide-for-students-2025.json",
+    )
+
+    # Batch over a folder
+    outputs = run_pdf_add_image_descriptions_batch(
+        pdf_dir="data/raw_pdf",
+        text_json_dir="data/processed/pdf/text",
+        target_pdf=None,
+    )
+"""
+
 
 import os
 import re
@@ -50,7 +85,60 @@ def extract_images_from_pdf(
     max_pages: Optional[int] = None,
     skip_first_n_images_per_page: int = 2,
 ) -> Dict[int, List[str]]:
-    """Extract all valid images from a PDF."""
+
+    """
+    Extract raster images from a PDF and save them to disk.
+
+    This function scans each page of a PDF, retrieves all embedded images,
+    applies basic filtering (minimum width/height), and writes the valid
+    images to an output folder. The function returns a mapping from page
+    numbers to lists of extracted image file paths.
+
+    Parameters
+    ----------
+    pdf_path : str
+        Path to the source PDF file.
+
+    output_root : str
+        Directory where extracted images will be stored. A subfolder
+        named after the PDF file (without extension) will be created.
+
+    min_width : int
+        Minimum image width (in pixels) required for extraction.
+        Smaller images (e.g., icons or UI fragments) are ignored.
+
+    min_height : int
+        Minimum image height (in pixels) required for extraction.
+
+    overwrite : bool
+        If False (default), existing extracted image files are reused.
+        If True, images are re-extracted and overwritten on disk.
+
+    max_pages : Optional[int]
+        Maximum number of pages to process. If None (default), all pages 
+        are scanned.
+
+    skip_first_n_images_per_page : int
+        Number of images at the beginning of each page's image list to skip.
+        This is useful for ignoring boilerplate images such as logos or
+        decorative UI elements. If set to a very large value (e.g., 100),
+        the function effectively skips all images on most pages.
+
+    Returns
+    -------
+    Dict[int, List[str]]
+        A dictionary mapping page numbers (1-based) to lists of extracted 
+        image file paths. Pages without valid images are omitted.
+
+    Notes
+    -----
+    - Skipping many images does not break the pipeline; it simply results 
+      in empty pages downstream, meaning no image summaries will be added.
+    - Extraction uses PyMuPDF (fitz), which preserves original image data
+      and formats (e.g., PNG, JPEG, etc.).
+    - This function does not perform any summarization; it only extracts
+      and filters images. Subsequent steps handle summarization and dispatch.
+    """
     if not os.path.isfile(pdf_path):
         logger.error(f"❌ PDF not found: {pdf_path}")
         return {}
@@ -452,11 +540,45 @@ def load_pdf_source_metadata(pdf_name: str) -> dict:
 # -------------------------------------------------------------------------
 # 🚀 STEP 4 — Unified pipeline
 # -------------------------------------------------------------------------
+def add_image_descriptions_pipeline(
+    pdf_path: str,
+    text_json_path: str,
+    model: str = MODEL_DEFAULT,
+):
+    """
+    Enrich a single PDF's section JSON with image paths and descriptions.
 
-def add_image_descriptions_pipeline(pdf_path: str, text_json_path: str, model: str = MODEL_DEFAULT):
+    This function runs the full image pipeline for one PDF:
+
+        1. Extract images from all pages of `pdf_path` (if no summary JSON exists yet).
+        2. Summarize each image using an Ollama/LLaVA vision-language model.
+        3. Save a page-level image JSON under `data/processed/pdf/image_description/`.
+        4. Dispatch images and summaries into the section-level JSON produced by
+           `pdf_text_loader.py`, based on page numbers and placeholders.
+        5. Append image descriptions to the section text (for better RAG context).
+        6. Recompute token lengths for each section and save a final enriched JSON
+           under `data/processed/pdf/final_enriched/`.
+
+    if a page-level image-summary JSON already exists for this PDF, extraction and summarization
+    are skipped and the existing summaries are reused.
+
+    Args:
+        pdf_path:
+            Path to the source PDF file (e.g. `data/raw_pdf/...pdf`).
+
+        text_json_path:
+            Path to the section-level JSON produced by `run_pdf_ingestion_text_pipeline`,
+            typically under `data/processed/pdf/text/`.
+
+        model:
+            Name of the Ollama vision-language model to use (default: `llava-phi3:latest`).
+
+    Returns:
+        Path (as a string) to the final enriched JSON file containing:
+            - section text + appended image descriptions
+            - metadata including image paths, image summaries, and token_length.
     """
-    Full pipeline with early skip for existing image summaries.
-    """
+
     pdf_name = Path(pdf_path).stem
 
     # Load metadata
@@ -521,10 +643,35 @@ def run_pdf_add_image_descriptions_batch(
     target_pdf: str | None = None,
     model: str = MODEL_DEFAULT,
 ):
+
     """
-    Run the image-description pipeline for:
-      - all PDFs in the folder, OR
-      - only one selected PDF.
+    Run the image-description pipeline for one or many PDFs in a folder.
+
+    For each PDF in `pdf_dir`:
+        - Find the corresponding section JSON in `text_json_dir`
+          (same stem, `.json` extension).
+        - Call `add_image_descriptions_pipeline` to enrich sections with
+          image paths, image summaries, and updated token lengths.
+
+    Args:
+        pdf_dir:
+            Directory containing the raw PDFs (e.g. `data/raw_pdf`).
+
+        text_json_dir:
+            Directory containing section-level JSON files generated by
+            `run_pdf_ingestion_text_pipeline` (e.g. `data/processed/pdf/text`).
+
+        target_pdf:
+            Optional PDF filename to restrict processing to a single file
+            (case-insensitive). If `None`, all `*.pdf` files in `pdf_dir`
+            are processed.
+
+        model:
+            Name of the Ollama vision-language model to use for summarization.
+
+    Returns:
+        A list of paths (as strings) to the final enriched JSON files,
+        one per successfully processed PDF.
     """
     pdf_dir = Path(pdf_dir)
     text_json_dir = Path(text_json_dir)

@@ -1,11 +1,52 @@
-"""
----------------------------------------------------
-💬 GENERATION PIPELINE (RAG FINAL STAGE)
 
-Run from CLI:
-    poetry run python -m src.generation.generation --q "How to run Bayesian Linear Mixed Models in JASP?" --mode bm25
+"""
+---------------------------------------------------
+5:
+ RAG generation pipeline (final answer stage)
+---------------------------------------------------
+
+This module is the final step of the RAG system: it takes a user query,
+retrieves relevant chunks (PDF, GitHub, video), and then asks an Ollama model 
+to generate a JASP-focused answer grounded in that context.
+
+High-level flow
+---------------
+1. Call `retrieve_clean(...)` to get top-k normalized results for the query
+   (defaulted mode: BM25 / vectors / hybrid + rerank).
+2. Build a concise context block from the retrieved sources, including
+   their titles, sections, page numbers, or timestamps.
+3. Insert the query and context into a prompt template tailored for JASP
+   documentation help.
+4. Stream the answer from an Ollama model (default: `mistral:7b`).
+5. Return both:
+   - the final answer (markdown)
+   - the list of sources used to generate it.
+
+If no documents are retrieved, the pipeline explicitly warns that the
+answer is not supported by the local JASP documentation and falls back
+to general model knowledge.
+
+CLI usage
+---------
+    poetry run python -m src.generation.generation \\
+        --q "How to run Bayesian Linear Mixed Models in JASP?" \\
+        --mode bm25_vector_fusion_rerank
+
+Main programmatic entrypoint:
+    from src.generation.generation import run_generation_pipeline
+
+    result = run_generation_pipeline(
+        query="How to run repeated measures ANOVA in JASP?",
+        model="mistral:7b",
+        mode="bm25_vector_fusion_rerank",
+    )
+
+    print(result["answer"])
+    print(result["sources"])
+
 ---------------------------------------------------
 """
+
 
 from __future__ import annotations
 
@@ -154,17 +195,42 @@ def run_generation_pipeline(
     mode: str = "bm25_vector_fusion_rerank",
 ):
     """
-    Unified pipeline used by both CLI and FastAPI backend.
-    Uses the same retrieval (`retrieve_clean`) as the /retrieve endpoint,
-    then calls Ollama to generate an answer.
+    End-to-end RAG pipeline used by both CLI and backend.
 
-    IMPORTANT:
-    - We do NOT reinterpret or reshape metadata here.
-    - We only add:
-        • rank    (1-based)
-        • text    (unified from text/content)
-    Everything else comes directly from retrieve_clean().
+    Steps:
+        1. Retrieve top-k relevant chunks via `retrieve_clean(query, mode=...)`.
+        2. Normalize them into a list of source dicts, each with:
+             - source_type (pdf / markdown / video / ...)
+             - title / section / page_number / timestamp
+             - text/content and score
+        3. Call `generate_answer_from_docs(...)` to build a JASP-specific
+           prompt and stream an answer from the Ollama model.
+        4. Return a structured dict containing:
+             - "query"
+             - "model"
+             - "retrieval_mode"
+             - "answer"   (markdown string)
+             - "sources"  (the list of used context chunks)
+
+    Args:
+        query:
+            User's natural language question.
+
+        model:
+            Ollama model name to use for answer generation
+            (e.g. "mistral:7b", "llama3.2:latest", ...).
+
+        mode:
+            Retrieval mode to use before generation, consistent with
+            `src.retrieval.retrieval` (bm25, vector, bm25_vector,
+            bm25_vector_fusion, bm25_vector_fusion_rerank).
+
+    Returns:
+        A dict with the generated answer and the supporting sources,
+        suitable for direct use in the API or UI.
     """
+
+
     logger.info(f"🎯 Running generation pipeline for query: {query} (mode={mode})")
 
     # 1️⃣ Retrieve top chunks with selected mode

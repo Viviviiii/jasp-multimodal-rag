@@ -1,24 +1,45 @@
+
 """
 ---------------------------------------------------
-💬 STREAMLIT FRONTEND for JASP RAG
+7:
+ Streamlit frontend for JASP RAG
 ---------------------------------------------------
 
-Interactively query your local RAG system.
+This app is a thin UI layer on top of the FastAPI backend. It lets you:
 
 Main panel:
-  • Type a question (e.g. “How to run repeated measures ANOVA in JASP”)
-  • Click "Search docs" to retrieve relevant chunks (PDF pages, videos, GitHub files)
-  • A big window shows the preview of the selected *original* document page
+  • Type a question (e.g. “How to run repeated measures ANOVA in JASP?”)
+  • Click **"Search docs"** to retrieve relevant chunks
+    (PDF pages, GitHub help files, video segments)
+  • Browse a ranked list of results and view the selected source in a large
+    preview area:
+      – PDF: in-browser page view with page jump  
+      – Video: YouTube player with timestamp  
+      – GitHub: rendered Markdown from the original file
 
 Sidebar:
-  • Choose a retrieval mode (BM25 / vector / hybrid / fusion / fusion+rerrank)
-  • Select an Ollama model (e.g. mistral:7b, llama3.2:3b, phi3:mini)
-  • Click “Generate Answer” to get an AI-generated answer (optional, can be slow)
+  • Choose a retrieval mode (BM25 / vector / hybrid / fusion / fusion + rerank)
+  • Select an Ollama model (e.g. `mistral:7b`, `llama3.2:3b`, `phi3:mini`) for generation task
+  • Optionally click **"Generate Answer"** to run full RAG (retrieval + LLM) and
+    see the answer directly in the sidebar, along with debug logs.
 
-Run:
+Backend endpoints used:
+  • POST /retrieve
+  • POST /generate
+  • GET  /config/retrieval-modes
+
+Run locally:
+
     poetry run streamlit run frontend/app.py
+
+Make sure the backend is running first:
+
+    poetry run uvicorn backend_api.main:app --reload --port 8000
+
 ---------------------------------------------------
 """
+
+
 
 import streamlit as st
 import requests
@@ -32,7 +53,7 @@ CONFIG_MODES_URL = "http://127.0.0.1:8000/config/retrieval-modes"
 DEFAULT_MODES = [
     "bm25",
     "vector",
-    "bm25_vector",
+   # "bm25_vector",
     "bm25_vector_fusion",
     "bm25_vector_fusion_rerank",
 ]
@@ -236,18 +257,29 @@ def get_retrieval_mode_from_sidebar():
     except ValueError:
         default_index = 0 if modes else 0
 
-    st.sidebar.markdown("### 🔎 Retrieval settings")
+    st.sidebar.markdown("### 🦞 Retrieval Mode Settings")
     mode = st.sidebar.selectbox(
         "Retrieval mode:",
         modes,
         index=default_index,
         help=(
-            "bm25: keyword search\n"
-            "vector: dense semantic search\n"
-            "bm25_vector: mixed list\n"
-            "bm25_vector_fusion: rank fusion\n"
-            "bm25_vector_fusion_rerank: fusion + cross-encoder reranking"
-        ),
+            "Choose how the system retrieves relevant documents:\n\n"
+            "• **bm25** – Classical keyword-based search.\n"
+            "   - Fast and robust for exact terms.\n"
+            "   - Works well when the query wording matches the document.\n\n"
+            "• **vector** – Dense semantic search using embeddings.\n"
+            "   - Captures meaning instead of exact words.\n"
+            "   - Useful when the query is phrased differently than the text.\n\n"
+            "• **bm25_vector_fusion** – Rank fusion of BM25 + vector search.\n"
+            "   - Combines lexical and semantic strengths.\n"
+            "   - More stable across different question types.\n\n"
+            "• **bm25_vector_fusion_rerank** – Full retrieval pipeline.\n"
+            "   - First fuses BM25 and vector rankings.\n"
+            "   - Then reorders top results with a cross-encoder for maximum precision.\n"
+            "   - Recommended as the most accurate mode.\n\n"
+            "Tip: If unsure, choose the rerank mode for best overall quality."
+        )
+
     )
 
     st.session_state["retrieval_mode"] = mode
