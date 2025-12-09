@@ -5,12 +5,6 @@ __pycache__/
 logs/
 src/__pycache__/
 poetry.lock
+notebooks/Achive/
 .DS_Store
-notebooks/
-notebooks/*
-**/notebooks/
 
-# macOS metadata
-.DS_Store
-.AppleDouble
-.LSOverride

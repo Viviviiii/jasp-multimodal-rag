@@ -15,7 +15,7 @@ This service exposes a simple HTTP API for the JASP RAG system. It connects:
 Exposed endpoints
 -----------------
 1. POST /retrieve
-   - Runs the retrieval pipeline (BM25 / vector / hybrid/..).
+   - Runs the retrieval pipeline (BM25 / vector / hybrid).
    - Returns cleaned, normalized metadata for:
        • PDFs (manual pages)
        • GitHub markdown help files

@@ -1,0 +1,5 @@
+QID,Question,Difficulty Level,Retrieval Mode,Success@k,Precision@k,Recall@k,nDCG@k
+1,How do I open a dataset and view it in JASP?,easy,BM25,0,0.0,0.0,0.8503449055347546
+1,How do I open a dataset and view it in JASP?,easy,bm_vector_fusion,1,0.2,1.0,0.7075790686744426
+1,How do I open a dataset and view it in JASP?,easy,bm_vector_fusion_rerank,1,0.2,1.0,1.0
+1,How do I open a dataset and view it in JASP?,easy,vector,1,0.4,1.0,0.9128781396400242

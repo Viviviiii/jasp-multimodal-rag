@@ -34,7 +34,7 @@ Users can query the system through a FastAPI backend and an intuitive Streamlit 
 
 
 # Quick Start
-0. Install dependencies
+0. Install dependencies:
        ' poetry install'
 
         Poetry will automatically installs:
@@ -161,6 +161,6 @@ Example:
 
 # update: When you make changes in VS Code:
 git add .
-git commit -m "full pipeline version-7"
+git commit -m "full pipeline version-7.06"
 git push
 

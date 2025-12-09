@@ -32,9 +32,7 @@ Run locally:
 
     poetry run streamlit run frontend/app.py
 
-Make sure the backend is running first:
-
-    poetry run uvicorn backend_api.main:app --reload --port 8000
+(Make sure the backend is running first: poetry run uvicorn backend_api.main:app --reload --port 8000 )
 
 ---------------------------------------------------
 """
