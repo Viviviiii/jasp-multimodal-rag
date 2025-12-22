@@ -161,6 +161,6 @@ Example:
 
 # update: When you make changes in VS Code:
 git add .
-git commit -m "full pipeline version-7.06"
+git commit -m "full pipeline version_9:fixed k"
 git push
 

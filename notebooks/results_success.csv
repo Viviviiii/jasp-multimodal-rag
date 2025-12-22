@@ -1,0 +1,321 @@
+QID,Question,Difficulty Level,Retrieval Mode,Success@k
+1,How do I open a dataset and view it in JASP?,easy,BM25,0
+1,How do I open a dataset and view it in JASP?,easy,bm_vector_fusion,1
+1,How do I open a dataset and view it in JASP?,easy,bm_vector_fusion_rerank,1
+1,How do I open a dataset and view it in JASP?,easy,vector,1
+2,How can I save or export a JASP data file in JASP?,easy,BM25,1
+2,How can I save or export a JASP data file in JASP?,easy,bm_vector_fusion,1
+2,How can I save or export a JASP data file in JASP?,easy,bm_vector_fusion_rerank,1
+2,How can I save or export a JASP data file in JASP?,easy,vector,1
+3,How to set up results preferences in JASP?,easy,BM25,1
+3,How to set up results preferences in JASP?,easy,bm_vector_fusion,1
+3,How to set up results preferences in JASP?,easy,bm_vector_fusion_rerank,1
+3,How to set up results preferences in JASP?,easy,vector,1
+4,How can I check for outliers in my dataset using JASP?,easy,BM25,1
+4,How can I check for outliers in my dataset using JASP?,easy,bm_vector_fusion,1
+4,How can I check for outliers in my dataset using JASP?,easy,bm_vector_fusion_rerank,1
+4,How can I check for outliers in my dataset using JASP?,easy,vector,1
+5,What are the assumptions of a one-sample t-test?,easy,BM25,1
+5,What are the assumptions of a one-sample t-test?,easy,bm_vector_fusion,1
+5,What are the assumptions of a one-sample t-test?,easy,bm_vector_fusion_rerank,1
+5,What are the assumptions of a one-sample t-test?,easy,vector,1
+6,How do I perform a multinomial test in JASP ?,easy,BM25,1
+6,How do I perform a multinomial test in JASP ?,easy,bm_vector_fusion,1
+6,How do I perform a multinomial test in JASP ?,easy,bm_vector_fusion_rerank,1
+6,How do I perform a multinomial test in JASP ?,easy,vector,1
+7,How to interpret the chi-square output?,easy,BM25,1
+7,How to interpret the chi-square output?,easy,bm_vector_fusion,1
+7,How to interpret the chi-square output?,easy,bm_vector_fusion_rerank,1
+7,How to interpret the chi-square output?,easy,vector,1
+8,How do I set up an independent samples t-test in JASP?,easy,BM25,0
+8,How do I set up an independent samples t-test in JASP?,easy,bm_vector_fusion,0
+8,How do I set up an independent samples t-test in JASP?,easy,bm_vector_fusion_rerank,1
+8,How do I set up an independent samples t-test in JASP?,easy,vector,1
+9,How do I run a Mann–Whitney U test for non-normal data in JASP?,easy,BM25,1
+9,How do I run a Mann–Whitney U test for non-normal data in JASP?,easy,bm_vector_fusion,1
+9,How do I run a Mann–Whitney U test for non-normal data in JASP?,easy,bm_vector_fusion_rerank,1
+9,How do I run a Mann–Whitney U test for non-normal data in JASP?,easy,vector,1
+10,How do I run a paired-samples t-test in JASP?,easy,BM25,1
+10,How do I run a paired-samples t-test in JASP?,easy,bm_vector_fusion,1
+10,How do I run a paired-samples t-test in JASP?,easy,bm_vector_fusion_rerank,1
+10,How do I run a paired-samples t-test in JASP?,easy,vector,1
+11,How do I perform a Wilcoxon signed-rank test for related samples in JASP,easy,BM25,1
+11,How do I perform a Wilcoxon signed-rank test for related samples in JASP,easy,bm_vector_fusion,1
+11,How do I perform a Wilcoxon signed-rank test for related samples in JASP,easy,bm_vector_fusion_rerank,1
+11,How do I perform a Wilcoxon signed-rank test for related samples in JASP,easy,vector,1
+12,How do I run a regression analysis in JASP?,easy,BM25,0
+12,How do I run a regression analysis in JASP?,easy,bm_vector_fusion,0
+12,How do I run a regression analysis in JASP?,easy,bm_vector_fusion_rerank,0
+12,How do I run a regression analysis in JASP?,easy,vector,0
+13,How do I specify predictors and outcome variables in JASP’s regression module?,easy,BM25,1
+13,How do I specify predictors and outcome variables in JASP’s regression module?,easy,bm_vector_fusion,0
+13,How do I specify predictors and outcome variables in JASP’s regression module?,easy,bm_vector_fusion_rerank,1
+13,How do I specify predictors and outcome variables in JASP’s regression module?,easy,vector,1
+14,What output does JASP provide for correlation analysis?,easy,BM25,0
+14,What output does JASP provide for correlation analysis?,easy,bm_vector_fusion,0
+14,What output does JASP provide for correlation analysis?,easy,bm_vector_fusion_rerank,0
+14,What output does JASP provide for correlation analysis?,easy,vector,0
+15,How do I run a one-way ANOVA for more than two groups in JASP?,easy,BM25,1
+15,How do I run a one-way ANOVA for more than two groups in JASP?,easy,bm_vector_fusion,1
+15,How do I run a one-way ANOVA for more than two groups in JASP?,easy,bm_vector_fusion_rerank,1
+15,How do I run a one-way ANOVA for more than two groups in JASP?,easy,vector,1
+16,How to choose appropriate post-hoc tests for ANOVA  in JASP?,easy,BM25,1
+16,How to choose appropriate post-hoc tests for ANOVA  in JASP?,easy,bm_vector_fusion,1
+16,How to choose appropriate post-hoc tests for ANOVA  in JASP?,easy,bm_vector_fusion_rerank,1
+16,How to choose appropriate post-hoc tests for ANOVA  in JASP?,easy,vector,1
+17,How do I check assumptions before running ANOVA in JASP?,easy,BM25,1
+17,How do I check assumptions before running ANOVA in JASP?,easy,bm_vector_fusion,1
+17,How do I check assumptions before running ANOVA in JASP?,easy,bm_vector_fusion_rerank,1
+17,How do I check assumptions before running ANOVA in JASP?,easy,vector,1
+18,How do I perform a Kruskal–Wallis test for non-normal multi-group data in JASP?,easy,BM25,1
+18,How do I perform a Kruskal–Wallis test for non-normal multi-group data in JASP?,easy,bm_vector_fusion,1
+18,How do I perform a Kruskal–Wallis test for non-normal multi-group data in JASP?,easy,bm_vector_fusion_rerank,1
+18,How do I perform a Kruskal–Wallis test for non-normal multi-group data in JASP?,easy,vector,1
+19,Where is the nonparametric ANOVA option located in the menu?,easy,BM25,1
+19,Where is the nonparametric ANOVA option located in the menu?,easy,bm_vector_fusion,1
+19,Where is the nonparametric ANOVA option located in the menu?,easy,bm_vector_fusion_rerank,1
+19,Where is the nonparametric ANOVA option located in the menu?,easy,vector,1
+20,How do I run a repeated-measures ANOVA in JASP?,easy,BM25,1
+20,How do I run a repeated-measures ANOVA in JASP?,easy,bm_vector_fusion,1
+20,How do I run a repeated-measures ANOVA in JASP?,easy,bm_vector_fusion_rerank,1
+20,How do I run a repeated-measures ANOVA in JASP?,easy,vector,1
+21,How do I specify within-subject factors and levels in JASP?,easy,BM25,1
+21,How do I specify within-subject factors and levels in JASP?,easy,bm_vector_fusion,1
+21,How do I specify within-subject factors and levels in JASP?,easy,bm_vector_fusion_rerank,1
+21,How do I specify within-subject factors and levels in JASP?,easy,vector,1
+22,"What output does JASP give (F-values, sphericity tests, etc.) for RM-ANOVA?",easy,BM25,1
+22,"What output does JASP give (F-values, sphericity tests, etc.) for RM-ANOVA?",easy,bm_vector_fusion,1
+22,"What output does JASP give (F-values, sphericity tests, etc.) for RM-ANOVA?",easy,bm_vector_fusion_rerank,1
+22,"What output does JASP give (F-values, sphericity tests, etc.) for RM-ANOVA?",easy,vector,1
+23,How do I conduct a Friedman test for non-parametric repeated-measures data in JASP?,easy,BM25,1
+23,How do I conduct a Friedman test for non-parametric repeated-measures data in JASP?,easy,bm_vector_fusion,1
+23,How do I conduct a Friedman test for non-parametric repeated-measures data in JASP?,easy,bm_vector_fusion_rerank,1
+23,How do I conduct a Friedman test for non-parametric repeated-measures data in JASP?,easy,vector,1
+24,How to run factorial ANOVA in JASP?,easy,BM25,0
+24,How to run factorial ANOVA in JASP?,easy,bm_vector_fusion,1
+24,How to run factorial ANOVA in JASP?,easy,bm_vector_fusion_rerank,1
+24,How to run factorial ANOVA in JASP?,easy,vector,0
+25,How do I interpret main effects and interactions in the JASP ANOVA output?,easy,BM25,1
+25,How do I interpret main effects and interactions in the JASP ANOVA output?,easy,bm_vector_fusion,1
+25,How do I interpret main effects and interactions in the JASP ANOVA output?,easy,bm_vector_fusion_rerank,1
+25,How do I interpret main effects and interactions in the JASP ANOVA output?,easy,vector,1
+26,How do I run a two-factor repeated-measures ANOVA (two within-subject variables) in JASP?,easy,BM25,1
+26,How do I run a two-factor repeated-measures ANOVA (two within-subject variables) in JASP?,easy,bm_vector_fusion,1
+26,How do I run a two-factor repeated-measures ANOVA (two within-subject variables) in JASP?,easy,bm_vector_fusion_rerank,1
+26,How do I run a two-factor repeated-measures ANOVA (two within-subject variables) in JASP?,easy,vector,1
+27,How do I set up a mixed (within- and between-subjects) ANOVA in JASP?,easy,BM25,1
+27,How do I set up a mixed (within- and between-subjects) ANOVA in JASP?,easy,bm_vector_fusion,1
+27,How do I set up a mixed (within- and between-subjects) ANOVA in JASP?,easy,bm_vector_fusion_rerank,1
+27,How do I set up a mixed (within- and between-subjects) ANOVA in JASP?,easy,vector,1
+28,How to interpret interaction effects in mixed ANOVA?,easy,BM25,1
+28,How to interpret interaction effects in mixed ANOVA?,easy,bm_vector_fusion,1
+28,How to interpret interaction effects in mixed ANOVA?,easy,bm_vector_fusion_rerank,1
+28,How to interpret interaction effects in mixed ANOVA?,easy,vector,1
+29,How to interpret ANCOVA outputs?,easy,BM25,1
+29,How to interpret ANCOVA outputs?,easy,bm_vector_fusion,1
+29,How to interpret ANCOVA outputs?,easy,bm_vector_fusion_rerank,1
+29,How to interpret ANCOVA outputs?,easy,vector,1
+30,How do I perform a chi-square test of association for two categorical variables in JASP?,easy,BM25,1
+30,How do I perform a chi-square test of association for two categorical variables in JASP?,easy,bm_vector_fusion,1
+30,How do I perform a chi-square test of association for two categorical variables in JASP?,easy,bm_vector_fusion_rerank,1
+30,How do I perform a chi-square test of association for two categorical variables in JASP?,easy,vector,1
+31,How are the expected frequencies calculated in chi-square test ？,easy,BM25,1
+31,How are the expected frequencies calculated in chi-square test ？,easy,bm_vector_fusion,1
+31,How are the expected frequencies calculated in chi-square test ？,easy,bm_vector_fusion_rerank,1
+31,How are the expected frequencies calculated in chi-square test ？,easy,vector,1
+32,How do I run a classical meta-analysis using JASP?,easy,BM25,1
+32,How do I run a classical meta-analysis using JASP?,easy,bm_vector_fusion,1
+32,How do I run a classical meta-analysis using JASP?,easy,bm_vector_fusion_rerank,1
+32,How do I run a classical meta-analysis using JASP?,easy,vector,1
+33,How do I perform logistic regression in JASP for binary outcome variables?,easy,BM25,1
+33,How do I perform logistic regression in JASP for binary outcome variables?,easy,bm_vector_fusion,1
+33,How do I perform logistic regression in JASP for binary outcome variables?,easy,bm_vector_fusion_rerank,1
+33,How do I perform logistic regression in JASP for binary outcome variables?,easy,vector,1
+34,How to run a Linear Mixed Model in Jasp?,easy,BM25,1
+34,How to run a Linear Mixed Model in Jasp?,easy,bm_vector_fusion,1
+34,How to run a Linear Mixed Model in Jasp?,easy,bm_vector_fusion_rerank,1
+34,How to run a Linear Mixed Model in Jasp?,easy,vector,0
+35,"Before fitting a Bayesian linear regression in JASP, what assumptions should be met?",easy,BM25,1
+35,"Before fitting a Bayesian linear regression in JASP, what assumptions should be met?",easy,bm_vector_fusion,1
+35,"Before fitting a Bayesian linear regression in JASP, what assumptions should be met?",easy,bm_vector_fusion_rerank,1
+35,"Before fitting a Bayesian linear regression in JASP, what assumptions should be met?",easy,vector,1
+36,how to interpret the Bayes Factors of a Bayesian Correlation analysis?,easy,BM25,1
+36,how to interpret the Bayes Factors of a Bayesian Correlation analysis?,easy,bm_vector_fusion,1
+36,how to interpret the Bayes Factors of a Bayesian Correlation analysis?,easy,bm_vector_fusion_rerank,1
+36,how to interpret the Bayes Factors of a Bayesian Correlation analysis?,easy,vector,1
+37,How to specify the random component and systematic component in the generalized linear models?,easy,BM25,1
+37,How to specify the random component and systematic component in the generalized linear models?,easy,bm_vector_fusion,1
+37,How to specify the random component and systematic component in the generalized linear models?,easy,bm_vector_fusion_rerank,1
+37,How to specify the random component and systematic component in the generalized linear models?,easy,vector,1
+38,Help me find a video to show a repeated measures ANOVA step by step in Jasp.,easy,BM25,1
+38,Help me find a video to show a repeated measures ANOVA step by step in Jasp.,easy,bm_vector_fusion,0
+38,Help me find a video to show a repeated measures ANOVA step by step in Jasp.,easy,bm_vector_fusion_rerank,1
+38,Help me find a video to show a repeated measures ANOVA step by step in Jasp.,easy,vector,1
+39,Show me a JASP introduction video.,easy,BM25,1
+39,Show me a JASP introduction video.,easy,bm_vector_fusion,1
+39,Show me a JASP introduction video.,easy,bm_vector_fusion_rerank,1
+39,Show me a JASP introduction video.,easy,vector,1
+40,How to use a Generalized Linear Mixed Model (GLMM)?,easy,BM25,1
+40,How to use a Generalized Linear Mixed Model (GLMM)?,easy,bm_vector_fusion,1
+40,How to use a Generalized Linear Mixed Model (GLMM)?,easy,bm_vector_fusion_rerank,1
+40,How to use a Generalized Linear Mixed Model (GLMM)?,easy,vector,1
+101,"I’ve just launched JASP for the first time and received a dataset from a collaborator, but the analysis window is empty and no variables are visible. What steps are required to load the data file so that the variables and cases become accessible for inspection and analysis?",difficult,BM25,1
+101,"I’ve just launched JASP for the first time and received a dataset from a collaborator, but the analysis window is empty and no variables are visible. What steps are required to load the data file so that the variables and cases become accessible for inspection and analysis?",difficult,bm_vector_fusion,1
+101,"I’ve just launched JASP for the first time and received a dataset from a collaborator, but the analysis window is empty and no variables are visible. What steps are required to load the data file so that the variables and cases become accessible for inspection and analysis?",difficult,bm_vector_fusion_rerank,1
+101,"I’ve just launched JASP for the first time and received a dataset from a collaborator, but the analysis window is empty and no variables are visible. What steps are required to load the data file so that the variables and cases become accessible for inspection and analysis?",difficult,vector,1
+102,"After cleaning and modifying a dataset in JASP, I want to preserve both the data and the analysis results so they can be reopened later or shared with someone using another statistics program. Where in JASP can this be done, and which options control whether the output, the data, or a different file format is saved?",difficult,BM25,1
+102,"After cleaning and modifying a dataset in JASP, I want to preserve both the data and the analysis results so they can be reopened later or shared with someone using another statistics program. Where in JASP can this be done, and which options control whether the output, the data, or a different file format is saved?",difficult,bm_vector_fusion,1
+102,"After cleaning and modifying a dataset in JASP, I want to preserve both the data and the analysis results so they can be reopened later or shared with someone using another statistics program. Where in JASP can this be done, and which options control whether the output, the data, or a different file format is saved?",difficult,bm_vector_fusion_rerank,1
+102,"After cleaning and modifying a dataset in JASP, I want to preserve both the data and the analysis results so they can be reopened later or shared with someone using another statistics program. Where in JASP can this be done, and which options control whether the output, the data, or a different file format is saved?",difficult,vector,1
+103,"I want to change how statistical results are displayed in JASP—for example, controlling effect size reporting, confidence intervals, or the number of decimals—but I can’t find these options within the analysis panels. Where are the global settings for adjusting how results are formatted and reported?",difficult,BM25,1
+103,"I want to change how statistical results are displayed in JASP—for example, controlling effect size reporting, confidence intervals, or the number of decimals—but I can’t find these options within the analysis panels. Where are the global settings for adjusting how results are formatted and reported?",difficult,bm_vector_fusion,1
+103,"I want to change how statistical results are displayed in JASP—for example, controlling effect size reporting, confidence intervals, or the number of decimals—but I can’t find these options within the analysis panels. Where are the global settings for adjusting how results are formatted and reported?",difficult,bm_vector_fusion_rerank,1
+103,"I want to change how statistical results are displayed in JASP—for example, controlling effect size reporting, confidence intervals, or the number of decimals—but I can’t find these options within the analysis panels. Where are the global settings for adjusting how results are formatted and reported?",difficult,vector,1
+104,"What tools does JASP provide for diagnosing extreme observations or unusual data points, and how do I access them?",difficult,BM25,0
+104,"What tools does JASP provide for diagnosing extreme observations or unusual data points, and how do I access them?",difficult,bm_vector_fusion,0
+104,"What tools does JASP provide for diagnosing extreme observations or unusual data points, and how do I access them?",difficult,bm_vector_fusion_rerank,0
+104,"What tools does JASP provide for diagnosing extreme observations or unusual data points, and how do I access them?",difficult,vector,0
+105,An analysis compares the average of a single sample to a fixed reference point to determine whether they differ beyond sampling variability. What inferential test is appropriate ?,difficult,BM25,1
+105,An analysis compares the average of a single sample to a fixed reference point to determine whether they differ beyond sampling variability. What inferential test is appropriate ?,difficult,bm_vector_fusion,1
+105,An analysis compares the average of a single sample to a fixed reference point to determine whether they differ beyond sampling variability. What inferential test is appropriate ?,difficult,bm_vector_fusion_rerank,1
+105,An analysis compares the average of a single sample to a fixed reference point to determine whether they differ beyond sampling variability. What inferential test is appropriate ?,difficult,vector,1
+106,"Survey responses are classified into “strongly agree,” “agree,” “neutral,” “disagree,” and “strongly disagree.” I want to test whether these response proportions differ from an equal distribution. How can this be analyzed?",difficult,BM25,0
+106,"Survey responses are classified into “strongly agree,” “agree,” “neutral,” “disagree,” and “strongly disagree.” I want to test whether these response proportions differ from an equal distribution. How can this be analyzed?",difficult,bm_vector_fusion,1
+106,"Survey responses are classified into “strongly agree,” “agree,” “neutral,” “disagree,” and “strongly disagree.” I want to test whether these response proportions differ from an equal distribution. How can this be analyzed?",difficult,bm_vector_fusion_rerank,1
+106,"Survey responses are classified into “strongly agree,” “agree,” “neutral,” “disagree,” and “strongly disagree.” I want to test whether these response proportions differ from an equal distribution. How can this be analyzed?",difficult,vector,1
+107,"A chi-square test of independence reports χ² = 12.4, df = 4, p = .015. What does this result tell me about the relationship between the two categorical variables?",difficult,BM25,1
+107,"A chi-square test of independence reports χ² = 12.4, df = 4, p = .015. What does this result tell me about the relationship between the two categorical variables?",difficult,bm_vector_fusion,1
+107,"A chi-square test of independence reports χ² = 12.4, df = 4, p = .015. What does this result tell me about the relationship between the two categorical variables?",difficult,bm_vector_fusion_rerank,1
+107,"A chi-square test of independence reports χ² = 12.4, df = 4, p = .015. What does this result tell me about the relationship between the two categorical variables?",difficult,vector,1
+108,"Two unrelated groups are compared on a continuous outcome, and the analysis focuses on the difference between their average values. What inferential test is appropriate and how to run it in jasp?",difficult,BM25,1
+108,"Two unrelated groups are compared on a continuous outcome, and the analysis focuses on the difference between their average values. What inferential test is appropriate and how to run it in jasp?",difficult,bm_vector_fusion,1
+108,"Two unrelated groups are compared on a continuous outcome, and the analysis focuses on the difference between their average values. What inferential test is appropriate and how to run it in jasp?",difficult,bm_vector_fusion_rerank,1
+108,"Two unrelated groups are compared on a continuous outcome, and the analysis focuses on the difference between their average values. What inferential test is appropriate and how to run it in jasp?",difficult,vector,1
+109,"I planned to use an independent-samples t-test to compare two groups, but normality is violated and there are outliers. What nonparametric test is appropriate in this situation?",difficult,BM25,0
+109,"I planned to use an independent-samples t-test to compare two groups, but normality is violated and there are outliers. What nonparametric test is appropriate in this situation?",difficult,bm_vector_fusion,0
+109,"I planned to use an independent-samples t-test to compare two groups, but normality is violated and there are outliers. What nonparametric test is appropriate in this situation?",difficult,bm_vector_fusion_rerank,1
+109,"I planned to use an independent-samples t-test to compare two groups, but normality is violated and there are outliers. What nonparametric test is appropriate in this situation?",difficult,vector,1
+110,"I measured participants’ reaction times before and after a training session. Because the same individuals are measured twice, which statistical test should I use to compare the two time points?How to run it in jasp?",difficult,BM25,0
+110,"I measured participants’ reaction times before and after a training session. Because the same individuals are measured twice, which statistical test should I use to compare the two time points?How to run it in jasp?",difficult,bm_vector_fusion,0
+110,"I measured participants’ reaction times before and after a training session. Because the same individuals are measured twice, which statistical test should I use to compare the two time points?How to run it in jasp?",difficult,bm_vector_fusion_rerank,1
+110,"I measured participants’ reaction times before and after a training session. Because the same individuals are measured twice, which statistical test should I use to compare the two time points?How to run it in jasp?",difficult,vector,1
+111,"The same individuals were measured before and after an intervention. Because the data violate normality and contain outliers, I can’t rely on a paired t-test. What nonparametric alternative should I apply?",difficult,BM25,0
+111,"The same individuals were measured before and after an intervention. Because the data violate normality and contain outliers, I can’t rely on a paired t-test. What nonparametric alternative should I apply?",difficult,bm_vector_fusion,0
+111,"The same individuals were measured before and after an intervention. Because the data violate normality and contain outliers, I can’t rely on a paired t-test. What nonparametric alternative should I apply?",difficult,bm_vector_fusion_rerank,0
+111,"The same individuals were measured before and after an intervention. Because the data violate normality and contain outliers, I can’t rely on a paired t-test. What nonparametric alternative should I apply?",difficult,vector,0
+112,"What is the difference among regressions, like linear regression, multiple regression, and logistic regression?",difficult,BM25,1
+112,"What is the difference among regressions, like linear regression, multiple regression, and logistic regression?",difficult,bm_vector_fusion,1
+112,"What is the difference among regressions, like linear regression, multiple regression, and logistic regression?",difficult,bm_vector_fusion_rerank,1
+112,"What is the difference among regressions, like linear regression, multiple regression, and logistic regression?",difficult,vector,1
+113,"In a linear regression predictive equation, how should the intercept and slope parameters be interpreted with respect to the dependent variable?",difficult,BM25,0
+113,"In a linear regression predictive equation, how should the intercept and slope parameters be interpreted with respect to the dependent variable?",difficult,bm_vector_fusion,0
+113,"In a linear regression predictive equation, how should the intercept and slope parameters be interpreted with respect to the dependent variable?",difficult,bm_vector_fusion_rerank,0
+113,"In a linear regression predictive equation, how should the intercept and slope parameters be interpreted with respect to the dependent variable?",difficult,vector,0
+114,My data is continuous but violate normality assumptions. Which alternatives to Pearson’s correlation coefficient should I use?,difficult,BM25,1
+114,My data is continuous but violate normality assumptions. Which alternatives to Pearson’s correlation coefficient should I use?,difficult,bm_vector_fusion,1
+114,My data is continuous but violate normality assumptions. Which alternatives to Pearson’s correlation coefficient should I use?,difficult,bm_vector_fusion_rerank,1
+114,My data is continuous but violate normality assumptions. Which alternatives to Pearson’s correlation coefficient should I use?,difficult,vector,1
+115,"Test scores are approximately normally distributed within each of three independent groups, but the group variances look unequal. Can I still use a one-way ANOVA, and what assumptions matter most here?",difficult,BM25,1
+115,"Test scores are approximately normally distributed within each of three independent groups, but the group variances look unequal. Can I still use a one-way ANOVA, and what assumptions matter most here?",difficult,bm_vector_fusion,1
+115,"Test scores are approximately normally distributed within each of three independent groups, but the group variances look unequal. Can I still use a one-way ANOVA, and what assumptions matter most here?",difficult,bm_vector_fusion_rerank,1
+115,"Test scores are approximately normally distributed within each of three independent groups, but the group variances look unequal. Can I still use a one-way ANOVA, and what assumptions matter most here?",difficult,vector,1
+116,An ANOVA shows a significant effect of treatment type on recovery time across four groups. What follow-up analyses are appropriate to identify where the differences lie?,difficult,BM25,1
+116,An ANOVA shows a significant effect of treatment type on recovery time across four groups. What follow-up analyses are appropriate to identify where the differences lie?,difficult,bm_vector_fusion,1
+116,An ANOVA shows a significant effect of treatment type on recovery time across four groups. What follow-up analyses are appropriate to identify where the differences lie?,difficult,bm_vector_fusion_rerank,0
+116,An ANOVA shows a significant effect of treatment type on recovery time across four groups. What follow-up analyses are appropriate to identify where the differences lie?,difficult,vector,0
+117,"I’m comparing reaction times across three independent groups. The distributions are strongly skewed and normality is violated, but the groups are independent. Since the assumptions of a one-way ANOVA are not met, which statistical test should I use instead?",difficult,BM25,1
+117,"I’m comparing reaction times across three independent groups. The distributions are strongly skewed and normality is violated, but the groups are independent. Since the assumptions of a one-way ANOVA are not met, which statistical test should I use instead?",difficult,bm_vector_fusion,1
+117,"I’m comparing reaction times across three independent groups. The distributions are strongly skewed and normality is violated, but the groups are independent. Since the assumptions of a one-way ANOVA are not met, which statistical test should I use instead?",difficult,bm_vector_fusion_rerank,1
+117,"I’m comparing reaction times across three independent groups. The distributions are strongly skewed and normality is violated, but the groups are independent. Since the assumptions of a one-way ANOVA are not met, which statistical test should I use instead?",difficult,vector,1
+118,"The Kruskal–Wallis test reports a significant chi-square statistic. What does this tell me about differences between the groups, and what conclusions can I draw?",difficult,BM25,1
+118,"The Kruskal–Wallis test reports a significant chi-square statistic. What does this tell me about differences between the groups, and what conclusions can I draw?",difficult,bm_vector_fusion,1
+118,"The Kruskal–Wallis test reports a significant chi-square statistic. What does this tell me about differences between the groups, and what conclusions can I draw?",difficult,bm_vector_fusion_rerank,1
+118,"The Kruskal–Wallis test reports a significant chi-square statistic. What does this tell me about differences between the groups, and what conclusions can I draw?",difficult,vector,1
+119,"Three independent experimental conditions are compared on a continuous but non-normally distributed outcome. Because parametric assumptions fail, which inferential approach should be applied?",difficult,BM25,1
+119,"Three independent experimental conditions are compared on a continuous but non-normally distributed outcome. Because parametric assumptions fail, which inferential approach should be applied?",difficult,bm_vector_fusion,1
+119,"Three independent experimental conditions are compared on a continuous but non-normally distributed outcome. Because parametric assumptions fail, which inferential approach should be applied?",difficult,bm_vector_fusion_rerank,1
+119,"Three independent experimental conditions are compared on a continuous but non-normally distributed outcome. Because parametric assumptions fail, which inferential approach should be applied?",difficult,vector,1
+120,What are the main differences between parametric repeated-measures ANOVA and non-parametric alternatives?,difficult,BM25,1
+120,What are the main differences between parametric repeated-measures ANOVA and non-parametric alternatives?,difficult,bm_vector_fusion,1
+120,What are the main differences between parametric repeated-measures ANOVA and non-parametric alternatives?,difficult,bm_vector_fusion_rerank,1
+120,What are the main differences between parametric repeated-measures ANOVA and non-parametric alternatives?,difficult,vector,1
+121,"My mixed factor ANOVA reveals a significant within-subjects effect but a non-significant between-subjects effect, yet their interaction is significant, how should the pattern of results be explained?",difficult,BM25,1
+121,"My mixed factor ANOVA reveals a significant within-subjects effect but a non-significant between-subjects effect, yet their interaction is significant, how should the pattern of results be explained?",difficult,bm_vector_fusion,1
+121,"My mixed factor ANOVA reveals a significant within-subjects effect but a non-significant between-subjects effect, yet their interaction is significant, how should the pattern of results be explained?",difficult,bm_vector_fusion_rerank,1
+121,"My mixed factor ANOVA reveals a significant within-subjects effect but a non-significant between-subjects effect, yet their interaction is significant, how should the pattern of results be explained?",difficult,vector,1
+122,"The output shows different F-values and p-values for the same within-subject effect under “None,” “Greenhouse–Geisser,” and “Huynh–Feldt.” How should these results be interpreted and which should be reported?",difficult,BM25,1
+122,"The output shows different F-values and p-values for the same within-subject effect under “None,” “Greenhouse–Geisser,” and “Huynh–Feldt.” How should these results be interpreted and which should be reported?",difficult,bm_vector_fusion,1
+122,"The output shows different F-values and p-values for the same within-subject effect under “None,” “Greenhouse–Geisser,” and “Huynh–Feldt.” How should these results be interpreted and which should be reported?",difficult,bm_vector_fusion_rerank,1
+122,"The output shows different F-values and p-values for the same within-subject effect under “None,” “Greenhouse–Geisser,” and “Huynh–Feldt.” How should these results be interpreted and which should be reported?",difficult,vector,1
+123,"Repeated measurements were collected from participants across four sessions, but Mauchly’s test indicates severe violation of sphericity and the outcome variable is not continuous. What test be appropriate here, and why?",difficult,BM25,1
+123,"Repeated measurements were collected from participants across four sessions, but Mauchly’s test indicates severe violation of sphericity and the outcome variable is not continuous. What test be appropriate here, and why?",difficult,bm_vector_fusion,1
+123,"Repeated measurements were collected from participants across four sessions, but Mauchly’s test indicates severe violation of sphericity and the outcome variable is not continuous. What test be appropriate here, and why?",difficult,bm_vector_fusion_rerank,1
+123,"Repeated measurements were collected from participants across four sessions, but Mauchly’s test indicates severe violation of sphericity and the outcome variable is not continuous. What test be appropriate here, and why?",difficult,vector,1
+124,"I have a 2×3 design with two independent variables, and each participant belongs to only one level of each factor. How do I analyze this using ANOVA in JASP?",difficult,BM25,1
+124,"I have a 2×3 design with two independent variables, and each participant belongs to only one level of each factor. How do I analyze this using ANOVA in JASP?",difficult,bm_vector_fusion,1
+124,"I have a 2×3 design with two independent variables, and each participant belongs to only one level of each factor. How do I analyze this using ANOVA in JASP?",difficult,bm_vector_fusion_rerank,1
+124,"I have a 2×3 design with two independent variables, and each participant belongs to only one level of each factor. How do I analyze this using ANOVA in JASP?",difficult,vector,1
+125,"I measured participants’ memory scores at three time points—pre-test, mid-test, and post-test. How do I analyze whether their performance changed over time in JASP?",difficult,BM25,1
+125,"I measured participants’ memory scores at three time points—pre-test, mid-test, and post-test. How do I analyze whether their performance changed over time in JASP?",difficult,bm_vector_fusion,1
+125,"I measured participants’ memory scores at three time points—pre-test, mid-test, and post-test. How do I analyze whether their performance changed over time in JASP?",difficult,bm_vector_fusion_rerank,1
+125,"I measured participants’ memory scores at three time points—pre-test, mid-test, and post-test. How do I analyze whether their performance changed over time in JASP?",difficult,vector,1
+126,"Participants completed the task under both condition A and condition B, and their performance was measured before and after training. Which statistical test should be used to examine the main effects of Condition, Time, and their interaction?",difficult,BM25,1
+126,"Participants completed the task under both condition A and condition B, and their performance was measured before and after training. Which statistical test should be used to examine the main effects of Condition, Time, and their interaction?",difficult,bm_vector_fusion,1
+126,"Participants completed the task under both condition A and condition B, and their performance was measured before and after training. Which statistical test should be used to examine the main effects of Condition, Time, and their interaction?",difficult,bm_vector_fusion_rerank,1
+126,"Participants completed the task under both condition A and condition B, and their performance was measured before and after training. Which statistical test should be used to examine the main effects of Condition, Time, and their interaction?",difficult,vector,0
+127,I have two groups—treatment and control—and I measured their anxiety levels at pre-test and post-test. Should I run a mixed ANOVA in JASP to see whether the groups changed differently over time?,difficult,BM25,1
+127,I have two groups—treatment and control—and I measured their anxiety levels at pre-test and post-test. Should I run a mixed ANOVA in JASP to see whether the groups changed differently over time?,difficult,bm_vector_fusion,1
+127,I have two groups—treatment and control—and I measured their anxiety levels at pre-test and post-test. Should I run a mixed ANOVA in JASP to see whether the groups changed differently over time?,difficult,bm_vector_fusion_rerank,1
+127,I have two groups—treatment and control—and I measured their anxiety levels at pre-test and post-test. Should I run a mixed ANOVA in JASP to see whether the groups changed differently over time?,difficult,vector,1
+128,"Participants were assigned to either condition A or condition B, and their performance was measured both before and after training. Which statistical test should be used to assess the effects of Condition, Time, and their interaction?",difficult,BM25,1
+128,"Participants were assigned to either condition A or condition B, and their performance was measured both before and after training. Which statistical test should be used to assess the effects of Condition, Time, and their interaction?",difficult,bm_vector_fusion,1
+128,"Participants were assigned to either condition A or condition B, and their performance was measured both before and after training. Which statistical test should be used to assess the effects of Condition, Time, and their interaction?",difficult,bm_vector_fusion_rerank,0
+128,"Participants were assigned to either condition A or condition B, and their performance was measured both before and after training. Which statistical test should be used to assess the effects of Condition, Time, and their interaction?",difficult,vector,0
+129,I want to compare post-test performance between two groups while statistically controlling for participants’ pre-test scores. Which analysis should I use?,difficult,BM25,1
+129,I want to compare post-test performance between two groups while statistically controlling for participants’ pre-test scores. Which analysis should I use?,difficult,bm_vector_fusion,1
+129,I want to compare post-test performance between two groups while statistically controlling for participants’ pre-test scores. Which analysis should I use?,difficult,bm_vector_fusion_rerank,1
+129,I want to compare post-test performance between two groups while statistically controlling for participants’ pre-test scores. Which analysis should I use?,difficult,vector,0
+130,Participants are classified into categories based on treatment group and outcome (success vs failure). How can I examine whether the distribution of outcomes differs between groups?,difficult,BM25,0
+130,Participants are classified into categories based on treatment group and outcome (success vs failure). How can I examine whether the distribution of outcomes differs between groups?,difficult,bm_vector_fusion,0
+130,Participants are classified into categories based on treatment group and outcome (success vs failure). How can I examine whether the distribution of outcomes differs between groups?,difficult,bm_vector_fusion_rerank,0
+130,Participants are classified into categories based on treatment group and outcome (success vs failure). How can I examine whether the distribution of outcomes differs between groups?,difficult,vector,0
+131,"Counts of observations are summarized in a contingency table, and the goal is to determine whether the observed frequencies deviate from what would be expected if the variables were independent. What statistical test is appropriate?",difficult,BM25,1
+131,"Counts of observations are summarized in a contingency table, and the goal is to determine whether the observed frequencies deviate from what would be expected if the variables were independent. What statistical test is appropriate?",difficult,bm_vector_fusion,1
+131,"Counts of observations are summarized in a contingency table, and the goal is to determine whether the observed frequencies deviate from what would be expected if the variables were independent. What statistical test is appropriate?",difficult,bm_vector_fusion_rerank,1
+131,"Counts of observations are summarized in a contingency table, and the goal is to determine whether the observed frequencies deviate from what would be expected if the variables were independent. What statistical test is appropriate?",difficult,vector,1
+132,"I have extracted effect sizes and standard errors from multiple independent studies—how can I perform a frequentist (classical) meta-analysis in JASP, including model selection and heterogeneity assessment?",difficult,BM25,1
+132,"I have extracted effect sizes and standard errors from multiple independent studies—how can I perform a frequentist (classical) meta-analysis in JASP, including model selection and heterogeneity assessment?",difficult,bm_vector_fusion,1
+132,"I have extracted effect sizes and standard errors from multiple independent studies—how can I perform a frequentist (classical) meta-analysis in JASP, including model selection and heterogeneity assessment?",difficult,bm_vector_fusion_rerank,1
+132,"I have extracted effect sizes and standard errors from multiple independent studies—how can I perform a frequentist (classical) meta-analysis in JASP, including model selection and heterogeneity assessment?",difficult,vector,1
+133,"Once predictors and a binary response are defined, how do I fit and interpret a frequentist logistic regression model in JASP, including odds ratios and goodness-of-fit measures?",difficult,BM25,1
+133,"Once predictors and a binary response are defined, how do I fit and interpret a frequentist logistic regression model in JASP, including odds ratios and goodness-of-fit measures?",difficult,bm_vector_fusion,1
+133,"Once predictors and a binary response are defined, how do I fit and interpret a frequentist logistic regression model in JASP, including odds ratios and goodness-of-fit measures?",difficult,bm_vector_fusion_rerank,1
+133,"Once predictors and a binary response are defined, how do I fit and interpret a frequentist logistic regression model in JASP, including odds ratios and goodness-of-fit measures?",difficult,vector,1
+134,"I expect baseline performance to differ between subjects, but also think the effect of condition varies by subject. How do I specify both random intercepts and random slopes in JASP, and how do I know if the extra complexity is justified?",difficult,BM25,1
+134,"I expect baseline performance to differ between subjects, but also think the effect of condition varies by subject. How do I specify both random intercepts and random slopes in JASP, and how do I know if the extra complexity is justified?",difficult,bm_vector_fusion,1
+134,"I expect baseline performance to differ between subjects, but also think the effect of condition varies by subject. How do I specify both random intercepts and random slopes in JASP, and how do I know if the extra complexity is justified?",difficult,bm_vector_fusion_rerank,1
+134,"I expect baseline performance to differ between subjects, but also think the effect of condition varies by subject. How do I specify both random intercepts and random slopes in JASP, and how do I know if the extra complexity is justified?",difficult,vector,1
+135,"My outcome variable has a few extreme values. In a Bayesian linear regression, what assumptions about error distribution am I making, and how should outliers be handled?",difficult,BM25,0
+135,"My outcome variable has a few extreme values. In a Bayesian linear regression, what assumptions about error distribution am I making, and how should outliers be handled?",difficult,bm_vector_fusion,1
+135,"My outcome variable has a few extreme values. In a Bayesian linear regression, what assumptions about error distribution am I making, and how should outliers be handled?",difficult,bm_vector_fusion_rerank,1
+135,"My outcome variable has a few extreme values. In a Bayesian linear regression, what assumptions about error distribution am I making, and how should outliers be handled?",difficult,vector,1
+136,I’m analyzing the relationship between marketing spend and monthly revenue using Bayesian correlation. The Bayes Factor is close to 1—what does this mean for making business decisions?,difficult,BM25,1
+136,I’m analyzing the relationship between marketing spend and monthly revenue using Bayesian correlation. The Bayes Factor is close to 1—what does this mean for making business decisions?,difficult,bm_vector_fusion,1
+136,I’m analyzing the relationship between marketing spend and monthly revenue using Bayesian correlation. The Bayes Factor is close to 1—what does this mean for making business decisions?,difficult,bm_vector_fusion_rerank,1
+136,I’m analyzing the relationship between marketing spend and monthly revenue using Bayesian correlation. The Bayes Factor is close to 1—what does this mean for making business decisions?,difficult,vector,1
+137,"I’m analyzing whether patients adhered to treatment (yes/no) based on age and dosage. How do I decide which probability distribution and link function to use, and how should predictors be included in the generalized linear model?",difficult,BM25,1
+137,"I’m analyzing whether patients adhered to treatment (yes/no) based on age and dosage. How do I decide which probability distribution and link function to use, and how should predictors be included in the generalized linear model?",difficult,bm_vector_fusion,1
+137,"I’m analyzing whether patients adhered to treatment (yes/no) based on age and dosage. How do I decide which probability distribution and link function to use, and how should predictors be included in the generalized linear model?",difficult,bm_vector_fusion_rerank,1
+137,"I’m analyzing whether patients adhered to treatment (yes/no) based on age and dosage. How do I decide which probability distribution and link function to use, and how should predictors be included in the generalized linear model?",difficult,vector,1
+138,"I have repeated measures data from a psychology experiment and need a video that walks through a repeated-measures ANOVA step-by-step (including assumptions, calculations, and interpretation). Can you show me a tutorial video that does that?",difficult,BM25,1
+138,"I have repeated measures data from a psychology experiment and need a video that walks through a repeated-measures ANOVA step-by-step (including assumptions, calculations, and interpretation). Can you show me a tutorial video that does that?",difficult,bm_vector_fusion,1
+138,"I have repeated measures data from a psychology experiment and need a video that walks through a repeated-measures ANOVA step-by-step (including assumptions, calculations, and interpretation). Can you show me a tutorial video that does that?",difficult,bm_vector_fusion_rerank,1
+138,"I have repeated measures data from a psychology experiment and need a video that walks through a repeated-measures ANOVA step-by-step (including assumptions, calculations, and interpretation). Can you show me a tutorial video that does that?",difficult,vector,1
+139,"I’ve never used JASP before. Can you give me a general introduction video explaining what JASP is used for, it’s designed for and how to use it?",difficult,BM25,0
+139,"I’ve never used JASP before. Can you give me a general introduction video explaining what JASP is used for, it’s designed for and how to use it?",difficult,bm_vector_fusion,1
+139,"I’ve never used JASP before. Can you give me a general introduction video explaining what JASP is used for, it’s designed for and how to use it?",difficult,bm_vector_fusion_rerank,1
+139,"I’ve never used JASP before. Can you give me a general introduction video explaining what JASP is used for, it’s designed for and how to use it?",difficult,vector,1
+140,"I’m evaluating a RAG system using two performance metrics: success@k (binary per query) and nDCG@k (continuous, bounded between 0 and 1). Each query is tested under multiple retrieval modes and difficulty levels, so the same query appears multiple times. I want to test whether retrieval mode and difficulty level have main effects or an interaction effect on performance. Given this repeated-measures structure and mixed outcome types, can generalized linear mixed models be used?",difficult,BM25,1
+140,"I’m evaluating a RAG system using two performance metrics: success@k (binary per query) and nDCG@k (continuous, bounded between 0 and 1). Each query is tested under multiple retrieval modes and difficulty levels, so the same query appears multiple times. I want to test whether retrieval mode and difficulty level have main effects or an interaction effect on performance. Given this repeated-measures structure and mixed outcome types, can generalized linear mixed models be used?",difficult,bm_vector_fusion,1
+140,"I’m evaluating a RAG system using two performance metrics: success@k (binary per query) and nDCG@k (continuous, bounded between 0 and 1). Each query is tested under multiple retrieval modes and difficulty levels, so the same query appears multiple times. I want to test whether retrieval mode and difficulty level have main effects or an interaction effect on performance. Given this repeated-measures structure and mixed outcome types, can generalized linear mixed models be used?",difficult,bm_vector_fusion_rerank,1
+140,"I’m evaluating a RAG system using two performance metrics: success@k (binary per query) and nDCG@k (continuous, bounded between 0 and 1). Each query is tested under multiple retrieval modes and difficulty levels, so the same query appears multiple times. I want to test whether retrieval mode and difficulty level have main effects or an interaction effect on performance. Given this repeated-measures structure and mixed outcome types, can generalized linear mixed models be used?",difficult,vector,1

@@ -126,8 +126,8 @@ COLLECTION_NAME = "jasp_manual_embeddings_v2"
 EMBED_MODEL = "BAAI/bge-large-en-v1.5"
 CHUNKS_JSON = "/Users/ywxiu/jasp-multimodal-rag/data/processed/chunks/"
 
-K_SEMANTIC = 10
-K_BM25 = 10
+K_SEMANTIC = 20
+K_BM25 = 20
 BOOST_WEIGHT = 5
 RRF_K = 120
 TOP_AFTER_RRF = 10
@@ -486,9 +486,9 @@ def rrf_fuse(results_a, results_b, k=RRF_K, top_n=TOP_AFTER_RRF):
 # --------------------------------------------------
 # CROSS-ENCODER RERANK
 # --------------------------------------------------
-
-def rerank_cross_encoder(nodes: List[NodeWithScore], query: str, top_k: int = TOP_FINAL) -> List[NodeWithScore]:
-    """Apply cross-encoder reranking (BGE preferred) with positive-score filtering."""
+#version 1:filtered
+def rerank_cross_encoder_filtered(nodes: List[NodeWithScore], query: str, top_k: int = TOP_FINAL) -> List[NodeWithScore]:
+    """Apply cross-encoder reranking (BGE preferred) with threshold filtering."""
     if not nodes:
         logger.warning("⚠️ No retrieved nodes to rerank.")
         return []
@@ -520,6 +520,37 @@ def rerank_cross_encoder(nodes: List[NodeWithScore], query: str, top_k: int = TO
 
     return filtered
 
+#version 2:no filter, used in protocol
+def rerank_cross_encoder(nodes: List[NodeWithScore], query: str, top_k: int = TOP_FINAL) -> List[NodeWithScore]:
+    """Apply cross-encoder reranking (BGE preferred). Always return top_k results (no threshold filtering)."""
+    if not nodes:
+        logger.warning("⚠️ No retrieved nodes to rerank.")
+        return []
+
+    results: List[NodeWithScore] = []
+    if FlagEmbeddingReranker is not None:
+        logger.info(f"⚙️ Cross-encoder rerank with BGE model: {BGE_RERANKER}")
+        reranker = FlagEmbeddingReranker(
+            model=BGE_RERANKER,
+            top_n=top_k,
+            use_fp16=True,
+        )
+        results = reranker.postprocess_nodes(nodes, query_str=query)
+        logger.success("✅ Reranking completed with FlagEmbeddingReranker")
+
+    elif SentenceTransformerRerank is not None:
+        logger.info(f"⚙️ Cross-encoder rerank with SentenceTransformer fallback: {ST_CE_FALLBACK}")
+        reranker = SentenceTransformerRerank(model=ST_CE_FALLBACK, top_n=top_k)
+        results = reranker.postprocess_nodes(nodes, query_str=query)
+
+    else:
+        logger.warning("⚠️ No cross-encoder available — skipping rerank.")
+        results = nodes[:top_k]
+
+    # --- minimal change: remove score threshold filtering ---
+    logger.info(f"📊 Returning top {len(results)} nodes (no score threshold applied)")
+
+    return results[:top_k]   # ensure still exactly top_k
 
 
 # helper for FastAPI backend to avoid rebuilding everything every request.
@@ -578,7 +609,7 @@ def retrieve_top_k(
                 2) RRF fusion of both ranked lists
                 3) Cross-encoder reranking (BGE reranker if available,
                    otherwise MiniLM fallback)
-                4) Filter out extremely low scores using SCORE_THRESHOLD.
+            
 
     Args:
         query:

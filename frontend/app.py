@@ -255,7 +255,7 @@ def get_retrieval_mode_from_sidebar():
     except ValueError:
         default_index = 0 if modes else 0
 
-    st.sidebar.markdown("### 🦞 Retrieval Mode Settings")
+    st.sidebar.markdown("🦞 Retrieval Settings")
     mode = st.sidebar.selectbox(
         "Retrieval mode:",
         modes,
@@ -306,13 +306,13 @@ def main():
     retrieval_mode = get_retrieval_mode_from_sidebar()
 
     st.sidebar.markdown("---")
-    st.sidebar.title("🦄 AI generated Answers")
+    st.sidebar.title("🦄 Generation Settings")
 
     model = st.sidebar.selectbox(
-        "Select model (Ollama):",
+        "Generation model (Ollama):",
         ["mistral:7b", "llama3.2:3b", "phi3:mini"],
     )
-    generate_answer_btn = st.sidebar.button("Generate Answer")
+    generate_answer_btn = st.sidebar.button("Try AI Generation Answer")
 
     # AI Answer block under the Generate Answer button
     if st.session_state["answer"]:

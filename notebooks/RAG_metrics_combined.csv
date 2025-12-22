@@ -1,5 +1,121 @@
 QID,Question,Difficulty Level,Retrieval Mode,Success@k,Precision@k,Recall@k,nDCG@k
-1,How do I open a dataset and view it in JASP?,easy,BM25,0,0.0,0.0,0.8503449055347546
-1,How do I open a dataset and view it in JASP?,easy,bm_vector_fusion,1,0.2,1.0,0.7075790686744426
-1,How do I open a dataset and view it in JASP?,easy,bm_vector_fusion_rerank,1,0.2,1.0,1.0
-1,How do I open a dataset and view it in JASP?,easy,vector,1,0.4,1.0,0.9128781396400242
+1,How do I open a dataset and view it in JASP?,easy,BM25,0,0.4,0.0,0.8503449055347546
+1,How do I open a dataset and view it in JASP?,easy,bm_vector_fusion,1,0.6,0.5,0.7075790686744426
+1,How do I open a dataset and view it in JASP?,easy,bm_vector_fusion_rerank,1,0.6,0.5,1.0
+1,How do I open a dataset and view it in JASP?,easy,vector,1,0.6,0.5,0.9128781396400242
+2,How can I save or export a JASP data file in JASP?,easy,BM25,1,0.8,0.5,0.6776636931349654
+2,How can I save or export a JASP data file in JASP?,easy,bm_vector_fusion,1,0.8,0.5,0.7025429713312312
+2,How can I save or export a JASP data file in JASP?,easy,bm_vector_fusion_rerank,1,1.0,0.5,0.7521866188906461
+2,How can I save or export a JASP data file in JASP?,easy,vector,1,0.6,0.5,0.7075790686744426
+3,How to set up results preferences in JASP?,easy,BM25,0,0.4,0.0,0.5437713091520254
+3,How to set up results preferences in JASP?,easy,bm_vector_fusion,0,0.4,0.0,1.0
+3,How to set up results preferences in JASP?,easy,bm_vector_fusion_rerank,0,0.4,0.0,0.8772153153380493
+3,How to set up results preferences in JASP?,easy,vector,0,0.6,0.0,0.9469024295259745
+4,How can I check for outliers in my dataset using JASP?,easy,BM25,1,0.4,1.0,0.944847956559586
+4,How can I check for outliers in my dataset using JASP?,easy,bm_vector_fusion,1,0.4,1.0,1.0
+4,How can I check for outliers in my dataset using JASP?,easy,bm_vector_fusion_rerank,1,0.4,1.0,1.0
+4,How can I check for outliers in my dataset using JASP?,easy,vector,1,0.2,1.0,1.0
+5,What are the assumptions of a one-sample t-test?,easy,BM25,1,0.6,1.0,0.9514426589871553
+5,What are the assumptions of a one-sample t-test?,easy,bm_vector_fusion,1,0.8,1.0,0.9935774939007994
+5,What are the assumptions of a one-sample t-test?,easy,bm_vector_fusion_rerank,1,1.0,1.0,0.9807710461847231
+5,What are the assumptions of a one-sample t-test?,easy,vector,1,0.8,1.0,0.9935774939007994
+6,How do I perform a multinomial test in JASP ?,easy,BM25,1,0.8,0.5,0.9047172294870752
+6,How do I perform a multinomial test in JASP ?,easy,bm_vector_fusion,1,0.8,0.75,0.9558295932317544
+6,How do I perform a multinomial test in JASP ?,easy,bm_vector_fusion_rerank,1,1.0,0.75,1.0
+6,How do I perform a multinomial test in JASP ?,easy,vector,1,1.0,0.5,0.9719643720954755
+7,How to interpret the chi-square output?,easy,BM25,1,0.8,0.6666666666666666,0.9805704719000117
+7,How to interpret the chi-square output?,easy,bm_vector_fusion,1,0.4,0.6666666666666666,1.0
+7,How to interpret the chi-square output?,easy,bm_vector_fusion_rerank,1,0.6,1.0,0.7122630665145961
+7,How to interpret the chi-square output?,easy,vector,1,0.4,0.6666666666666666,0.9197207891481876
+8,How do I set up an independent samples t-test in JASP?,easy,BM25,0,0.0,0.0,0.0
+8,How do I set up an independent samples t-test in JASP?,easy,bm_vector_fusion,0,0.0,0.0,0.0
+8,How do I set up an independent samples t-test in JASP?,easy,bm_vector_fusion_rerank,1,0.6,1.0,0.940914767159646
+8,How do I set up an independent samples t-test in JASP?,easy,vector,1,0.6,1.0,0.6460523621555107
+9,How do I run a Mann–Whitney U test for non-normal data in JASP?,easy,BM25,1,0.2,1.0,1.0
+9,How do I run a Mann–Whitney U test for non-normal data in JASP?,easy,bm_vector_fusion,1,0.4,1.0,0.9197207891481876
+9,How do I run a Mann–Whitney U test for non-normal data in JASP?,easy,bm_vector_fusion_rerank,1,0.4,1.0,1.0
+9,How do I run a Mann–Whitney U test for non-normal data in JASP?,easy,vector,1,0.4,1.0,0.9639404333166532
+10,How do I run a paired-samples t-test in JASP?,easy,BM25,1,0.6,1.0,0.8529278650606569
+10,How do I run a paired-samples t-test in JASP?,easy,bm_vector_fusion,1,0.4,0.5,1.0
+10,How do I run a paired-samples t-test in JASP?,easy,bm_vector_fusion_rerank,1,0.6,1.0,0.9060254355346824
+10,How do I run a paired-samples t-test in JASP?,easy,vector,1,0.4,0.5,1.0
+11,How do I perform a Wilcoxon signed-rank test for related samples in JASP,easy,BM25,1,0.6,1.0,0.9469024295259745
+11,How do I perform a Wilcoxon signed-rank test for related samples in JASP,easy,bm_vector_fusion,1,0.4,0.5,0.9639404333166532
+11,How do I perform a Wilcoxon signed-rank test for related samples in JASP,easy,bm_vector_fusion_rerank,1,0.6,1.0,0.9674679834891694
+11,How do I perform a Wilcoxon signed-rank test for related samples in JASP,easy,vector,1,0.4,0.5,0.4935456744811716
+12,How do I run a regression analysis in JASP?,easy,BM25,0,0.0,0.0,0.0
+12,How do I run a regression analysis in JASP?,easy,bm_vector_fusion,0,0.0,0.0,0.0
+12,How do I run a regression analysis in JASP?,easy,bm_vector_fusion_rerank,0,0.0,0.0,0.0
+12,How do I run a regression analysis in JASP?,easy,vector,0,0.2,0.0,0.43067655807339306
+13,How do I specify predictors and outcome variables in JASP’s regression module?,easy,BM25,1,0.8,1.0,0.7606395682357036
+13,How do I specify predictors and outcome variables in JASP’s regression module?,easy,bm_vector_fusion,0,0.0,0.25,0.0
+13,How do I specify predictors and outcome variables in JASP’s regression module?,easy,bm_vector_fusion_rerank,1,0.8,1.0,1.0
+13,How do I specify predictors and outcome variables in JASP’s regression module?,easy,vector,1,0.2,0.25,1.0
+14,What output does JASP provide for correlation analysis?,easy,BM25,0,0.0,0.0,0.0
+14,What output does JASP provide for correlation analysis?,easy,bm_vector_fusion,0,0.0,0.0,0.0
+14,What output does JASP provide for correlation analysis?,easy,bm_vector_fusion_rerank,0,0.0,0.0,0.0
+14,What output does JASP provide for correlation analysis?,easy,vector,0,0.0,0.0,0.0
+15,How do I run a one-way ANOVA for more than two groups in JASP?,easy,BM25,1,0.6,1.0,0.6460523621555107
+15,How do I run a one-way ANOVA for more than two groups in JASP?,easy,bm_vector_fusion,1,0.4,1.0,1.0
+15,How do I run a one-way ANOVA for more than two groups in JASP?,easy,bm_vector_fusion_rerank,1,0.4,1.0,1.0
+15,How do I run a one-way ANOVA for more than two groups in JASP?,easy,vector,1,0.4,0.5,0.531730627995306
+16,How to choose appropriate post-hoc tests for ANOVA  in JASP?,easy,BM25,1,1.0,0.8,0.8480742992651265
+16,How to choose appropriate post-hoc tests for ANOVA  in JASP?,easy,bm_vector_fusion,1,1.0,0.8,1.0
+16,How to choose appropriate post-hoc tests for ANOVA  in JASP?,easy,bm_vector_fusion_rerank,1,1.0,0.8,0.9719643720954755
+16,How to choose appropriate post-hoc tests for ANOVA  in JASP?,easy,vector,1,1.0,0.8,0.989141344633751
+17,How do I check assumptions before running ANOVA in JASP?,easy,BM25,1,0.8,0.6,0.7606395682357036
+17,How do I check assumptions before running ANOVA in JASP?,easy,bm_vector_fusion,1,1.0,1.0,1.0
+17,How do I check assumptions before running ANOVA in JASP?,easy,bm_vector_fusion_rerank,1,1.0,1.0,1.0
+17,How do I check assumptions before running ANOVA in JASP?,easy,vector,1,1.0,1.0,1.0
+18,How do I perform a Kruskal–Wallis test for non-normal multi-group data in JASP?,easy,BM25,1,0.6,0.6666666666666666,1.0
+18,How do I perform a Kruskal–Wallis test for non-normal multi-group data in JASP?,easy,bm_vector_fusion,1,1.0,0.6666666666666666,0.9578347709816888
+18,How do I perform a Kruskal–Wallis test for non-normal multi-group data in JASP?,easy,bm_vector_fusion_rerank,1,1.0,1.0,1.0
+18,How do I perform a Kruskal–Wallis test for non-normal multi-group data in JASP?,easy,vector,1,0.8,0.6666666666666666,1.0
+19,Where is the nonparametric ANOVA option located in the menu?,easy,BM25,1,0.4,1.0,0.8772153153380493
+19,Where is the nonparametric ANOVA option located in the menu?,easy,bm_vector_fusion,1,0.6,1.0,0.9061827879747687
+19,Where is the nonparametric ANOVA option located in the menu?,easy,bm_vector_fusion_rerank,1,0.8,1.0,0.9550337350142764
+19,Where is the nonparametric ANOVA option located in the menu?,easy,vector,1,0.4,0.5,0.6885288809404666
+20,How do I run a repeated-measures ANOVA in JASP?,easy,BM25,1,1.0,1.0,1.0
+20,How do I run a repeated-measures ANOVA in JASP?,easy,bm_vector_fusion,1,1.0,1.0,0.9395225786842205
+20,How do I run a repeated-measures ANOVA in JASP?,easy,bm_vector_fusion_rerank,1,1.0,1.0,1.0
+20,How do I run a repeated-measures ANOVA in JASP?,easy,vector,1,1.0,0.6666666666666666,0.9395225786842205
+21,How do I specify within-subject factors and levels in JASP?,easy,BM25,1,1.0,0.6666666666666666,0.9807710461847231
+21,How do I specify within-subject factors and levels in JASP?,easy,bm_vector_fusion,1,0.6,0.3333333333333333,0.8676182686276376
+21,How do I specify within-subject factors and levels in JASP?,easy,bm_vector_fusion_rerank,1,0.6,0.6666666666666666,1.0
+21,How do I specify within-subject factors and levels in JASP?,easy,vector,1,0.2,0.3333333333333333,0.38685280723454163
+22,"What output does JASP give (F-values, sphericity tests, etc.) for RM-ANOVA?",easy,BM25,1,1.0,1.0,1.0
+22,"What output does JASP give (F-values, sphericity tests, etc.) for RM-ANOVA?",easy,bm_vector_fusion,1,0.6,0.25,1.0
+22,"What output does JASP give (F-values, sphericity tests, etc.) for RM-ANOVA?",easy,bm_vector_fusion_rerank,1,0.4,0.25,0.9327783893101107
+22,"What output does JASP give (F-values, sphericity tests, etc.) for RM-ANOVA?",easy,vector,1,0.6,0.25,0.6484938358340886
+23,How do I conduct a Friedman test for non-parametric repeated-measures data in JASP?,easy,BM25,1,0.4,1.0,0.8503449055347546
+23,How do I conduct a Friedman test for non-parametric repeated-measures data in JASP?,easy,bm_vector_fusion,1,0.4,1.0,1.0
+23,How do I conduct a Friedman test for non-parametric repeated-measures data in JASP?,easy,bm_vector_fusion_rerank,1,0.6,1.0,1.0
+23,How do I conduct a Friedman test for non-parametric repeated-measures data in JASP?,easy,vector,1,0.4,1.0,1.0
+24,How to run factorial ANOVA in JASP?,easy,BM25,0,0.2,0.0,0.5
+24,How to run factorial ANOVA in JASP?,easy,bm_vector_fusion,1,0.2,1.0,0.5
+24,How to run factorial ANOVA in JASP?,easy,bm_vector_fusion_rerank,1,0.2,1.0,1.0
+24,How to run factorial ANOVA in JASP?,easy,vector,0,0.0,0.0,0.0
+25,How do I interpret main effects and interactions in the JASP ANOVA output?,easy,BM25,1,0.8,0.8,1.0
+25,How do I interpret main effects and interactions in the JASP ANOVA output?,easy,bm_vector_fusion,1,1.0,0.8,1.0
+25,How do I interpret main effects and interactions in the JASP ANOVA output?,easy,bm_vector_fusion_rerank,1,1.0,1.0,1.0
+25,How do I interpret main effects and interactions in the JASP ANOVA output?,easy,vector,1,0.6,0.2,1.0
+26,How do I run a two-factor repeated-measures ANOVA (two within-subject variables) in JASP?,easy,BM25,1,0.4,0.5,0.58688267143572
+26,How do I run a two-factor repeated-measures ANOVA (two within-subject variables) in JASP?,easy,bm_vector_fusion,1,0.4,1.0,0.5437713091520254
+26,How do I run a two-factor repeated-measures ANOVA (two within-subject variables) in JASP?,easy,bm_vector_fusion_rerank,1,0.4,1.0,1.0
+26,How do I run a two-factor repeated-measures ANOVA (two within-subject variables) in JASP?,easy,vector,1,0.4,0.5,0.6885288809404666
+27,How do I set up a mixed (within- and between-subjects) ANOVA in JASP?,easy,BM25,1,0.6,1.0,0.9674679834891694
+27,How do I set up a mixed (within- and between-subjects) ANOVA in JASP?,easy,bm_vector_fusion,1,0.6,1.0,1.0
+27,How do I set up a mixed (within- and between-subjects) ANOVA in JASP?,easy,bm_vector_fusion_rerank,1,0.6,1.0,1.0
+27,How do I set up a mixed (within- and between-subjects) ANOVA in JASP?,easy,vector,1,0.4,1.0,0.6934264036172708
+28,How to interpret interaction effects in mixed ANOVA?,easy,BM25,1,0.6,1.0,0.9469024295259745
+28,How to interpret interaction effects in mixed ANOVA?,easy,bm_vector_fusion,1,0.4,0.5,1.0
+28,How to interpret interaction effects in mixed ANOVA?,easy,bm_vector_fusion_rerank,1,0.4,0.5,1.0
+28,How to interpret interaction effects in mixed ANOVA?,easy,vector,1,0.4,0.5,1.0
+29,How to interpret ANCOVA outputs?,easy,BM25,1,0.6,0.5,0.9061827879747687
+29,How to interpret ANCOVA outputs?,easy,bm_vector_fusion,1,1.0,1.0,0.9355095261428396
+29,How to interpret ANCOVA outputs?,easy,bm_vector_fusion_rerank,1,0.8,1.0,0.6991835908151116
+29,How to interpret ANCOVA outputs?,easy,vector,1,1.0,1.0,0.9578347709816888
+30,How do I perform a chi-square test of association for two categorical variables in JASP?,easy,BM25,1,0.2,1.0,1.0
+30,How do I perform a chi-square test of association for two categorical variables in JASP?,easy,bm_vector_fusion,1,0.2,1.0,1.0
+30,How do I perform a chi-square test of association for two categorical variables in JASP?,easy,bm_vector_fusion_rerank,1,0.2,1.0,1.0
+30,How do I perform a chi-square test of association for two categorical variables in JASP?,easy,vector,1,0.2,1.0,1.0
