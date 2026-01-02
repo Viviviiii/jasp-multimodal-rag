@@ -79,7 +79,8 @@ Example:
 # Structure
 |-- README.md #High-level overview of the project, setup instructions, and how everything works.
 
-|-- data      #Stores raw, processed, and intermediate datasets used by the RAG pipeline.
+|-- data      #Stores raw, processed, and intermediate datasets used by the RAG pipeline. 
+              "data/rag jasp data.xlsx"contains all the data of the thesis, like questions,retrieved chunks,humanrating and thesis tables.
 
 |-- src       #Main source code containing all modular components of the ingestion→retrieval→generation pipeline.
 
@@ -161,6 +162,6 @@ Example:
 
 # update: When you make changes in VS Code:
 git add .
-git commit -m "full pipeline version_9:fixed k"
+git commit -m "full pipeline version_final"
 git push
 
