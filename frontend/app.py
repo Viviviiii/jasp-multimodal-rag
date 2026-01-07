@@ -428,7 +428,7 @@ def main():
             status_box.info("🐝🐝🐝 AI is thinking...")
 
             try:
-                resp = requests.post(GENERATE_URL, json=payload, timeout=60)
+                resp = requests.post(GENERATE_URL, json=payload, timeout=600)
             except Exception as e:
                 status_box.error(f"🐞 NETWORK ERROR: {e}")
                 return
